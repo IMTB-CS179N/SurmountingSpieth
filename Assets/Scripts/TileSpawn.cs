@@ -4,36 +4,47 @@ using UnityEngine;
 
 public class TileSpawn : MonoBehaviour
 {
+    [SerializeField]
+    int numTiles = 4;
     public GameObject shop;
     public PlayerMove player;
+
     // float moveSpeed = 1f;
     List<GameObject> tiles = new List<GameObject>();
+    int random_num;
+
+    int PATH_X_LENGTH = 50;
+
+    // int X_BOUNDS = 100;
+    int Y_BOUNDS = 40;
+
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    void Start() { }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A)) {
-            float new_x = player.transform.position.x + 50;
-            GameObject a = Instantiate<GameObject>(shop, transform.position + new Vector3(new_x, 25, 0), transform.rotation, this.transform);
-            GameObject b = Instantiate<GameObject>(shop, transform.position + new Vector3(new_x, 0, 0), transform.rotation, this.transform);
-            GameObject c = Instantiate<GameObject>(shop, transform.position + new Vector3(new_x, -25, 0), transform.rotation, this.transform);
-            tiles.Add(a);
-            tiles.Add(b);
-            tiles.Add(c);
-        }   
-        if (Input.GetKeyDown(KeyCode.Alpha1) && !player.IsMoving()){
-            player.SetDestination(tiles[0].transform.position);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2) && !player.IsMoving()) {
-            player.SetDestination(tiles[1].transform.position);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3) && !player.IsMoving()) {
-            player.SetDestination(tiles[2].transform.position);
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            for (int i = 1; i < numTiles; i++)
+            {
+                Vector3 offset = new Vector3(
+                    player.transform.position.x + PATH_X_LENGTH,
+                    2 * Y_BOUNDS * (float)i / (float)numTiles + -Y_BOUNDS,
+                    0
+                );
+                GameObject a = Instantiate<GameObject>(
+                    shop,
+                    transform.position + offset,
+                    transform.rotation,
+                    this.transform
+                );
+                a.AddComponent<SetAsDestination>();
+                a.GetComponent<SetAsDestination>().player = this.player;
+                tiles.Add(a);
+            }
+            random_num = Random.Range(0, numTiles);
+            tiles[random_num].GetComponent<SetAsDestination>().chosen = true;
         }
     }
 }
