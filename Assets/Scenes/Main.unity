@@ -177,6 +177,7 @@ GameObject:
   m_Component:
   - component: {fileID: 451593740}
   - component: {fileID: 451593741}
+  - component: {fileID: 451593742}
   m_Layer: 0
   m_Name: TileSpawner
   m_TagString: Untagged
@@ -214,6 +215,19 @@ MonoBehaviour:
   numTiles: 5
   shop: {fileID: 1491098966658643830, guid: 785de3ca0fba8442bb7d47ee1869b30d, type: 3}
   player: {fileID: 1361054773}
+--- !u!114 &451593742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451593739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82a75976f903349a58bfbbe5f11a8a27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 30
 --- !u!1 &503984544
 GameObject:
   m_ObjectHideFlags: 0
@@ -432,7 +446,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8221602617765685113, guid: 9aafb9366447243068a6ea0449f084e4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -40
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8221602617765685113, guid: 9aafb9366447243068a6ea0449f084e4, type: 3}
       propertyPath: m_LocalPosition.y
