@@ -33,17 +33,19 @@ public class TileSpawn : MonoBehaviour
                     2 * Y_BOUNDS * (float)i / (float)numTiles + -Y_BOUNDS,
                     0
                 );
-                GameObject a = Instantiate<GameObject>(
+                GameObject newObject = Instantiate<GameObject>(
                     shop,
                     transform.position + offset,
                     transform.rotation,
                     this.transform
                 );
-                a.AddComponent<SetAsDestination>();
-                a.GetComponent<SetAsDestination>().player = this.player;
-                tiles.Add(a);
+                newObject.AddComponent<SetAsDestination>();
+                newObject.GetComponent<SetAsDestination>().player = this.player;
+                newObject.GetComponent<SetAsDestination>().spawner =
+                    this.GetComponent<TileSpawnerMove>();
+                tiles.Add(newObject);
             }
-            random_num = Random.Range(0, numTiles);
+            random_num = Random.Range(0, numTiles - 1);
             tiles[random_num].GetComponent<SetAsDestination>().chosen = true;
         }
     }

@@ -7,6 +7,7 @@ public class SetAsDestination : MonoBehaviour
     public bool chosen = false;
 
     public PlayerMove player;
+    public TileSpawnerMove spawner;
 
     // Start is called before the first frame update
     void Start() { }
@@ -16,7 +17,8 @@ public class SetAsDestination : MonoBehaviour
     {
         if (chosen && Input.GetKeyDown(KeyCode.Alpha1))
         {
-            player.SetDestination(this.transform.position);
+            player.SetDestination(this.transform.position.y);
+            spawner.SetDestination(-this.transform.position.x);
         }
     }
 }

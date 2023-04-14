@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMove : MonoBehaviour
+public class TileSpawnerMove : MonoBehaviour
 {
     Vector3 destination;
 
@@ -30,12 +30,12 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    public void SetDestination(float newY)
+    public void SetDestination(float newX)
     {
         Vector3 new_pos = this.transform.position;
-        new_pos.y = newY;
+        new_pos.x = newX;
         destination = new_pos;
-        moveSpeed = Mathf.Abs(newY) * 2;
+        moveSpeed = Mathf.Abs(newX) * 2;
         moving = true;
     }
 }
