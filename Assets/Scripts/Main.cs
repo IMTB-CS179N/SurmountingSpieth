@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using Project.Input;
 
 using UnityEngine;
 
@@ -7,16 +6,23 @@ namespace Project
 {
     public class Main : MonoBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
+        private static Main ms_instance;
+
+        public static Main Instance => Main.ms_instance == null ? (Main.ms_instance = Object.FindFirstObjectByType<Main>()) : Main.ms_instance;
+
+        private void Start()
         {
             Debug.Log("Hello Unity!");
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Update()
         {
 
+        }
+
+        private void FixedUpdate()
+        {
+            _ = InputProcessor.Instance.RaycastLeftSingular();
         }
     }
 }
