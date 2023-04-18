@@ -7,7 +7,10 @@ namespace Project.Input
     {
         private static InputProcessor ms_instance;
 
-        public static InputProcessor Instance => InputProcessor.ms_instance == null ? (InputProcessor.ms_instance = Object.FindFirstObjectByType<InputProcessor>()) : ms_instance;
+        public static InputProcessor Instance =>
+            InputProcessor.ms_instance == null
+                ? (InputProcessor.ms_instance = Object.FindFirstObjectByType<InputProcessor>())
+                : ms_instance;
 
         private Vector2 m_mouseWorldPos;
         private bool m_wasRightPressed;
@@ -66,7 +69,9 @@ namespace Project.Input
                 }
             }
 
-            this.m_mouseWorldPos = this.m_mainCamera.ScreenToWorldPoint(Mouse.current.position.value);
+            this.m_mouseWorldPos = this.m_mainCamera.ScreenToWorldPoint(
+                Mouse.current.position.value
+            );
         }
 
         public bool IsButtonPressed(Key key)
@@ -142,6 +147,7 @@ namespace Project.Input
                 if (raycast)
                 {
                     Debug.Log($"Raycasted {raycast.collider.name}");
+                    raycast.transform.gameObject.GetComponent<OnClick>().Click();
                 }
 #endif
 

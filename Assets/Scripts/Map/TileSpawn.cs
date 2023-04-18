@@ -53,6 +53,7 @@ public class TileSpawn : MonoBehaviour
         newObject.AddComponent<SetAsDestination>();
         newObject.GetComponent<SetAsDestination>().player = this.player;
         newObject.GetComponent<SetAsDestination>().spawner = this.GetComponent<TileSpawnerMove>();
+        newObject.AddComponent<TileClick>();
         newObject.name = curr_level.ToString();
         tiles[curr_level].Add(newObject);
         return newObject;

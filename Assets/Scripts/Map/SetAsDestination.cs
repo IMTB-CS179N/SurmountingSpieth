@@ -22,4 +22,11 @@ public class SetAsDestination : MonoBehaviour
             chosen = false;
         }
     }
+
+    public void Set()
+    {
+        player.SetDestination(this.transform.localPosition.y);
+        spawner.SetDestination(-this.transform.localPosition.x);
+        chosen = false;
+    }
 }
