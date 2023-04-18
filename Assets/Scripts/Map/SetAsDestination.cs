@@ -17,8 +17,9 @@ public class SetAsDestination : MonoBehaviour
     {
         if (chosen && Input.GetKeyDown(KeyCode.Alpha1))
         {
-            player.SetDestination(this.transform.position.y);
-            spawner.SetDestination(-this.transform.position.x);
+            player.SetDestination(this.transform.localPosition.y);
+            spawner.SetDestination(-this.transform.localPosition.x);
+            chosen = false;
         }
     }
 }

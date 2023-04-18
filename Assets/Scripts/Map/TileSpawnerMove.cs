@@ -35,7 +35,7 @@ public class TileSpawnerMove : MonoBehaviour
         Vector3 new_pos = this.transform.position;
         new_pos.x = newX;
         destination = new_pos;
-        moveSpeed = Mathf.Abs(newX) * 2;
+        moveSpeed = Mathf.Abs(newX - this.transform.position.x) * 2;
         moving = true;
     }
 }

@@ -35,7 +35,7 @@ public class PlayerMove : MonoBehaviour
         Vector3 new_pos = this.transform.position;
         new_pos.y = newY;
         destination = new_pos;
-        moveSpeed = Mathf.Abs(newY) * 2;
+        moveSpeed = Mathf.Abs(newY - this.transform.position.y) * 2;
         moving = true;
     }
 }
