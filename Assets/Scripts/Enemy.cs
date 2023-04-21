@@ -15,18 +15,24 @@ public class Enemy : MonoBehaviour
 
     public void takeDamage(int damage) {
         currentHealth -= damage;
-
-        if(currentHealth <= 0) {
+        if(currentHealth > 0) {
+            Debug.Log("Enemy's health is: " + currentHealth);
+        }
+        else if(currentHealth <= 0) {
             Die();
         }
     }
 
     void Die() {
         Debug.Log("Enemy Dead!");
+        Destroy(GetComponent<SpriteRenderer>());
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(GetComponent<Ability>().attacking == true) {
+            takeDamage(GetComponent<Ability>().baseDamage);
+         }
     }
 }

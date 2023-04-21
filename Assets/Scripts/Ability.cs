@@ -27,15 +27,15 @@ public class Ability : MonoBehaviour
         baseDamage = 2;
     }
      public void attack() {
-        GetComponent<Enemy>().takeDamage(baseDamage);
-        if(GetComponent<Enemy>().currentHealth >= 0) {
-            Debug.Log("Enemy's health is: " + GetComponent<Enemy>().currentHealth);
-        }
+        attacking = true;
     }
 
     void Update() {
         if(Input.GetMouseButtonDown(0)) {
             attack();
+        }
+        if(!Input.GetMouseButtonDown(0)) {
+            attacking = false;
         }
     }
 }
