@@ -94,6 +94,20 @@ namespace Project.Input
             return this.m_mouseRightDown;
         }
 
+        public Collider2D RaycastViaMouse()
+        {
+            var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
+
+#if DEBUG
+            if (raycast)
+            {
+                Debug.Log($"Raycasted {raycast.collider.name}");
+            }
+#endif
+
+            return raycast.collider;
+        }
+
         public Collider2D RaycastLeftContinuous()
         {
             if (this.m_mouseLeftDown)
