@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace Project.Input
@@ -76,7 +77,7 @@ namespace Project.Input
 
         public bool IsPointerOverUIObject()
         {
-            return false; // #TODO
+            return EventSystem.current.IsPointerOverGameObject();
         }
 
         public Vector2 MouseWorldPosition()
@@ -96,21 +97,26 @@ namespace Project.Input
 
         public Collider2D RaycastViaMouse()
         {
-            var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
+            if (!this.IsPointerOverUIObject())
+            {
+                var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
 
 #if DEBUG
-            if (raycast)
-            {
-                Debug.Log($"Raycasted {raycast.collider.name}");
-            }
+                if (raycast)
+                {
+                    Debug.Log($"Raycasted {raycast.collider.name}");
+                }
 #endif
 
-            return raycast.collider;
+                return raycast.collider;
+            }
+
+            return null;
         }
 
         public Collider2D RaycastLeftContinuous()
         {
-            if (this.m_mouseLeftDown)
+            if (!this.IsPointerOverUIObject() && this.m_mouseLeftDown)
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
 
@@ -129,7 +135,7 @@ namespace Project.Input
 
         public Collider2D RaycastRightContinuous()
         {
-            if (this.m_mouseRightDown)
+            if (!this.IsPointerOverUIObject() && this.m_mouseRightDown)
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
 
@@ -148,7 +154,7 @@ namespace Project.Input
 
         public Collider2D RaycastLeftSingular()
         {
-            if (this.m_wasLeftPressed)
+            if (!this.IsPointerOverUIObject() && this.m_wasLeftPressed)
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
 
@@ -167,7 +173,7 @@ namespace Project.Input
 
         public Collider2D RaycastRightSingular()
         {
-            if (this.m_wasRightPressed)
+            if (!this.IsPointerOverUIObject() && this.m_wasRightPressed)
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
 

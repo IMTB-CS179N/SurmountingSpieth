@@ -17,7 +17,7 @@ namespace Project
 
         private void Update()
         {
-
+            // Debug.Log(InputProcessor.Instance.IsPointerOverUIObject());
         }
 
         private void FixedUpdate()
