@@ -1,3 +1,5 @@
+using Project.Input;
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,34 +23,26 @@ namespace Project.UI
                 }
             }
 
-            var fontSize = new StyleLength(Mathf.Ceil((Screen.width / 640) * 0.4f + 14.0f));
-
             {
-                var button = this.m_ui.rootVisualElement.Q<Button>("button_play");
-
-                button.style.fontSize = fontSize;
+                var button = this.m_ui.rootVisualElement.Q<Button>("newgame-button");
 
                 button.clicked += () =>
                 {
-                    Debug.Log("Play Clicked");
+                    Debug.Log("NewGame Clicked");
                 };
             }
 
             {
-                var button = this.m_ui.rootVisualElement.Q<Button>("button_rules");
-
-                button.style.fontSize = fontSize;
+                var button = this.m_ui.rootVisualElement.Q<Button>("continue-button");
 
                 button.clicked += () =>
                 {
-                    Debug.Log("Rules Clicked");
+                    Debug.Log("Continue Clicked");
                 };
             }
 
             {
-                var button = this.m_ui.rootVisualElement.Q<Button>("button_settings");
-
-                button.style.fontSize = fontSize;
+                var button = this.m_ui.rootVisualElement.Q<Button>("settings-button");
 
                 button.clicked += () =>
                 {
@@ -57,13 +51,20 @@ namespace Project.UI
             }
 
             {
-                var button = this.m_ui.rootVisualElement.Q<Button>("button_quit");
-
-                button.style.fontSize = fontSize;
+                var button = this.m_ui.rootVisualElement.Q<Button>("question-button");
 
                 button.clicked += () =>
                 {
-                    Debug.Log("Quit Clicked");
+                    Debug.Log("Question Clicked");
+                };
+            }
+
+            {
+                var button = this.m_ui.rootVisualElement.Q<Button>("credits-button");
+
+                button.clicked += () =>
+                {
+                    Debug.Log("Credits Clicked");
                 };
             }
         }
@@ -73,6 +74,22 @@ namespace Project.UI
             if (this.m_ui != null && this.m_ui.rootVisualElement != null)
             {
                 //
+            }
+        }
+
+        private void Update()
+        {
+            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.S))
+            {
+                var target = this.m_ui.rootVisualElement.Q<Button>("newgame-button");
+
+                using (var e = new NavigationSubmitEvent()
+                {
+                    target = target,
+                })
+                {
+                    target.SendEvent(e);
+                }
             }
         }
     }
