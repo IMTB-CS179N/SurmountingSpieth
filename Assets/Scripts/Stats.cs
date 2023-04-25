@@ -1,7 +1,7 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Dispose
+using System.Dispose;
 
 // to create a usable copy, right click the script inside the file inspector
 // and click "Unit Stats"
@@ -106,7 +106,7 @@ public class Stats : IDisposable
     
 
 }
-
+*/
 //Notes 
 /*
 
