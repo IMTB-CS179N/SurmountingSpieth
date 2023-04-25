@@ -10,15 +10,9 @@ public class Ability : MonoBehaviour
     public int manaCost;
     public int baseDamage;
     public bool attacking = false;
+    public GameObject projectile;
+    public float projectileForce;
 
-
-
-    public Ability(string abilityName, string abilityDescription, int manaCost, int baseDamage) {
-        abilityName = this.abilityName;
-        abilityDescription = this.abilityDescription;
-        manaCost = this.manaCost;
-        baseDamage = this.baseDamage;
-    }
 
     public Ability() {
         abilityName = "Generic";
@@ -26,16 +20,17 @@ public class Ability : MonoBehaviour
         manaCost = 2;
         baseDamage = 2;
     }
-     public void attack() {
-        attacking = true;
-    }
+ 
+    
+
 
     void Update() {
-        if(Input.GetMouseButtonDown(0)) {
-            attack();
-        }
-        if(!Input.GetMouseButtonDown(0)) {
-            attacking = false;
+        if(Input.GetMouseButtonDown(1)) {
+            GameObject spell = Instantiate(projectile, transform.position, Quaternion.identity);
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 myPos = transform.position;
+            Vector2 direction = (mousePos - myPos).normalized;
+            spell.GetComponent<Rigidbody2D>().velocity = direction * projectileForce;
         }
     }
 }

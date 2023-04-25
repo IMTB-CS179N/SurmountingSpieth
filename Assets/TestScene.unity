@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 4798212}
   - component: {fileID: 4798211}
   - component: {fileID: 4798210}
-  - component: {fileID: 4798213}
+  - component: {fileID: 4798215}
   - component: {fileID: 4798214}
   m_Layer: 0
   m_Name: Player
@@ -231,7 +231,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4798213
+--- !u!61 &4798214
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4798209}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.0000000037252903, y: -0.023083568}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.32, y: 0.32}
+    newSize: {x: 0.32, y: 0.32}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.23197716, y: 0.3170581}
+  m_EdgeRadius: 0
+--- !u!114 &4798215
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -248,21 +274,6 @@ MonoBehaviour:
   manaCost: 2
   baseDamage: 2
   attacking: 0
-  script: {fileID: 4798214}
---- !u!114 &4798214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4798209}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19c4a9146bf77674a910af958ad88b12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 10
-  currentHealth: 0
 --- !u!1 &482671747
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,6 +370,8 @@ GameObject:
   - component: {fileID: 846062262}
   - component: {fileID: 846062264}
   - component: {fileID: 846062265}
+  - component: {fileID: 846062266}
+  - component: {fileID: 846062267}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -426,8 +439,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 846062261}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_LocalPosition: {x: 4.0113, y: 0.0142, z: 0}
+  m_LocalScale: {x: 2.9292002, y: 2.9114058, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -468,3 +481,103 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 10
   currentHealth: 0
+--- !u!114 &846062266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846062261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bbdd82e9fa9c5a4e82b5d22f15619d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityName: Generic
+  abilityDescription: Generic
+  manaCost: 2
+  baseDamage: 2
+  attacking: 0
+--- !u!61 &846062267
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846062261}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.0014643222, y: -0.005899757}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.32, y: 0.32}
+    newSize: {x: 0.32, y: 0.32}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.22514024, y: 0.3058346}
+  m_EdgeRadius: 0
+--- !u!1001 &5556691107402391898
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.7810541
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.10084512
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237138358381564578, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8264360320010090840, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}
+      propertyPath: m_Name
+      value: TestSpell
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1e3ff1fc0d4a9ea48801b105302d01ed, type: 3}

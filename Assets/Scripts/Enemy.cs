@@ -7,6 +7,8 @@ public class Enemy : MonoBehaviour
 
     public int maxHealth = 10;
     public int currentHealth;
+    public GameObject Player;
+    public GameObject projectile;
 
     void Start() {
         currentHealth = maxHealth;
@@ -15,11 +17,17 @@ public class Enemy : MonoBehaviour
 
     public void takeDamage(int damage) {
         currentHealth -= damage;
-        if(currentHealth > 0) {
+        if(currentHealth >= 0) {
             Debug.Log("Enemy's health is: " + currentHealth);
         }
-        else if(currentHealth <= 0) {
+        if(currentHealth <= 0) {
             Die();
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision) {
+        if(collision.gameObject) {
+            takeDamage(Player.GetComponent<Ability>().baseDamage);
         }
     }
 
@@ -29,10 +37,5 @@ public class Enemy : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if(GetComponent<Ability>().attacking == true) {
-            takeDamage(GetComponent<Ability>().baseDamage);
-         }
-    }
+    void Update() {}
 }
