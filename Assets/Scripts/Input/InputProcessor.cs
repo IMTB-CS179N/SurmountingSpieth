@@ -147,7 +147,6 @@ namespace Project.Input
                 if (raycast)
                 {
                     Debug.Log($"Raycasted {raycast.collider.name}");
-                    raycast.transform.gameObject.GetComponent<OnClick>().Click();
                 }
 #endif
 

@@ -8,7 +8,7 @@ public class TileSpawnerMove : MonoBehaviour
 
     [SerializeField]
     float moveSpeed;
-    bool moving = false;
+    public bool moving = false;
 
     // Start is called before the first frame update
     void Start() { }
@@ -35,7 +35,7 @@ public class TileSpawnerMove : MonoBehaviour
         Vector3 new_pos = this.transform.position;
         new_pos.x = newX;
         destination = new_pos;
-        moveSpeed = Mathf.Abs(newX - this.transform.position.x) * 2;
+        moveSpeed = Mathf.Abs(newX - this.transform.position.x) * 4;
         moving = true;
     }
 }

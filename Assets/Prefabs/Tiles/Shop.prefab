@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6625597154099858848}
   - component: {fileID: 7165709986457135023}
+  - component: {fileID: 2822620325522208887}
   m_Layer: 0
   m_Name: Shop
   m_TagString: Untagged
@@ -71,19 +72,31 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 748460277
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 313e779e304284b9d9196a2a2a472c26, type: 3}
+  m_Sprite: {fileID: 1569671468, guid: ee5508d738e5b4a4cabb87b0ee210bcd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 32, y: 32}
+  m_Size: {x: 16, y: 16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2822620325522208887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 577080331573752774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92286728526c741759364f5995d5e026, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1491098966658643830
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,7 +123,7 @@ Transform:
   m_GameObject: {fileID: 1491098966658643830}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 4}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6625597154099858848}
@@ -141,5 +154,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 32, y: 32}
+  m_Size: {x: 8, y: 8}
   m_EdgeRadius: 0
