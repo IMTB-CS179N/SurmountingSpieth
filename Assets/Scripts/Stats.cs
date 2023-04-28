@@ -1,6 +1,7 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 //using System.Dispose;
 
 // to create a usable copy, right click the script inside the file inspector
@@ -8,25 +9,25 @@ using UnityEngine;
 
 //[CreateAssetMenu(menuName = "Unit Stats")]
 
-/*public class Stats : IDisposable
+public class Stats : IDisposable
 {
     //[Order(0)] // need to add the column numbers
     public string EntityName { get; set; }
-    [Order(0)]
+    //[Order(0)]
     public string Race { get; set; }
-    [Order(1)]
+    //[Order(1)]
     public string C_Class { get; set; }
-    [Order(2)]
+    //[Order(2)]
     public int Health { get; set; }
-    [Order(3)]
+    //[Order(3)]
     public int BaseDamage { get; set; } //attack points
-    [Order(4)]
+    //[Order(4)]
     public int BaseMana { get; set; }
-    [Order(5)]
+    //[Order(5)]
     public int BaseSpeed { get; set; }
-    [Order(6)]
+    //[Order(6)]
     public string Model { get; set; } //temporary until we have sprite incorporation
-    [Order(7)]
+    //[Order(7)]
     bool Alive { get; set; }
 
 
@@ -84,21 +85,21 @@ using UnityEngine;
 
         Health = Health - amount;
         if(Health <= 0){
-            alive = false;
+            Alive = false;
         }
 
     }
 
     public void revive(){
-        alive = true;
+        Alive = true;
     }
 
     public void kill(){
-        alive = false;
+        Alive = false;
     }
 
     public bool giveAlive(){ //just wrote this to get rid of a warning message
-        return alive;
+        return Alive;
     }
 
     public void Dispose(){}
