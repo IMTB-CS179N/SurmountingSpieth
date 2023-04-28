@@ -12,6 +12,8 @@ namespace Project
 
         private void Start()
         {
+            var items = AssetParser.ParseFromCSV<Stats>("data.csv", true);
+
             Debug.Log("Hello Unity!");
         }
 

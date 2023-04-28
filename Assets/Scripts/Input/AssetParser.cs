@@ -9,13 +9,24 @@ namespace Project.Input
 {
     public class AssetParser
     {
-        public static T[] ParseFromCSV<T>(string file) where T : IDisposable
+        public static T[] ParseFromCSV<T>(string file, bool useResources) where T : IDisposable
         {
             var type = typeof(T);
 
             var properties = AssetParser.GetProperties(type);
 
-            using (var stream = new StreamReader(File.OpenRead(file)))
+            TextReader stream;
+
+            if (useResources)
+            {
+                stream = new StreamReader(new MemoryStream(Resources.Load<TextAsset>(file).bytes));
+            }
+            else
+            {
+                stream = new StreamReader(File.OpenRead(file));
+            }
+
+            try
             {
                 var instances = new List<T>();
 
@@ -43,6 +54,10 @@ namespace Project.Input
                 }
 
                 return instances.ToArray();
+            }
+            finally
+            {
+                stream.Dispose();
             }
         }
 
@@ -87,7 +102,12 @@ namespace Project.Input
             }
             else if (property.PropertyType == typeof(bool))
             {
-                property.SetValue(target, Boolean.Parse(value));
+                if (!Boolean.TryParse(value, out bool result))
+                {
+                    result = Int32.Parse(value) != 0;
+                }
+
+                property.SetValue(target, result);
             }
             else if (property.PropertyType == typeof(sbyte))
             {
