@@ -1,6 +1,7 @@
-/*using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Diagnostics;
 using System;
 //using System.Dispose;
 
@@ -50,9 +51,9 @@ public class Stats : IDisposable
     public Stats(string EN, string Race, string Class, int Health, int BD, int BM, int BS, string Sprites){
 
         EntityName = EN;
-        Race = Race;
+        this.Race = Race;
         C_Class = Class;
-        Health = Health;
+        this.Health = Health;
         BaseDamage = BD;
         BaseMana = BM;
         BaseSpeed = BS;
@@ -106,7 +107,7 @@ public class Stats : IDisposable
 
     
 
-}*/
+}
 
 //Notes 
 /*

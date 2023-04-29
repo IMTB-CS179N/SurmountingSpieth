@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-
-    public int maxHealth = 10;
-    public int currentHealth;
+    [SerializeField]
+    private int currentHealth;
     public GameObject Player;
     public GameObject projectile;
+    public Stats stats = new Stats();
+
+    public Enemy() {
+        stats.C_Class = "Rogue";
+        stats.Health = 10;
+    }
 
     void Start() {
-        currentHealth = maxHealth;
+        currentHealth = stats.Health;
         Debug.Log("Enemy's current health is 10");
     }
 
@@ -27,7 +32,7 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision) {
         if(collision.gameObject) {
-            takeDamage(Player.GetComponent<Ability>().baseDamage);
+            takeDamage(Player.GetComponent<Ability>().stats.BaseDamage);
         }
     }
 
