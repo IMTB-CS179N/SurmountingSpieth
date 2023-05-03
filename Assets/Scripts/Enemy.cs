@@ -32,7 +32,7 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision) {
         if(collision.gameObject) {
-            takeDamage(Player.GetComponent<Ability>().stats.BaseDamage);
+            takeDamage(Player.GetComponent<PlayerAbility>().stats.BaseDamage);
         }
     }
 
