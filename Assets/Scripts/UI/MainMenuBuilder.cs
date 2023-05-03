@@ -11,6 +11,11 @@ namespace Project.UI
     {
         private UIDocument m_ui;
 
+        private void Awake()
+        {
+            this.m_ui = this.GetComponent<UIDocument>();
+        }
+
         private void OnEnable()
         {
             if (this.m_ui == null)
@@ -47,6 +52,8 @@ namespace Project.UI
                 button.clicked += () =>
                 {
                     Debug.Log("Settings Clicked");
+
+
                 };
             }
 
