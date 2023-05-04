@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 637b7671d72134210b17e4b1392996e8, type: 3}
   m_Name: Persistent Character
   m_EditorClassIdentifier: 
-  ClassChoice: 
+  ClassChoice: Paladin
   RaceChoice: 

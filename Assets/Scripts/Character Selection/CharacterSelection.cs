@@ -35,4 +35,6 @@ public class CharacterSelection : ScriptableObject
         Debug.Log(RaceChoice);
 
     }
+
+
 }
