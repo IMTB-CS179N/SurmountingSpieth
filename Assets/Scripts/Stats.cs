@@ -10,23 +10,23 @@ using System;
 
 public class Stats : IDisposable
 {
-    //[Order(0)] // need to add the column numbers
+    [Order(0)] // need to add the column numbers
     public string EntityName { get; set; }
-    //[Order(0)]
+    [Order(0)]
     public string Race { get; set; }
-    //[Order(1)]
+    [Order(1)]
     public string C_Class { get; set; }
-    //[Order(2)]
+    [Order(2)]
     public int Health { get; set; }
-    //[Order(3)]
+    [Order(3)]
     public int BaseDamage { get; set; } //attack points
-    //[Order(4)]
+    [Order(4)]
     public int BaseMana { get; set; }
-    //[Order(5)]
+    [Order(5)]
     public int BaseSpeed { get; set; }
-    //[Order(6)]
+    [Order(6)]
     public string Model { get; set; } //temporary until we have sprite incorporation
-    //[Order(7)]
+    [Order(7)]
     bool Alive { get; set; }
 
 
