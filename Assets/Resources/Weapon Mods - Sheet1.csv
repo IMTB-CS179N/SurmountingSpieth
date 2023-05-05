@@ -1,0 +1,165 @@
+Bard,Axe,-2,-1
+Rogue,Axe,0,-1
+Paladin,Axe,1,0
+Wizard,Axe,-1,-2
+Cleric,Axe,-1,-2
+Barbarian,Axe,3,1
+Human ,Axe,0,0
+Dwarf,Axe,2,0
+Elf,Axe,1,0
+Dragonborn,Axe,3,0
+Orc,Axe,4,0
+Bard,Dagger,-2,3
+Rogue,Dagger,4,4
+Paladin,Dagger,2,2
+Wizard,Dagger,-1,2
+Cleric,Dagger,-1,2
+Barbarian,Dagger,0,3
+Human ,Dagger,0,1
+Dwarf,Dagger,-1,1
+Elf,Dagger,2,2
+Dragonborn,Dagger,0,1
+Orc,Dagger,0,1
+Bard,Bow n Arrow,-3,3
+Rogue,Bow n Arrow,3,4
+Paladin,Bow n Arrow,3,1
+Wizard,Bow n Arrow,-1,1
+Cleric,Bow n Arrow,-2,1
+Barbarian,Bow n Arrow,0,2
+Human ,Bow n Arrow,0,0
+Dwarf,Bow n Arrow,-2,-2
+Elf,Bow n Arrow,4,4
+Dragonborn,Bow n Arrow,0,0
+Orc,Bow n Arrow,0,0
+Bard,Wand,1,4
+Rogue,Wand,1,3
+Paladin,Wand,0,2
+Wizard,Wand,4,4
+Cleric,Wand,3,4
+Barbarian,Wand,0,3
+Human ,Wand,1,1
+Dwarf,Wand,0,1
+Elf,Wand,2,2
+Dragonborn,Wand,0,1
+Orc,Wand,0,1
+Bard,Dead Fish,2,3
+Rogue,Dead Fish,0,2
+Paladin,Dead Fish,0,0
+Wizard,Dead Fish,0,0
+Cleric,Dead Fish,0,0
+Barbarian,Dead Fish,0,0
+Human ,Dead Fish,0,0
+Dwarf,Dead Fish,0,0
+Elf,Dead Fish,0,0
+Dragonborn,Dead Fish,0,0
+Orc,Dead Fish,0,0
+Bard,Hammer,-2,-2
+Rogue,Hammer,0,-2
+Paladin,Hammer,2,0
+Wizard,Hammer,-1,-2
+Cleric,Hammer,-1,-2
+Barbarian,Hammer,3,0
+Human ,Hammer,0,0
+Dwarf,Hammer,2,0
+Elf,Hammer,0,-1
+Dragonborn,Hammer,3,0
+Orc,Hammer,4,0
+Bard,Short Sword,-1,2
+Rogue,Short Sword,2,2
+Paladin,Short Sword,3,2
+Wizard,Short Sword,-1,1
+Cleric,Short Sword,-1,1
+Barbarian,Short Sword,4,2
+Human ,Short Sword,2,1
+Dwarf,Short Sword,0,1
+Elf,Short Sword,3,2
+Dragonborn,Short Sword,2,1
+Orc,Short Sword,3,1
+Bard,Mace,-3,-1
+Rogue,Mace,-1,-2
+Paladin,Mace,1,-1
+Wizard,Mace,-2,-2
+Cleric,Mace,-2,-2
+Barbarian,Mace,4,-1
+Human ,Mace,0,-1
+Dwarf,Mace,2,-2
+Elf,Mace,-1,-1
+Dragonborn,Mace,3,0
+Orc,Mace,3,1
+Bard,Throwing Knives,-1,3
+Rogue,Throwing Knives,4,3
+Paladin,Throwing Knives,0,2
+Wizard,Throwing Knives,-1,1
+Cleric,Throwing Knives,-1,1
+Barbarian,Throwing Knives,2,2
+Human ,Throwing Knives,0,2
+Dwarf,Throwing Knives,-2,1
+Elf,Throwing Knives,2,3
+Dragonborn,Throwing Knives,0,2
+Orc,Throwing Knives,0,1
+Bard,Spear ,-2,1
+Rogue,Spear ,-1,1
+Paladin,Spear ,2,0
+Wizard,Spear ,-2,0
+Cleric,Spear ,-2,0
+Barbarian,Spear ,3,3
+Human ,Spear ,0,0
+Dwarf,Spear ,1,0
+Elf,Spear ,2,2
+Dragonborn,Spear ,3,0
+Orc,Spear ,2,1
+Bard,Crossbow,-2,2
+Rogue,Crossbow,4,3
+Paladin,Crossbow,4,0
+Wizard,Crossbow,0,0
+Cleric,Crossbow,-1,0
+Barbarian,Crossbow,1,1
+Human ,Crossbow,1,-1
+Dwarf,Crossbow,-1,-3
+Elf,Crossbow,4,3
+Dragonborn,Crossbow,1,-1
+Orc,Crossbow,1,-1
+Bard,Lute,4,3
+Rogue,Lute,0,0
+Paladin,Lute,0,0
+Wizard,Lute,0,0
+Cleric,Lute,0,0
+Barbarian,Lute,0,0
+Human ,Lute,0,0
+Dwarf,Lute,0,0
+Elf,Lute,0,0
+Dragonborn,Lute,0,0
+Orc,Lute,0,0
+Bard,Bongos,3,4
+Rogue,Bongos,0,0
+Paladin,Bongos,0,0
+Wizard,Bongos,0,0
+Cleric,Bongos,0,0
+Barbarian,Bongos,0,0
+Human ,Bongos,0,0
+Dwarf,Bongos,0,0
+Elf,Bongos,0,0
+Dragonborn,Bongos,0,0
+Orc,Bongos,0,0
+Bard,Staff,1,4
+Rogue,Staff,1,3
+Paladin,Staff,0,2
+Wizard,Staff,3,3
+Cleric,Staff,4,4
+Barbarian,Staff,0,3
+Human ,Staff,1,1
+Dwarf,Staff,0,1
+Elf,Staff,2,2
+Dragonborn,Staff,0,1
+Orc,Staff,0,1
+Bard,Great Sword,-3,-2
+Rogue,Great Sword,-1,-2
+Paladin,Great Sword,4,2
+Wizard,Great Sword,-3,-3
+Cleric,Great Sword,-3,-3
+Barbarian,Great Sword,3,3
+Human ,Great Sword,0,-1
+Dwarf,Great Sword,-2,-3
+Elf,Great Sword,1,-1
+Dragonborn,Great Sword,2,-2
+Orc,Great Sword,3,-1
