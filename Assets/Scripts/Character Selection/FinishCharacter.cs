@@ -15,7 +15,7 @@ namespace Project{
         // Start is called before the first frame update
         void Start(){
 
-            Templates = AssetParser.ParseFromCSV<Stats>("CharacterTemplates.csv");
+            //Templates = AssetParser.ParseFromCSV<Stats>("CharacterTemplates.csv");
 
             Debug.Log("Successful Parse");
            
