@@ -22,8 +22,8 @@ public class Ability : IDisposable
     public Ability() {
         C_Class = "";
         AbilityName = "";
-        ManaCost = 3;
-        DamageMultiplier = 1;
+        ManaCost = -1;
+        DamageMultiplier = -1;
         //CooldownTime = 0;
     }
 
