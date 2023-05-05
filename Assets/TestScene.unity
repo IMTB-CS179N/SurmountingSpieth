@@ -266,10 +266,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4798209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5bbdd82e9fa9c5a4e82b5d22f15619d4, type: 3}
+  m_Script: {fileID: 11500000, guid: 5bb4d81d290f42041a62cba66d156dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseMana: 20
+  currentMana: 0
+  currentDamage: 0
   projectile: {fileID: 1903360174874014806, guid: d965e79382d7fcd499ed902793e5cac6, type: 3}
   projectileForce: 10
 --- !u!1 &482671747
@@ -476,7 +477,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19c4a9146bf77674a910af958ad88b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
   currentHealth: 0
   Player: {fileID: 4798209}
   projectile: {fileID: 1903360174874014806, guid: d965e79382d7fcd499ed902793e5cac6, type: 3}
