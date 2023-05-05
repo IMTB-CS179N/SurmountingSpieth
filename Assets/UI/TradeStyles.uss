@@ -20,7 +20,7 @@
     border-top-color: rgb(48, 48, 48);
     border-bottom-color: rgb(48, 48, 48);
     background-color: rgb(9, 19, 21);
-    background-image: url('project://database/Assets/Resources/ItemSlotBackground.png?fileID=21300000&guid=d551788294390f548801fb1cd208fa9b&type=3#ItemSlotBackground');
+    background-image: resource('UI/Trade/ItemSlotBackground');
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
     border-top-right-radius: 3px;
