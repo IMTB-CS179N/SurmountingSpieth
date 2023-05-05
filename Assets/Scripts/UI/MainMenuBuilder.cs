@@ -2,102 +2,59 @@ using Project.Input;
 
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Project.UI
 {
-    public class MainMenuBuilder : MonoBehaviour
+    public class MainMenuBuilder : UIBuilder
     {
-        private UIDocument m_ui;
-
-        private void Awake()
+        protected override void BindEvents()
         {
-            this.m_ui = this.GetComponent<UIDocument>();
+            this.OnUIEnabled += this.OnEnableEvent;
+            this.OnUIDisabled += this.OnDisableEvent;
+
+            this.BindButtonClick("newgame-button", this.OnNewGameButtonClicked);
+            this.BindButtonClick("continue-button", this.OnContinueButtonClicked);
+            this.BindButtonClick("settings-button", this.OnSettingsButtonClicked);
+            this.BindButtonClick("question-button", this.OnQuestionButtonClicked);
+            this.BindButtonClick("credits-button", this.OnCreditsButtonClicked);
         }
 
-        private void OnEnable()
+        private void OnEnableEvent()
         {
-            if (this.m_ui == null)
-            {
-                this.m_ui = this.GetComponent<UIDocument>();
 
-                if (this.m_ui == null)
-                {
-                    return;
-                }
-            }
-
-            {
-                var button = this.m_ui.rootVisualElement.Q<Button>("newgame-button");
-
-                button.clicked += () =>
-                {
-                    Debug.Log("NewGame Clicked");
-                };
-            }
-
-            {
-                var button = this.m_ui.rootVisualElement.Q<Button>("continue-button");
-
-                button.clicked += () =>
-                {
-                    Debug.Log("Continue Clicked");
-                };
-            }
-
-            {
-                var button = this.m_ui.rootVisualElement.Q<Button>("settings-button");
-
-                button.clicked += () =>
-                {
-                    Debug.Log("Settings Clicked");
-
-
-                };
-            }
-
-            {
-                var button = this.m_ui.rootVisualElement.Q<Button>("question-button");
-
-                button.clicked += () =>
-                {
-                    Debug.Log("Question Clicked");
-                };
-            }
-
-            {
-                var button = this.m_ui.rootVisualElement.Q<Button>("credits-button");
-
-                button.clicked += () =>
-                {
-                    Debug.Log("Credits Clicked");
-                };
-            }
         }
 
-        private void OnDisable()
+        private void OnDisableEvent()
         {
-            if (this.m_ui != null && this.m_ui.rootVisualElement != null)
-            {
-                //
-            }
+
         }
 
-        private void Update()
+        private void OnNewGameButtonClicked()
         {
-            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.S))
-            {
-                var target = this.m_ui.rootVisualElement.Q<Button>("newgame-button");
 
-                using (var e = new NavigationSubmitEvent()
-                {
-                    target = target,
-                })
-                {
-                    target.SendEvent(e);
-                }
-            }
+        }
+
+        private void OnContinueButtonClicked()
+        {
+
+        }
+
+        private void OnSettingsButtonClicked()
+        {
+
+        }
+
+        private void OnQuestionButtonClicked()
+        {
+
+        }
+
+        private void OnCreditsButtonClicked()
+        {
+
         }
     }
 }

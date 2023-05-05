@@ -1,7 +1,4 @@
-﻿using System;
-
-using UnityEngine;
-using UnityEngine.UIElements;
+﻿using UnityEngine;
 
 using Object = UnityEngine.Object;
 
@@ -14,7 +11,7 @@ namespace Project.UI
             Main,
             InGame,
             Settings,
-            Character,
+            Creation,
             Trade,
         }
 
@@ -25,19 +22,19 @@ namespace Project.UI
         private ScreenType m_currentType;
 
         [SerializeField]
-        private UIDocument MainUI;
+        private UIBuilder MainUI;
 
         [SerializeField]
-        private UIDocument InGameUI;
+        private UIBuilder InGameUI;
 
         [SerializeField]
-        private UIDocument SettingsUI;
+        private UIBuilder SettingsUI;
 
         [SerializeField]
-        private UIDocument CharacterCreationUI;
+        private UIBuilder CreationUI;
 
         [SerializeField]
-        private UIDocument TradeUI;
+        private UIBuilder TradeUI;
 
         private void Awake()
         {
@@ -70,9 +67,9 @@ namespace Project.UI
                 Debug.LogWarning("Settings UI is not attached to the UI Manager!");
             }
 
-            if (this.CharacterCreationUI != null)
+            if (this.CreationUI != null)
             {
-                this.CharacterCreationUI.enabled = false;
+                this.CreationUI.enabled = false;
             }
             else
             {
@@ -99,45 +96,30 @@ namespace Project.UI
             }
         }
 
-        public UIDocument GetUI(ScreenType type)
+        public UIBuilder GetUI(ScreenType type)
         {
             return type switch
             {
                 ScreenType.Main => this.MainUI,
                 ScreenType.InGame => this.InGameUI,
                 ScreenType.Settings => this.SettingsUI,
-                ScreenType.Character => this.CharacterCreationUI,
+                ScreenType.Creation => this.CreationUI,
                 ScreenType.Trade => this.TradeUI,
                 _ => null,
             };
         }
 
-        public UIDocument GetCurrentlyEnabledUI()
+        public UIBuilder GetCurrentlyEnabledUI()
         {
             return this.m_currentType switch
             {
                 ScreenType.Main => this.MainUI,
                 ScreenType.InGame => this.InGameUI,
                 ScreenType.Settings => this.SettingsUI,
-                ScreenType.Character => this.CharacterCreationUI,
+                ScreenType.Creation => this.CreationUI,
                 ScreenType.Trade => this.TradeUI,
                 _ => null,
             };
-        }
-
-        public void BindEventToScreenButton(ScreenType type, string buttonName, Action action)
-        {
-            var screen = this.GetUI(type);
-
-            if (screen != null)
-            {
-                var button = screen.rootVisualElement.Q<Button>(buttonName);
-
-                if (button != null)
-                {
-                    button.clicked += action;
-                }
-            }
         }
     }
 }

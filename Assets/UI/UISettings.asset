@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 19101, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: MainMenuSettings
+  m_Name: UISettings
   m_EditorClassIdentifier: 
   themeUss: {fileID: -4733365628477956816, guid: b3386d28d0faf8042abb6857d54d0679, type: 3}
   m_TargetTexture: {fileID: 0}

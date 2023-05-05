@@ -42,3 +42,16 @@
     flex-direction: row;
     flex-wrap: wrap;
 }
+
+.bottom-bar-label-style {
+    flex-grow: 1;
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-top-width: 3px;
+    border-bottom-width: 3px;
+    border-left-color: rgb(89, 47, 0);
+    border-right-color: rgb(89, 47, 0);
+    border-top-color: rgb(89, 47, 0);
+    border-bottom-color: rgb(89, 47, 0);
+    background-color: rgba(190, 70, 0, 0.41);
+}
