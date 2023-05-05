@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Project.Input;
 using System;
 
 using Project.Input;
@@ -10,9 +8,13 @@ using Project.Input;
 
 //[CreateAssetMenu(menuName = "Unit Stats")]
 
+
+namespace Project{
+    
+
 public class Stats : IDisposable
 {
-    [Order(0)] // need to add the column numbers
+    //[Order(0)] // need to add the column numbers
     public string EntityName { get; set; }
     [Order(0)]
     public string Race { get; set; }
@@ -29,12 +31,14 @@ public class Stats : IDisposable
     [Order(6)]
     public string Model { get; set; } //temporary until we have sprite incorporation
     [Order(7)]
-    bool Alive { get; set; }
+    public bool Alive { get; set; }
+
+    
 
 
     public Stats(){
 
-        EntityName = "";
+        //EntityName = "";
         Race = "";
         C_Class = "";
         Health = -1;
@@ -50,7 +54,7 @@ public class Stats : IDisposable
     //deprecated
     public Stats(string EN, string Race, string Class, int Health, int BD, int BM, int BS, string Sprites){
 
-        this.EntityName = EN;
+        //this.EntityName = EN;
         this.Race = Race;
         this.C_Class = Class;
         this.Health = Health;
@@ -107,6 +111,7 @@ public class Stats : IDisposable
 
     
 
+}
 }
 
 //Notes 
