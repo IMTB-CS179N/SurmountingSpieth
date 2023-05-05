@@ -15,7 +15,9 @@ namespace Project
 
         private void Start()
         {
-            Debug.Log("Hello Unity!");
+            var array = AssetParser.ParseFromCSV<Ability>("/Users/susan/Desktop/CS179N/Project/Resources/Character Abilities - Sheet1.csv.bytes");
+        
+            Debug.Log(array.ToString());
         }
 
         private void Update() { }
