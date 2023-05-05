@@ -34,7 +34,7 @@ public class Stats : IDisposable
 
     public Stats(){
 
-        EntityName = "";
+        //EntityName = "";
         Race = "";
         C_Class = "";
         Health = -1;
@@ -50,7 +50,7 @@ public class Stats : IDisposable
     //deprecated
     public Stats(string EN, string Race, string Class, int Health, int BD, int BM, int BS, string Sprites){
 
-        this.EntityName = EN;
+        //this.EntityName = EN;
         this.Race = Race;
         this.C_Class = Class;
         this.Health = Health;
