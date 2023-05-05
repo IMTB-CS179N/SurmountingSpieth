@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Project.Input;
-
+using UnityEngine.SceneManagement;
 
 
 namespace Project{
     public class FinishCharacter : MonoBehaviour
     {
         [SerializeField] public CharacterSelection data; //used to tie button input to values
-        Stats[] Templates; //csv information
-        Stats UserCharacter; //Final decision
+        public Stats[] Templates; //csv information
+        public Stats UserCharacter; //Final decision
 
         // Start is called before the first frame update
         void Start(){
@@ -18,7 +18,7 @@ namespace Project{
             Templates = AssetParser.ParseFromCSV<Stats>("CharacterTemplates.csv");
 
             Debug.Log("Successful Parse");
-            
+           
         
         }
 
@@ -26,8 +26,8 @@ namespace Project{
 
             for(int i = 0; i < 30; ++i){
 
-                string CsvRace = Templates[i].EntityName;
-                string CsvClass = Templates[i].Race;
+                string CsvRace = Templates[i].Race;
+                string CsvClass = Templates[i].C_Class;
                 
                 //Debug.Log(CsvClass);
                 //Debug.Log(CsvRace);
@@ -37,6 +37,7 @@ namespace Project{
                     UserCharacter = Templates[i];
                     
                     Debug.Log("Template Saved");
+                    //SceneManager.LoadScene (sceneName:"Map");
                     break;
                 }
 

@@ -12,7 +12,7 @@ namespace Project{
 
 public class Stats : IDisposable
 {
-    [Order(0)] // need to add the column numbers
+    //[Order(0)] // need to add the column numbers
     public string EntityName { get; set; }
     [Order(0)]
     public string Race { get; set; }
@@ -29,7 +29,9 @@ public class Stats : IDisposable
     [Order(6)]
     public string Model { get; set; } //temporary until we have sprite incorporation
     [Order(7)]
-    bool Alive { get; set; }
+    public bool Alive { get; set; }
+
+    
 
 
     public Stats(){
