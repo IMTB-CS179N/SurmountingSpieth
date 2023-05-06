@@ -15,9 +15,11 @@ namespace Project
 
         private void Start()
         {
-            var array = AssetParser.ParseFromCSV<Ability>("/Users/susan/Desktop/CS179N/Project/Resources/Character Abilities - Sheet1.csv.bytes");
-        
-            Debug.Log(array.ToString());
+            // var array = AssetParser.ParseFromCSV<Ability>(
+            //     "Assets/Resources/Character Abilities - Sheet1.csv.bytes"
+            // );
+
+            // Debug.Log(array.ToString());
         }
 
         private void Update() { }

@@ -505,6 +505,7 @@ GameObject:
   - component: {fileID: 296547413}
   - component: {fileID: 296547414}
   - component: {fileID: 296547415}
+  - component: {fileID: 296547417}
   - component: {fileID: 296547416}
   m_Layer: 0
   m_Name: Main Root
@@ -592,6 +593,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce649a8854a349b9833363e5407a847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CharacterBuild: {fileID: 296547417}
+--- !u!114 &296547417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296547410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec219e4419755466da975ccf99c2a171, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: f03fc6f53d5324d2b9c4a99f0873105d, type: 2}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

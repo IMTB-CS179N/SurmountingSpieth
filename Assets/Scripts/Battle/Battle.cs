@@ -19,12 +19,18 @@ namespace Project
         public static Battle Instance =>
             ms_instance == null ? (ms_instance = FindFirstObjectByType<Battle>()) : ms_instance;
 
-        private List<Enemy> m_enemies;
+        public FinishCharacter CharacterBuild;
+        private Player player = new Player();
+        private List<Enemy> m_enemies = new List<Enemy>();
 
         private StateType CurrentTurn = StateType.Player;
 
         // Start is called before the first frame update
-        void Start() { }
+        void Start()
+        {
+            player.SetStats(CharacterBuild);
+            m_enemies.Add(new Enemy());
+        }
 
         // Update is called once per frame
         void Update()
@@ -35,6 +41,7 @@ namespace Project
                     if (PlayerFinished())
                     {
                         this.PerformPlayerAttack();
+                        Debug.Log("Switching to enemy turn");
                         CurrentTurn = StateType.Enemy;
                     }
 
@@ -42,6 +49,9 @@ namespace Project
                 case StateType.Enemy:
                     if (EnemyFinished())
                     {
+                        Debug.Log("extra before health: " + player.Health);
+                        this.PerformEnemyAttack();
+                        Debug.Log("Switching to player turn");
                         CurrentTurn = StateType.Player;
                     }
                     break;
@@ -72,20 +82,36 @@ namespace Project
 
         private void PerformPlayerAttack()
         {
+            Debug.Log("Player Attacking");
             var enemy = this.m_enemies[0];
 
-            if (BattleUtil.Attack(Player.Instance, enemy))
+            if (BattleUtil.Attack(player, enemy))
             {
                 this.m_enemies.RemoveAt(0);
 
                 if (this.m_enemies.Count == 0)
                 {
+                    Debug.Log("Won battle");
                     // win
                 }
                 else
                 {
                     // update ui and battlefield
                 }
+            }
+        }
+
+        private void PerformEnemyAttack()
+        {
+            Debug.Log("Enemy Attacking");
+            var enemy = this.m_enemies[0];
+            if (BattleUtil.Attack(enemy, player))
+            {
+                Debug.Log("Enemy killed player");
+            }
+            else
+            {
+                // update ui and battlefield
             }
         }
 

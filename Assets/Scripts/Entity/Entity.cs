@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace Project
@@ -7,12 +8,15 @@ namespace Project
     public interface IEntity
     {
         int Health { get; set; }
+        int ArmorValue { get; set; }
         int Mana { get; set; }
 
         int Damage { get; }
 
         int Precision { get; }
         float DodgeChance { get; }
+
+        int DepleteArmor(int damage);
 
         int ComputeDamage();
     }
@@ -21,11 +25,11 @@ namespace Project
     {
         public static Player Instance = new();
 
-        private Stats m_stats;
+        Stats m_stats { get; set; }
         private Ability[] m_abilities;
 
         // private List<Weapon> m_weapons;
-        // private List<Armor> m_armors;
+        private List<Armor> m_armors = new List<Armor>();
         private int m_precision;
         private float m_dodgeChance;
 
@@ -34,10 +38,19 @@ namespace Project
             // this.m_stats = stats;
 
             // Health = stats.Health;
-            Health = 0;
+            m_armors.Add(new Armor());
+            ArmorValue = m_armors[0].ArmorValue;
+        }
+
+        public void SetStats(FinishCharacter build)
+        {
+            this.m_stats = build.UserCharacter;
+            Health = m_stats.Health;
+            Debug.Log("Successfully bound stats to character");
         }
 
         public int Health { get; set; }
+        public int ArmorValue { get; set; }
         public int Mana { get; set; }
 
         public int Damage { get; set; }
@@ -45,21 +58,17 @@ namespace Project
         public int Precision => this.m_precision;
         public float DodgeChance => this.m_dodgeChance;
 
+        public int DepleteArmor(int damage)
+        {
+            var NewDamage = Math.Max(0, damage - ArmorValue);
+            ArmorValue = Math.Max(0, ArmorValue - damage);
+
+            return NewDamage;
+        }
+
         public int ComputeDamage()
         {
-            return 0;
-        }
-    }
-
-    public class SomeClass
-    {
-        private Stats m_stats;
-
-        public int CurrentHealth;
-
-        public SomeClass(Stats stats)
-        {
-            this.m_stats = stats;
+            return 3;
         }
     }
 
@@ -69,6 +78,7 @@ namespace Project
         private float m_dodgeChance;
 
         public int Health { get; set; }
+        public int ArmorValue { get; set; }
         public int Mana { get; set; }
 
         public int Damage { get; set; }
@@ -76,9 +86,23 @@ namespace Project
         public int Precision => this.m_precision;
         public float DodgeChance => this.m_dodgeChance;
 
+        public Enemy()
+        {
+            Health = 100;
+            ArmorValue = 2;
+        }
+
+        public int DepleteArmor(int damage)
+        {
+            var NewDamage = Math.Max(0, damage - ArmorValue);
+            ArmorValue = Math.Max(0, ArmorValue - damage);
+
+            return NewDamage;
+        }
+
         public int ComputeDamage()
         {
-            return 0;
+            return 3;
         }
     }
 
@@ -88,7 +112,9 @@ namespace Project
         {
             if (CheckIfHit(attacker, receiver))
             {
-                receiver.Health -= attacker.ComputeDamage();
+                var damage = attacker.ComputeDamage();
+
+                receiver.Health -= receiver.DepleteArmor(damage);
 
                 if (receiver.Health <= 0)
                 {
