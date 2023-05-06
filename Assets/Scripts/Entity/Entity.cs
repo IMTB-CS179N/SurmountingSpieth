@@ -29,11 +29,12 @@ namespace Project
         private int m_precision;
         private float m_dodgeChance;
 
-        public Player(Stats stats)
+        public Player()
         {
-            this.m_stats = stats;
+            // this.m_stats = stats;
 
-            Health = stats.Health;
+            // Health = stats.Health;
+            Health = 0;
         }
 
         public int Health { get; set; }
