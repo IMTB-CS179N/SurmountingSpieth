@@ -1,7 +1,6 @@
 using Project.Input;
 using System;
 
-using Project.Input;
 
 
 namespace Project{
@@ -18,9 +17,9 @@ public class Weapons : IDisposable
     [Order(3)]
     public double WCMod { get; set; } //crit modifier
     [Order(4)]
-    public int WDMGmod { get; set; } //weapon dmg modifier
+    public double WDMGmod { get; set; } //weapon dmg modifier
     [Order(5)]
-    public int WSPDmod { get; set; } //weapon spd modifier
+    public double WSPDmod { get; set; } //weapon spd modifier
     [Order(6)]
     public string Model { get; set; } //temporary until we have sprite incorporation
 
@@ -52,6 +51,8 @@ public class Weapons : IDisposable
         this.Model = Model;
 
     }
+
+    public void Dispose(){}
 
 
     
