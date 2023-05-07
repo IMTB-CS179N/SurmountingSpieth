@@ -19,54 +19,67 @@ public class Stats : IDisposable
     [Order(0)]
     public string Race { get; set; }
     [Order(1)]
-    public string C_Class { get; set; }
+    public string CharacterClass { get; set; }
     [Order(2)]
-    public int Health { get; set; }
+    public int Health { get; set; } //HP
     [Order(3)]
     public int BaseDamage { get; set; } //attack points
     [Order(4)]
-    public int BaseMana { get; set; }
+    public int BaseMana { get; set; } 
     [Order(5)]
-    public int BaseSpeed { get; set; }
+    public double BaseDodge { get; set; } 
     [Order(6)]
-    public string Model { get; set; } //temporary until we have sprite incorporation
+    public double BasePrecision { get; set; }
     [Order(7)]
+    public double BaseCritChance { get; set; }
+    [Order(8)]
+    public double BaseCritMult { get; set; }
+    [Order(9)]
+    public string Model { get; set; } //temporary until we have sprite incorporation
+    [Order(10)]
     public bool Alive { get; set; }
-
-    
 
 
     public Stats(){
 
-        //EntityName = "";
-        Race = "";
-        C_Class = "";
-        Health = -1;
-        BaseDamage = -1;
-        BaseMana = -1;
-        BaseSpeed = -1;
-        Model = "";
-        Alive = false;
-
+        this.EntityName = "";
+        this.Race = "";
+        this.CharacterClass = "";
+        this.Health = 0;
+        this.BaseDamage = 0;
+        this.BaseMana = 0;
+        this.BaseDodge = 0.0;
+        this.BasePrecision = 0.0;
+        this.BaseCritChance = 0.0;
+        this.BaseCritMult = 0.0;
+        this.Model = "";
+        this.Alive = true;
 
     }
 
-    //deprecated
-    public Stats(string EN, string Race, string Class, int Health, int BD, int BM, int BS, string Sprites){
+    public Stats(string Race, string Class, int Health, int baseDamage, int baseMana, double baseDodge, double basePrecision, double baseCritChance, double baseCritMult, string spriteLoc){
 
-        //this.EntityName = EN;
+        this.EntityName = "";
         this.Race = Race;
-        this.C_Class = Class;
+        this.CharacterClass = Class;
         this.Health = Health;
-        this.BaseDamage = BD;
-        this.BaseMana = BM;
-        this.BaseSpeed = BS;
-        this.Model = Sprites;
+        this.BaseDamage = baseDamage;
+        this.BaseMana = baseMana;
+        this.BaseDodge = baseDodge;
+        this.BasePrecision = basePrecision;
+        this.BaseCritChance = baseCritChance;
+        this.BaseCritMult = baseCritMult;
+        this.Model = spriteLoc;
         this.Alive = true;
 
     }
 
 
+    public void UpdateName(string name){
+
+        this.EntityName = name;
+
+    }
 
     public void changeHealth(int amount){ //increase or decrease health, meant for items or effects that modify health
 
