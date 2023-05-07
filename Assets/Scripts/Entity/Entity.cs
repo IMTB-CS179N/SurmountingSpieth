@@ -30,6 +30,11 @@ namespace Project
 
         // private List<Weapon> m_weapons;
         private List<Armor> m_armors = new List<Armor>();
+        private List<Weapons> m_weapons = new List<Weapons>();
+
+        private Armor e_armor;
+        private Weapons e_weapon;
+
         private int m_precision;
         private float m_dodgeChance;
 
