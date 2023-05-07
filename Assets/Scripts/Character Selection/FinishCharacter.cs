@@ -16,7 +16,7 @@ namespace Project
         // Start is called before the first frame update
         void Start()
         {
-            Templates = AssetParser.ParseFromCSV<Stats>("CharacterTemplates.csv");
+            Templates = AssetParser.ParseFromCSV<Stats>("CharacterTemplatesV1.csv");
 
             Debug.Log("Successful Parse");
             CompleteCharacter();
@@ -30,7 +30,7 @@ namespace Project
             for (int i = 0; i < 30; ++i)
             {
                 string CsvRace = Templates[i].Race;
-                string CsvClass = Templates[i].C_Class;
+                string CsvClass = Templates[i].CharacterClass;
 
                 // Debug.Log(CsvClass);
                 // Debug.Log(CsvRace);
