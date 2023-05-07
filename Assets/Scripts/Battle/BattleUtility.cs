@@ -2,13 +2,7 @@ using UnityEngine;
 using System;
 
 public static class BattleUtility {
-    private static float HitChance;
-    private static float Precision;
-    private static float DodgeChance;
-    private static float CriticalChance;
-    private static float CriticalDamage;
-
-    public static bool CalculateHit() {
+    public static bool CalculateHit(float Precision, float DodgeChance) {
         if(DodgeChance == 0.0) {
             return true;
         }
@@ -20,7 +14,7 @@ public static class BattleUtility {
         return UnityEngine.Random.Range(0,100) < Hit;
     }
 
-    public static float CalculateDamage(float BaseDamage) {
+    public static float CalculateDamage(float BaseDamage, float CriticalChance, float CriticalDamage) {
         float Damage = BaseDamage;
         if(UnityEngine.Random.Range(0,100) < CriticalChance) {
             Damage *= CriticalDamage;

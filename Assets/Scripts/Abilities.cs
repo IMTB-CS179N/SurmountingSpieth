@@ -28,12 +28,14 @@ public class Ability : IDisposable
         //CooldownTime = 0;
     }
 
-    public void manaReduction(int currentMana) {
+    public int manaReduction(int currentMana) {
         currentMana -= ManaCost;
+        return currentMana;
     }
     
-    public void abilityDamageIncrease(int currentDamage) {
+    public int abilityDamageIncrease(int currentDamage) {
         currentDamage *= DamageMultiplier;
+        return currentDamage;
     }
 
     /*public void turnsCooldown() {
