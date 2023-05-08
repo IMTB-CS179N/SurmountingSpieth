@@ -15,6 +15,8 @@ namespace Project
 
         int Precision { get; }
         float DodgeChance { get; }
+        float CriticalChance { get; }
+        float CriticalDamage { get; }
 
         int DepleteArmor(int damage);
 
@@ -57,11 +59,25 @@ namespace Project
 
         public int Precision => this.m_precision;
         public float DodgeChance => this.m_dodgeChance;
+        public float CriticalChance => 0.5f;
+        public float CriticalDamage => 1.5f;
 
         public int DepleteArmor(int damage)
         {
             var NewDamage = Math.Max(0, damage - ArmorValue);
+            var temp = ArmorValue;
             ArmorValue = Math.Max(0, ArmorValue - damage);
+            Debug.Log(
+                "Depleting armor from "
+                    + temp
+                    + " to "
+                    + ArmorValue
+                    + " by taking "
+                    + damage
+                    + " damage, with Health taking "
+                    + NewDamage
+                    + " damage"
+            );
 
             return NewDamage;
         }
@@ -85,17 +101,32 @@ namespace Project
 
         public int Precision => this.m_precision;
         public float DodgeChance => this.m_dodgeChance;
+        public float CriticalChance => 0.5f;
+        public float CriticalDamage => 1.5f;
 
         public Enemy()
         {
             Health = 100;
             ArmorValue = 2;
+            Damage = 3;
         }
 
         public int DepleteArmor(int damage)
         {
             var NewDamage = Math.Max(0, damage - ArmorValue);
+            var temp = ArmorValue;
             ArmorValue = Math.Max(0, ArmorValue - damage);
+            Debug.Log(
+                "Depleting armor from "
+                    + temp
+                    + " to "
+                    + ArmorValue
+                    + " by taking "
+                    + damage
+                    + " damage, with Health taking "
+                    + NewDamage
+                    + " damage"
+            );
 
             return NewDamage;
         }
@@ -103,31 +134,6 @@ namespace Project
         public int ComputeDamage()
         {
             return 3;
-        }
-    }
-
-    public static class BattleUtil
-    {
-        public static bool Attack(IEntity attacker, IEntity receiver)
-        {
-            if (CheckIfHit(attacker, receiver))
-            {
-                var damage = attacker.ComputeDamage();
-
-                receiver.Health -= receiver.DepleteArmor(damage);
-
-                if (receiver.Health <= 0)
-                {
-                    return true; // kill
-                }
-            }
-
-            return false;
-        }
-
-        public static bool CheckIfHit(IEntity attacker, IEntity receiver)
-        {
-            return true; // take into account precision and dodge chance, return true if hit
         }
     }
 }
