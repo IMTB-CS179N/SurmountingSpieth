@@ -75,6 +75,15 @@ namespace Project.UI
             {
                 Debug.LogWarning("Character Creation UI is not attached to the UI Manager!");
             }
+
+            if (this.TradeUI != null)
+            {
+                this.TradeUI.UI.enabled = false;
+            }
+            else
+            {
+                Debug.LogWarning("Trade UI is not attached to the UI manager!");
+            }
         }
 
         public void PerformScreenChange(ScreenType type)

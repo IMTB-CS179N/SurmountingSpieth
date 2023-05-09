@@ -15,12 +15,13 @@ namespace Project
 
         private void Start()
         {
-            var array = AssetParser.ParseFromCSV<Ability>("Character Abilities - Sheet1.csv", true);
-        
-            Debug.Log(array.ToString());
+            // #TODO start game
         }
 
-        private void Update() { }
+        private void Update()
+        {
+            // #TODO any update related events
+        }
 
         private void FixedUpdate()
         {

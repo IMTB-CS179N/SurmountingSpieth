@@ -24,6 +24,8 @@ namespace Project.UI
         {
             this.OnUIEnabled += () => this.UI.enabled = true;
             this.OnUIDisabled += () => this.UI.enabled = false;
+
+            this.BindEvents();
         }
 
         private void OnEnable()
