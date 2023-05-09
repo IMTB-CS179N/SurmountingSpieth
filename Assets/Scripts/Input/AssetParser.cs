@@ -9,13 +9,24 @@ namespace Project.Input
 {
     public class AssetParser
     {
-        public static T[] ParseFromCSV<T>(string file) where T : IDisposable
+        public static T[] ParseFromCSV<T>(string file, bool useResources) where T : IDisposable
         {
             var type = typeof(T);
 
             var properties = AssetParser.GetProperties(type);
 
-            using (var stream = new StreamReader(File.OpenRead(file)))
+            TextReader stream;
+
+            if (useResources)
+            {
+                stream = new StreamReader(new MemoryStream(Resources.Load<TextAsset>(file).bytes));
+            }
+            else
+            {
+                stream = new StreamReader(File.OpenRead(file));
+            }
+
+            try
             {
                 var instances = new List<T>();
 
@@ -43,6 +54,10 @@ namespace Project.Input
                 }
 
                 return instances.ToArray();
+            }
+            finally
+            {
+                stream.Dispose();
             }
         }
 
@@ -87,7 +102,12 @@ namespace Project.Input
             }
             else if (property.PropertyType == typeof(bool))
             {
-                property.SetValue(target, Boolean.Parse(value));
+                if (!Boolean.TryParse(value, out bool result))
+                {
+                    result = Int32.Parse(value) != 0;
+                }
+
+                property.SetValue(target, result);
             }
             else if (property.PropertyType == typeof(sbyte))
             {
@@ -131,11 +151,37 @@ namespace Project.Input
             }
             else if (property.PropertyType == typeof(Sprite))
             {
-                property.SetValue(target, Resources.Load<Sprite>(value));
+                property.SetValue(target, ResourceManager.LoadSprite(value));
             }
             else if (property.PropertyType == typeof(Texture2D))
             {
-                property.SetValue(target, Resources.Load<Texture2D>(value));
+                property.SetValue(target, ResourceManager.LoadTexture2D(value));
+            }
+            else if (property.PropertyType == typeof(int[]))
+            {
+                var splits = value.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                var result = new int[splits.Length];
+
+                for (int i = 0; i < result.Length; ++i)
+                {
+                    result[i] = Int32.Parse(splits[i]);
+                }
+
+                property.SetValue(target, result);
+            }
+            else if (property.PropertyType == typeof(float[]))
+            {
+                var splits = value.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                var result = new float[splits.Length];
+
+                for (int i = 0; i < result.Length; ++i)
+                {
+                    result[i] = Single.Parse(splits[i]);
+                }
+
+                property.SetValue(target, result);
             }
             else
             {
