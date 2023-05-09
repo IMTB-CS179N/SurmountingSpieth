@@ -5,53 +5,53 @@ using System;
 
 using Project.Input;
 
-namespace Project
+public class Ability : IDisposable
 {
-    public class Ability : IDisposable
-    {
-        [Order(0)]
-        public string C_Class { get; set; }
+    [Order(0)]
+    public string C_Class {get;set;}
+    [Order(1)]
+    public string AbilityName {get; set;}
+    [Order(2)]
+    public int ManaCost {get; set;}
+    [Order(3)]
+    public int DamageMultiplier {get; set;}
 
-        [Order(1)]
-        public string AbilityName { get; set; }
+    //public int CooldownTime {get;set;}
+    //private int turnsRemaining;
+    
 
-        [Order(2)]
-        public float DamageMultiplier { get; set; }
+    public Ability() {
+        C_Class = "";
+        AbilityName = "";
+        ManaCost = -1;
+        DamageMultiplier = -1;
+        //CooldownTime = 0;
+    }
 
-        [Order(3)]
-        public int ManaCost { get; set; }
+    public int manaReduction(int currentMana) {
+        currentMana -= ManaCost;
+        return currentMana;
+    }
+    
+    public int abilityDamageIncrease(int currentDamage) {
+        currentDamage *= DamageMultiplier;
+        return currentDamage;
+    }
 
-        public Ability()
-        {
-            C_Class = "";
-            AbilityName = "";
-            ManaCost = -1;
-            DamageMultiplier = -1;
-            //CooldownTime = 0;
+    /*public void turnsCooldown() {
+        turnsRemaining = CooldownTurns;
+        if(turnsRemaining > 0) {
+            turnsRemaining--;
         }
-
-        public void ManaReduction(int currentMana)
-        {
-            //currentMana -= ManaCost;
+        else {
+            //can use ability
         }
+    }*/
 
-        public void AbilityDamageIncrease(int currentDamage)
-        {
-            //currentDamage *= DamageMultiplier;
-        }
-
-        /*public void turnsCooldown() {
-            turnsRemaining = CooldownTurns;
-            if(turnsRemaining > 0) {
-                turnsRemaining--;
-            }
-            else {
-                //can use ability
-            }
-        }*/
-
-        public void Dispose()
-        {
-        }
+    public void Dispose(){}
+    void Update() {}
+    void Start(
+    ) {
+        //turnsRemaining = 0;
     }
 }
