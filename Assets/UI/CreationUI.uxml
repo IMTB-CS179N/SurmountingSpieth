@@ -65,8 +65,8 @@
                     <ui:ProgressBar value="15" name="dodge-bar" class="statistic-bar statistic-bar-background statistic-bar-progress" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="finish-layout" style="width: 100%; height: 15%; padding-left: 15px; padding-right: 15px; padding-top: 0; padding-bottom: 25px; background-color: rgba(0, 0, 0, 0); flex-shrink: 0;">
-                <ui:VisualElement name="finish-button" style="flex-grow: 1; background-image: resource(&apos;UI/Creation/Finish&apos;); -unity-background-scale-mode: stretch-to-fill;" />
+            <ui:VisualElement name="finish-layout" style="width: 100%; height: 15%; padding-left: 15px; padding-right: 15px; padding-top: 0; padding-bottom: 25px; background-color: rgba(0, 0, 0, 0); flex-shrink: 0; flex-direction: row-reverse;">
+                <ui:VisualElement name="finish-button" style="flex-grow: 0; background-image: resource(&apos;UI/Creation/Finish&apos;); -unity-background-scale-mode: stretch-to-fill; flex-shrink: 0; height: 100%; width: 200px;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

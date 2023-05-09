@@ -151,11 +151,37 @@ namespace Project.Input
             }
             else if (property.PropertyType == typeof(Sprite))
             {
-                property.SetValue(target, Resources.Load<Sprite>(value));
+                property.SetValue(target, ResourceManager.LoadSprite(value));
             }
             else if (property.PropertyType == typeof(Texture2D))
             {
-                property.SetValue(target, Resources.Load<Texture2D>(value));
+                property.SetValue(target, ResourceManager.LoadTexture2D(value));
+            }
+            else if (property.PropertyType == typeof(int[]))
+            {
+                var splits = value.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                var result = new int[splits.Length];
+
+                for (int i = 0; i < result.Length; ++i)
+                {
+                    result[i] = Int32.Parse(splits[i]);
+                }
+
+                property.SetValue(target, result);
+            }
+            else if (property.PropertyType == typeof(float[]))
+            {
+                var splits = value.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                var result = new float[splits.Length];
+
+                for (int i = 0; i < result.Length; ++i)
+                {
+                    result[i] = Single.Parse(splits[i]);
+                }
+
+                property.SetValue(target, result);
             }
             else
             {
