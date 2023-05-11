@@ -1,4 +1,5 @@
-﻿using Project.Game;
+﻿using Project.Battle;
+using Project.Game;
 
 using System;
 using System.Collections.Generic;
@@ -531,7 +532,14 @@ namespace Project.UI
         {
             if (this.IsFinishButtonInteractable())
             {
-                Debug.Log("Finish clicked!");
+                var @class = this.m_classIcons[this.m_selectedClass].Name;
+                var race = this.m_raceIcons[this.m_selectedRace].Name;
+
+                Player.Initialize(race, @class);
+
+                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+
+                MapManager.Instance.Load();
             }
         }
 
