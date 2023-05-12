@@ -85,7 +85,7 @@ namespace Project
             Debug.Log("Player Attacking");
             var enemy = this.m_enemies[0];
 
-            if (BattleUtil.Attack(player, enemy))
+            if (BattleUtility.Attack(player, enemy))
             {
                 this.m_enemies.RemoveAt(0);
 
@@ -105,7 +105,7 @@ namespace Project
         {
             Debug.Log("Enemy Attacking");
             var enemy = this.m_enemies[0];
-            if (BattleUtil.Attack(enemy, player))
+            if (BattleUtility.Attack(enemy, player))
             {
                 Debug.Log("Enemy killed player");
             }
