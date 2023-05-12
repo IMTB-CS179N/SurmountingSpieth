@@ -1,60 +1,67 @@
-using UnityEngine;
-// using Project.Entity
-using System;
+using Project.Game;
 
-namespace Project
+using UnityEngine;
+
+namespace Project.Battle
 {
+    public struct OutcomeInfo
+    {
+        public bool HitMissed;
+        public int DamageDealt;
+        public bool KilledAnyEnemy;
+
+    }
+
     public static class BattleUtility
     {
-        public static bool CalculateHit(float Precision, float DodgeChance)
+        public static bool CheckIfHits(float precision, float evasion)
         {
-            if (DodgeChance == 0.0)
+            // evasion is 0.0f to 1.0f
+            // precision is 0.0f to infinity
+
+            if (evasion <= 0.0f)
             {
-                return true;
+                return true; // if dodge is 0%, always hits
             }
-            else if (DodgeChance == 1.0)
+
+            if (evasion >= 1.0f)
             {
-                return false;
+                return false; // if dodge is 100%, never hits (should never happen though?)
             }
-            float ChanceToHit = (1f - DodgeChance) + (Precision * 0.01f);
-            int Hit = (int)(ChanceToHit * 100);
-            return UnityEngine.Random.Range(0, 100) < Hit;
+
+            var chance = precision * (1.0f - evasion);
+
+            if (chance >= 1.0f)
+            {
+                return true; // if too much precision, always hits
+            }
+
+            return Random.Range(0, 100) < (int)(chance * 100.0f);
         }
 
-        public static float CalculateDamage(
-            float BaseDamage,
-            float CriticalChance,
-            float CriticalDamage
-        )
+        public static int CalculateDamage(int damage, int armor, float critChance, float critMultiplier, bool trueDamage)
         {
-            float Damage = BaseDamage;
-            if (UnityEngine.Random.Range(0, 100) < CriticalChance)
+            float applied = damage;
+
+            if (critChance >= 1.0f || (critChance > 0.0f && Random.Range(0, 100) < (int)(critChance * 100.0f)))
             {
-                Damage *= CriticalDamage;
+                applied *= critMultiplier; // if crit chance is 100% or if it applies in general
             }
-            return Damage;
+
+            return (int)(trueDamage ? applied : (applied * (100.0f / (100.0f + armor))));
         }
 
-        public static bool Attack(IEntity attacker, IEntity receiver)
+        public static void Attack(IEntity attacker, IEntity receiver)
         {
-            if (CalculateHit(attacker.Precision, receiver.DodgeChance))
-            {
-                var damage = CalculateDamage(
-                    attacker.Damage,
-                    attacker.CriticalChance,
-                    attacker.CriticalDamage
-                );
-                Debug.Log(
-                    "Doing " + damage + " damage to entity with " + receiver.Health + " health"
-                );
-                receiver.Health -= receiver.DepleteArmor((int)damage);
-                Debug.Log("New health: " + receiver.Health);
-                if (receiver.Health <= 0)
-                {
-                    return true;
-                }
-            }
-            return false;
+            // information we have to receive:
+            //   - entity information, attacker and receiver
+            //   - information about entities
+            //   - whether an ability should be used by an attacker
+            
+            // information we have to send back:
+            //   - whether an attack hit
+            //   - how much damage was dealt
+
         }
     }
 }

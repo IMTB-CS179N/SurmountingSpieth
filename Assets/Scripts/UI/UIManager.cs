@@ -10,6 +10,7 @@ namespace Project.UI
         {
             Main,
             InGame,
+            Battle,
             Settings,
             Creation,
             Trade,
@@ -26,6 +27,9 @@ namespace Project.UI
 
         [SerializeField]
         private UIBuilder InGameUI;
+
+        [SerializeField]
+        private UIBuilder BattleUI;
 
         [SerializeField]
         private UIBuilder SettingsUI;
@@ -56,6 +60,15 @@ namespace Project.UI
             else
             {
                 Debug.LogWarning("InGame UI is not attached to the UI Manager!");
+            }
+
+            if (this.BattleUI != null)
+            {
+                this.BattleUI.enabled = false;
+            }
+            else
+            {
+                Debug.LogWarning("Battle UI is not attached to the UI Manager!");
             }
 
             if (this.SettingsUI != null)
@@ -111,6 +124,7 @@ namespace Project.UI
             {
                 ScreenType.Main => this.MainUI,
                 ScreenType.InGame => this.InGameUI,
+                ScreenType.Battle => this.BattleUI,
                 ScreenType.Settings => this.SettingsUI,
                 ScreenType.Creation => this.CreationUI,
                 ScreenType.Trade => this.TradeUI,
@@ -124,6 +138,7 @@ namespace Project.UI
             {
                 ScreenType.Main => this.MainUI,
                 ScreenType.InGame => this.InGameUI,
+                ScreenType.Battle => this.BattleUI,
                 ScreenType.Settings => this.SettingsUI,
                 ScreenType.Creation => this.CreationUI,
                 ScreenType.Trade => this.TradeUI,
