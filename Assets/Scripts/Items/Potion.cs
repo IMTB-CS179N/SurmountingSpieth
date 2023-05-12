@@ -1,4 +1,4 @@
-using Project.Input;
+﻿using Project.Input;
 
 using System;
 
@@ -6,9 +6,10 @@ using UnityEngine;
 
 namespace Project.Items
 {
-    public class Weapon : IItem, IDisposable
+    public class Potion : IItem, IDisposable
     {
         private Sprite m_sprite;
+        private string m_effect;
         private string m_desc;
         private string m_name;
 
@@ -20,43 +21,39 @@ namespace Project.Items
         }
 
         [Order(1)]
-        public float Damage { get; set; } // base weapon dmg
-        
-        [Order(2)]
-        public float CritChance { get; set; } // crit chance
-        
-        [Order(3)]
-        public float CritMultiplier { get; set; } // crit modifier
-        
-        [Order(4)]
-        public float Precision { get; set; } // precision
+        public string Effect
+        {
+            get => this.m_effect;
+            set => this.m_effect = value ?? String.Empty;
+        }
 
-        [Order(5)]
+        [Order(2)]
+        public float Modifier { get; set; }
+
+        [Order(3)]
         public int Price { get; set; }
 
-        [Order(6)]
+        [Order(4)]
         public Sprite Sprite
         {
             get => this.m_sprite;
             set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
-        [Order(7)]
+        [Order(5)]
         public string Description
         {
             get => this.m_desc;
             set => this.m_desc = value ?? String.Empty;
         }
 
-        public Weapon()
+        public Potion()
         {
+            this.Price = 0;
+            this.Modifier = 0.0f;
             this.m_name = String.Empty;
             this.m_desc = String.Empty;
-            this.Damage = 7.0f;
-            this.CritChance = 0.5f;
-            this.CritMultiplier = 0.5f;
-            this.Precision = 0.0f;
-            this.Price = 100;
+            this.m_effect = String.Empty;
             this.m_sprite = ResourceManager.DefaultSprite;
         }
 

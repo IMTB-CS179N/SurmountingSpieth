@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Project.Items
 {
-    public class Weapon : IItem, IDisposable
+    public class Armor : IItem, IDisposable
     {
         private Sprite m_sprite;
         private string m_desc;
@@ -20,43 +20,39 @@ namespace Project.Items
         }
 
         [Order(1)]
-        public float Damage { get; set; } // base weapon dmg
-        
-        [Order(2)]
-        public float CritChance { get; set; } // crit chance
-        
-        [Order(3)]
-        public float CritMultiplier { get; set; } // crit modifier
-        
-        [Order(4)]
-        public float Precision { get; set; } // precision
+        public int Value { get; set; }
 
-        [Order(5)]
+        [Order(2)]
+        public float PrecisionReduction { get; set; }
+
+        [Order(3)]
+        public float EvasionAdditive { get; set; }
+
+        [Order(4)]
         public int Price { get; set; }
 
-        [Order(6)]
+        [Order(5)]
         public Sprite Sprite
         {
             get => this.m_sprite;
-            set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
+            set => this.m_sprite = value == null ? null : ResourceManager.DefaultSprite;
         }
 
-        [Order(7)]
+        [Order(6)]
         public string Description
         {
             get => this.m_desc;
             set => this.m_desc = value ?? String.Empty;
         }
 
-        public Weapon()
+        public Armor()
         {
             this.m_name = String.Empty;
             this.m_desc = String.Empty;
-            this.Damage = 7.0f;
-            this.CritChance = 0.5f;
-            this.CritMultiplier = 0.5f;
-            this.Precision = 0.0f;
-            this.Price = 100;
+            this.Value = 0;
+            this.Price = 0;
+            this.PrecisionReduction = 0.0f;
+            this.EvasionAdditive = 0.0f;
             this.m_sprite = ResourceManager.DefaultSprite;
         }
 
