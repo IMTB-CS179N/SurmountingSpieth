@@ -8,6 +8,8 @@ namespace Project.Items
 
         int Price { get; }
 
+        string Description { get; }
+
         Sprite Sprite { get; }
     }
 }

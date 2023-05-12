@@ -54,9 +54,6 @@ namespace Project.Game
             set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
-        [Order(10)]
-        public bool Alive { get; set; } // i mean, yeah?
-
         public Stats()
         {
             this.m_race = String.Empty;

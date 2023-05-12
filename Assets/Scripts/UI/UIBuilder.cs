@@ -22,20 +22,19 @@ namespace Project.UI
 
         private void Awake()
         {
-            this.OnUIEnabled += () => this.UI.enabled = true;
-            this.OnUIDisabled += () => this.UI.enabled = false;
-
             this.BindEvents();
         }
 
         private void OnEnable()
         {
+            this.UI.enabled = true; // ensure UI is enabled BEFORE we set it up
             this.OnUIEnabled?.Invoke();
         }
 
         private void OnDisable()
         {
             this.OnUIDisabled?.Invoke();
+            this.UI.enabled = false; // ensure UI is disabled AFTER the cleanup
         }
 
         private void Update()
@@ -53,16 +52,6 @@ namespace Project.UI
                         keyEvent.action();
                     }
                 }
-            }
-        }
-
-        public void BindButtonClick(string name, Action action)
-        {
-            var button = this.UI.rootVisualElement.Q<Button>(name);
-
-            if (button is not null)
-            {
-                button.clicked += action;
             }
         }
 

@@ -18,12 +18,16 @@ namespace Project.Game
 
         private static Player ms_instance;
 
-        private readonly List<Weapon> m_weapons;
-        private readonly List<Armor> m_armors;
-        private readonly List<Effect> m_effects;
+        private readonly List<Trinket> m_trinkets;
         private readonly List<Potion> m_potions;
+        private readonly List<Weapon> m_weapons;
+        private readonly List<Effect> m_effects;
+        private readonly List<Armor> m_armors;
         private readonly Ability[] m_abilities;
         private readonly Stats m_stats;
+
+        private Weapon m_equippedWeapon;
+        private Armor m_equippedArmor;
 
         private int m_maxHealth;
         private int m_maxMana;
@@ -59,6 +63,8 @@ namespace Project.Game
 
         public IReadOnlyList<Potion> Potions => this.m_potions;
 
+        public IReadOnlyList<Trinket> Trinkets => this.m_trinkets;
+
         public IReadOnlyList<Effect> Effects => this.m_effects;
 
         public IReadOnlyList<Ability> Abilities => this.m_abilities;
@@ -77,6 +83,7 @@ namespace Project.Game
             this.m_weapons = new();
             this.m_potions = new();
             this.m_effects = new();
+            this.m_trinkets = new();
             this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == @class).Select(_ => new Ability(_)).ToArray();
         }
 
@@ -258,8 +265,6 @@ namespace Project.Game
 
             this.m_armors.Insert(index, armor);
 
-            this.RecalculateStats();
-
             return index;
         }
 
@@ -280,8 +285,6 @@ namespace Project.Game
             int index = Player.BinarySearchInsertionPlace(weapon, this.m_weapons);
 
             this.m_weapons.Insert(index, weapon);
-
-            this.RecalculateStats();
 
             return index;
         }
@@ -304,7 +307,28 @@ namespace Project.Game
 
             this.m_potions.Insert(index, potion);
 
-            return index; // no need to recalculate stats since potions don't affect them unless used
+            return index;
+        }
+
+        public int PurchaseTrinket(Trinket trinket)
+        {
+            if (trinket is null)
+            {
+                throw new ArgumentNullException(nameof(trinket));
+            }
+            
+            if (trinket.Price > this.m_money)
+            {
+                throw new ArgumentException("Unable to purchase because not enough money");
+            }
+
+            this.m_money -= trinket.Price;
+
+            int index = Player.BinarySearchInsertionPlace(trinket, this.m_trinkets);
+
+            this.m_trinkets.Insert(index, trinket);
+
+            return index;
         }
 
         public void SellArmor(Armor armor)
@@ -312,6 +336,13 @@ namespace Project.Game
             if (armor is not null && this.m_armors.Remove(armor))
             {
                 this.m_money += (int)(armor.Price * Player.SellMultiplier);
+
+                if (Object.ReferenceEquals(armor, this.m_equippedArmor))
+                {
+                    this.m_equippedArmor = null;
+
+                    this.RecalculateStats();
+                }
             }
         }
 
@@ -320,6 +351,13 @@ namespace Project.Game
             if (weapon is not null && this.m_weapons.Remove(weapon))
             {
                 this.m_money += (int)(weapon.Price * Player.SellMultiplier);
+
+                if (Object.ReferenceEquals(weapon, this.m_equippedWeapon))
+                {
+                    this.m_equippedWeapon = null;
+
+                    this.RecalculateStats();
+                }
             }
         }
 
@@ -328,6 +366,76 @@ namespace Project.Game
             if (potion is not null && this.m_potions.Remove(potion))
             {
                 this.m_money += (int)(potion.Price * Player.SellMultiplier);
+            }
+        }
+
+        public void SellTrinket(Trinket trinket)
+        {
+            if (trinket is not null && this.m_trinkets.Remove(trinket))
+            {
+                this.m_money += (int)(trinket.Price * Player.SellMultiplier);
+            }
+        }
+
+        public void SellArmor(int index)
+        {
+            if (index >= 0 && index < this.m_armors.Count)
+            {
+                var armor = this.m_armors[index];
+
+                this.m_money += (int)(armor.Price * Player.SellMultiplier);
+
+                if (Object.ReferenceEquals(armor, this.m_equippedArmor))
+                {
+                    this.m_equippedArmor = null;
+
+                    this.RecalculateStats();
+                }
+
+                this.m_armors.RemoveAt(index);
+            }
+        }
+
+        public void SellWeapon(int index)
+        {
+            if (index >= 0 && index < this.m_weapons.Count)
+            {
+                var weapon = this.m_weapons[index];
+
+                this.m_money += (int)(weapon.Price * Player.SellMultiplier);
+
+                if (Object.ReferenceEquals(weapon, this.m_equippedWeapon))
+                {
+                    this.m_equippedWeapon = null;
+
+                    this.RecalculateStats();
+                }
+
+                this.m_weapons.RemoveAt(index);
+            }
+        }
+
+        public void SellPotion(int index)
+        {
+            if (index >= 0 && index < this.m_potions.Count)
+            {
+                var potion = this.m_potions[index];
+
+                this.m_money += (int)(potion.Price * Player.SellMultiplier);
+
+                this.m_potions.RemoveAt(index);
+            }
+        }
+
+        public void SellTrinket(int index)
+        {
+            if (index >= 0 && index < this.m_trinkets.Count)
+            {
+                var trinket = this.m_trinkets[index];
+
+                this.m_money += (int)(trinket.Price * Player.SellMultiplier);
+
+                this.m_trinkets.RemoveAt(index);
             }
         }
 

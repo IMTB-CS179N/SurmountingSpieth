@@ -19,6 +19,10 @@ namespace Project
 
         public static readonly string WeaponDataPath = "Data/Weapons.csv";
 
+        public static readonly string PotionDataPath = "Data/Potions.csv";
+
+        public static readonly string TrinketDataPath = "Data/Trinkets.csv";
+
         public static readonly string AbilityDataPath = "Data/Abilities.csv";
 
         public static readonly string RaceDataPath = "Data/Races.csv";
@@ -27,9 +31,13 @@ namespace Project
 
         public static readonly string CharacterDataPath = "Data/Characters.csv";
 
+        public static readonly string SelectedItemPath = "UI/Shared/SelectedItemBackground";
+
         private static readonly Dictionary<string, Texture2D> ms_loadedTextures = new();
         private static readonly Dictionary<string, Sprite> ms_loadedSprites = new();
 
+        private static Trinket[] ms_trinkets;
+        private static Potion[] ms_potions;
         private static Weapon[] ms_weapons;
         private static Armor[] ms_armors;
 
@@ -53,9 +61,13 @@ namespace Project
 
         public static IReadOnlyList<AbilityData> Abilities => ms_abilities ??= AssetParser.ParseFromCSV<AbilityData>(AbilityDataPath, true);
 
-        public static IReadOnlyList<Armor> Armors => ms_armors ??= AssetParser.ParseFromCSV<Armor>(ArmorDataPath, true);
+        public static IReadOnlyList<Armor> Armors => ms_armors ??= AssetParser.ParseFromCSV<Armor>(ArmorDataPath, true).Sorted();
 
-        public static IReadOnlyList<Weapon> Weapons => ms_weapons ??= AssetParser.ParseFromCSV<Weapon>(WeaponDataPath, true);
+        public static IReadOnlyList<Weapon> Weapons => ms_weapons ??= AssetParser.ParseFromCSV<Weapon>(WeaponDataPath, true).Sorted();
+
+        public static IReadOnlyList<Potion> Potions => ms_potions ??= AssetParser.ParseFromCSV<Potion>(PotionDataPath, true).Sorted();
+
+        public static IReadOnlyList<Trinket> Trinkets => ms_trinkets ??= AssetParser.ParseFromCSV<Trinket>(TrinketDataPath, true).Sorted();
 
         public static Texture2D LoadTexture2D(string path)
         {
@@ -135,6 +147,16 @@ namespace Project
             }
 
             return default;
+        }
+
+        public static T[] Sorted<T>(this T[] items) where T : IItem
+        {
+            if (items is not null && items.Length > 0)
+            {
+                Array.Sort(items, (x, y) => x.Price.CompareTo(y.Price));
+            }
+
+            return items;
         }
     }
 }

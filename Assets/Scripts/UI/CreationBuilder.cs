@@ -46,7 +46,7 @@ namespace Project.UI
                 this.style.paddingRight = 4;
 
                 this.style.unityBackgroundImageTintColor = Color.clear;
-                this.style.backgroundImage = new StyleBackground(ResourceManager.LoadSprite(kSelectedItem));
+                this.style.backgroundImage = new StyleBackground(ResourceManager.LoadSprite(ResourceManager.SelectedItemPath));
 
                 this.Image = new VisualElement()
                 {
@@ -74,8 +74,6 @@ namespace Project.UI
                 this.style.unityBackgroundImageTintColor = Color.clear;
             }
         }
-
-        private const string kSelectedItem = "UI/Shared/SelectedItemBackground";
 
         private const string kCharacterImage = "character-image";
         private const string kFinishButton = "finish-button";
@@ -537,9 +535,9 @@ namespace Project.UI
 
                 Player.Initialize(race, @class);
 
-                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
-
                 MapManager.Instance.Load();
+
+                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
             }
         }
 
