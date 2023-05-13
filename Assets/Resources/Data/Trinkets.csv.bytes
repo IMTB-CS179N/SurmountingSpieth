@@ -1,4 +1,6 @@
-Flame trinket,2,-2,sprite
-Strength trinket,4,0,sprite
-Ice Trinket,1,-3,sprite
-Poison Trinket,3,-1,sprite
+Trinket1,true,Damage,10,100,sprite,"This is a trinket that adds 10 damage"
+Trinket2,false,Damage,20,200,sprite,"This is a trinket that adds 20 damage"
+Trinket3,true,Damage,30,300,sprite,"This is a trinket that adds 30 damage"
+Trinket4,false,Damage,40,400,sprite,"This is a trinket that adds 40 damage"
+Trinket5,true,Damage,50,500,sprite,"This is a trinket that adds 50 damage"
+Trinket6,false,Damage,60,600,sprite,"This is a trinket that adds 60 damage"

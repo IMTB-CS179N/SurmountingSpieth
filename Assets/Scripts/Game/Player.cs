@@ -85,6 +85,8 @@ namespace Project.Game
             this.m_effects = new();
             this.m_trinkets = new();
             this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == @class).Select(_ => new Ability(_)).ToArray();
+
+            this.m_money = 500;
         }
 
 
@@ -221,7 +223,7 @@ namespace Project.Game
             {
                 var ability = this.m_abilities[abilityIndex];
 
-                damage = (int)(this.m_damage * ability.DamageMultiplier);
+                damage = (int)(this.m_damage); // * ability.DamageMultiplier);
 
                 canMiss = ability.CanMiss;
 

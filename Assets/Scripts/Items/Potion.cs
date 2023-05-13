@@ -31,16 +31,19 @@ namespace Project.Items
         public float Modifier { get; set; }
 
         [Order(3)]
-        public int Price { get; set; }
+        public int Duration { get; set; }
 
         [Order(4)]
+        public int Price { get; set; }
+
+        [Order(5)]
         public Sprite Sprite
         {
             get => this.m_sprite;
             set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
-        [Order(5)]
+        [Order(6)]
         public string Description
         {
             get => this.m_desc;

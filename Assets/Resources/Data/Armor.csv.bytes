@@ -1,6 +1,3 @@
-Leather Armor,10,0,1,Sprite
-Chainmail Armor,15,-2,1,Sprite
-Light Armor,20,-4,1,Sprite
-Heavy Amror,30,-8,1,Sprite
-Dragonscale Armor,35,-10,1,Sprite
-Medium Armor,25,-6,1,Sprite
+Armor1,Helmet,0,30,7,0.02,200,sprite,"This is armor that gives 30 armor, 2% evasion, has 0 trinket slots"
+Armor2,Helmet,1,60,7,0.02,600,sprite,"This is armor that gives 60 armor, 2% evasion, has 1 trinket slot"
+Armor3,Helmet,2,90,7,0.02,1000,sprite,"This is armor that gives 90 armor, 2% evasion, has 2 trinket slots"

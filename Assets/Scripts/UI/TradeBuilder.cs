@@ -185,7 +185,7 @@ namespace Project.UI
         private static readonly Color ms_lockedBackColor = new Color32(61, 29, 14, 255);
 
         private static readonly Color ms_activeTint = new Color32(150, 150, 150, 255);
-        private static readonly Color ms_selectTint = new Color32(60, 20, 185, 255);
+        private static readonly Color ms_selectTint = new Color32(255, 255, 255, 255);
 
         private readonly List<IconElement> m_playerInventory = new();
         private readonly List<IconElement> m_sellerInventory = new();
@@ -208,6 +208,9 @@ namespace Project.UI
             this.m_playerView = this.UI.rootVisualElement.Q<ScrollView>(kPlayerInventory);
             this.m_sellerView = this.UI.rootVisualElement.Q<ScrollView>(kSellerInventory);
 
+            this.m_playerView.Clear();
+            this.m_sellerView.Clear();
+
             this.SetupArmorButton();
             this.SetupWeaponButton();
             this.SetupPotionButton();
@@ -223,7 +226,11 @@ namespace Project.UI
 
         private void OnDisableEvent()
         {
-            this.ResetInventories();
+            this.m_selectedIndex = -1;
+            this.m_isFocusedOnSeller = false;
+
+            this.m_playerInventory.Clear();
+            this.m_sellerInventory.Clear();
 
             this.m_playerView = null;
             this.m_sellerView = null;
@@ -271,23 +278,30 @@ namespace Project.UI
             {
                 element.RegisterCallback<MouseLeaveEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_unlockedIdledTint;
+                    if (element.pickingMode == PickingMode.Position)
+                    {
+                        element.style.unityBackgroundImageTintColor = ms_unlockedIdledTint;
+                    }
                 });
 
                 element.RegisterCallback<MouseEnterEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_unlockedHoverTint;
+                    if (element.pickingMode == PickingMode.Position)
+                    {
+                        element.style.unityBackgroundImageTintColor = ms_unlockedHoverTint;
+                    }
                 });
 
                 element.RegisterCallback<MouseDownEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_unlockedPressTint;
+                    if (element.pickingMode == PickingMode.Position)
+                    {
+                        element.style.unityBackgroundImageTintColor = ms_unlockedPressTint;
+                    }
                 });
 
                 element.RegisterCallback<MouseUpEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_unlockedHoverTint;
-
                     onMouseUp?.Invoke();
                 });
 
@@ -339,6 +353,8 @@ namespace Project.UI
                             break;
                     }
 
+                    this.m_playerView[this.m_selectedIndex].Blur();
+
                     this.m_playerView.RemoveAt(this.m_selectedIndex);
 
                     this.m_playerInventory.RemoveAt(this.m_selectedIndex);
@@ -354,18 +370,18 @@ namespace Project.UI
 
         private void ReinitializeAll(Tab newTab)
         {
-            this.SetCurrentButtonTint(Color.white);
+            this.SetCurrentButtonStatus(false);
 
             this.ResetInventories();
 
             this.m_currentTab = newTab;
 
-            this.SetCurrentButtonTint(ms_activeTint);
+            this.SetCurrentButtonStatus(true);
 
             this.SetupInventories();
         }
 
-        private void SetCurrentButtonTint(Color color)
+        private void SetCurrentButtonStatus(bool active)
         {
             var root = this.UI.rootVisualElement;
 
@@ -380,7 +396,18 @@ namespace Project.UI
 
             if (button is not null)
             {
-                button.style.unityBackgroundImageTintColor = color;
+                if (active)
+                {
+                    button.style.unityBackgroundImageTintColor = ms_activeTint;
+
+                    button.pickingMode = PickingMode.Ignore;
+                }
+                else
+                {
+                    button.style.unityBackgroundImageTintColor = Color.white;
+
+                    button.pickingMode = PickingMode.Position;
+                }
             }
         }
 
@@ -503,7 +530,7 @@ namespace Project.UI
 
                 int index = elements.IndexOf(icon);
 
-                if (index != this.m_selectedIndex)
+                if (index != this.m_selectedIndex || icon.IsPlayers == this.m_isFocusedOnSeller)
                 {
                     if (this.m_selectedIndex >= 0)
                     {

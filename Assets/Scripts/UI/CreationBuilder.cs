@@ -88,7 +88,7 @@ namespace Project.UI
         private static readonly Color ms_hoverTint = new Color32(200, 200, 200, 255);
         private static readonly Color ms_pressTint = new Color32(170, 170, 170, 255);
 
-        private static readonly Color ms_selectTint = new Color32(60, 20, 185, 255);
+        private static readonly Color ms_selectTint = Color.black; // new Color32(60, 20, 185, 255);
 
         private readonly List<IconElement> m_classIcons = new();
         private readonly List<IconElement> m_raceIcons = new();

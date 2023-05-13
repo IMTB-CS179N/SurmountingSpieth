@@ -20,28 +20,31 @@ namespace Project.Items
         }
 
         [Order(1)]
-        public float Damage { get; set; } // base weapon dmg
-        
+        public int MaxTrinketCount { get; set; }
+
         [Order(2)]
-        public float CritChance { get; set; } // crit chance
+        public int Damage { get; set; } // base weapon dmg
         
         [Order(3)]
-        public float CritMultiplier { get; set; } // crit modifier
+        public float CritChance { get; set; } // crit chance
         
         [Order(4)]
+        public float CritMultiplier { get; set; } // crit modifier
+        
+        [Order(5)]
         public float Precision { get; set; } // precision
 
-        [Order(5)]
+        [Order(6)]
         public int Price { get; set; }
 
-        [Order(6)]
+        [Order(7)]
         public Sprite Sprite
         {
             get => this.m_sprite;
             set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
-        [Order(7)]
+        [Order(8)]
         public string Description
         {
             get => this.m_desc;
@@ -52,7 +55,7 @@ namespace Project.Items
         {
             this.m_name = String.Empty;
             this.m_desc = String.Empty;
-            this.Damage = 7.0f;
+            this.Damage = 7;
             this.CritChance = 0.5f;
             this.CritMultiplier = 0.5f;
             this.Precision = 0.0f;
