@@ -18,28 +18,7 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="player-items-bar" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: resource(&apos;UI/Trade/Inventory_Background_&apos;); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(123, 80, 47); border-right-color: rgb(123, 80, 47); border-top-color: rgb(123, 80, 47); border-bottom-color: rgb(123, 80, 47);">
-                        <ui:ScrollView name="player-scrollview" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="flex-grow: 1; background-color: rgba(255, 255, 255, 0); padding-left: 2px; padding-right: 2px; padding-top: 4px; padding-bottom: 4px;">
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                        </ui:ScrollView>
+                        <ui:ScrollView name="player-scrollview" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="flex-grow: 1; background-color: rgba(255, 255, 255, 0); padding-left: 2px; padding-right: 2px; padding-top: 4px; padding-bottom: 4px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="seller-layout" style="width: 50%; height: 100%; background-color: rgba(0, 0, 0, 0); flex-shrink: 0; padding-left: 8px; padding-right: 8px; padding-top: 10px; padding-bottom: 10px;">
@@ -47,28 +26,7 @@
                         <ui:VisualElement name="seller-name-label" style="flex-shrink: 0; height: 100%; justify-content: flex-start; width: 40%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; background-color: rgba(67, 128, 219, 0.47); background-image: resource(&apos;UI/Trade/Craig_Trade_Tag&apos;); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(123, 80, 47); border-right-color: rgb(123, 80, 47); border-top-color: rgb(123, 80, 47); border-bottom-color: rgb(123, 80, 47);" />
                     </ui:VisualElement>
                     <ui:VisualElement name="seller-items-bar" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: resource(&apos;UI/Trade/Inventory_Background_&apos;); border-left-color: rgb(123, 80, 47); border-right-color: rgb(123, 80, 47); border-top-color: rgb(123, 80, 47); border-bottom-color: rgb(123, 80, 47); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px;">
-                        <ui:ScrollView name="seller-scrollview" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="flex-grow: 1; padding-left: 2px; padding-right: 2px; padding-top: 4px; padding-bottom: 4px;">
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                            <Project.UI.InventoryItem />
-                        </ui:ScrollView>
+                        <ui:ScrollView name="seller-scrollview" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="flex-grow: 1; padding-left: 2px; padding-right: 2px; padding-top: 4px; padding-bottom: 4px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>

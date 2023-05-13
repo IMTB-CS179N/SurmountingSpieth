@@ -179,9 +179,9 @@ namespace Project.UI
         private static readonly Color ms_unlockedPressTint = new Color32(170, 170, 170, 255);
         private static readonly Color ms_unlockedBackColor = new Color32(101, 59, 28, 255);
 
-        private static readonly Color ms_lockedIdledTint = new Color32(120, 120, 120, 255);
-        private static readonly Color ms_lockedHoverTint = new Color32(95, 95, 95, 255);
-        private static readonly Color ms_lockedPressTint = new Color32(70, 70, 70, 255);
+        private static readonly Color ms_lockedIdledTint = new Color32(100, 100, 100, 255);
+        private static readonly Color ms_lockedHoverTint = new Color32(75, 75, 75, 255);
+        private static readonly Color ms_lockedPressTint = new Color32(50, 50, 50, 255);
         private static readonly Color ms_lockedBackColor = new Color32(61, 29, 14, 255);
 
         private static readonly Color ms_activeTint = new Color32(150, 150, 150, 255);
