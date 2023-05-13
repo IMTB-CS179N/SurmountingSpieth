@@ -1,13 +1,13 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/InventoryStyles.uss?fileID=7433441132597879392&amp;guid=9543586b6661def43aaee9f33ddc2690&amp;type=3#InventoryStyles" />
-    <ui:VisualElement name="overlay" style="flex-grow: 1; align-items: center; justify-content: center;">
-        <ui:VisualElement name="main-layout" style="width: 560px; height: 420px; background-color: rgba(166, 0, 0, 0.34); flex-shrink: 0; flex-direction: column;">
-            <ui:Label text="Inventory" display-tooltip-when-elided="false" enable-rich-text="false" name="inventory-label" style="width: 100%; height: 32px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-text-align: middle-center; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 32px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);">
+    <ui:VisualElement name="overlay" style="flex-grow: 1; align-items: center; justify-content: center; background-image: none;">
+        <ui:VisualElement name="main-layout" style="width: 560px; height: 420px; background-color: rgb(103, 63, 39); flex-shrink: 0; flex-direction: column; background-image: none; -unity-background-scale-mode: stretch-to-fill;">
+            <ui:Label text="Inventory" display-tooltip-when-elided="false" enable-rich-text="false" name="inventory-label" style="width: 100%; height: 32px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-text-align: middle-center; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 32px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">
                 <ui:VisualElement name="back-button" style="width: 32px; height: 32px; background-image: url(&apos;project://database/Packages/com.unity.collab-proxy/Editor/PlasticSCM/Assets/Images/d_iconclosebutton@2x.png?fileID=2800000&amp;guid=0525793900d728a42936791a8a6de63b&amp;type=3#d_iconclosebutton@2x&apos;); -unity-background-image-tint-color: rgb(0, 0, 0);" />
             </ui:Label>
-            <ui:VisualElement style="flex-direction: row; flex-shrink: 1; flex-grow: 1;">
-                <ui:VisualElement name="setup-container" style="width: 40%; height: 100%; flex-shrink: 0; background-color: rgba(212, 192, 0, 0.38);">
-                    <ui:VisualElement style="width: 100%; height: 40%; flex-shrink: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row;">
+            <ui:VisualElement name="main-container" style="flex-direction: row; flex-shrink: 1; flex-grow: 1; padding-left: 8px; padding-right: 8px; padding-top: 8px; padding-bottom: 8px; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);">
+                <ui:VisualElement name="setup-container" style="width: 40%; height: 100%; flex-shrink: 0; background-color: rgb(189, 146, 82); border-left-width: 4px; border-right-width: 4px; border-top-width: 4px; border-bottom-width: 4px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);">
+                    <ui:VisualElement style="width: 100%; height: 40%; flex-shrink: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.31);">
                         <ui:VisualElement style="flex-shrink: 0; width: 50%; height: 100%; padding-left: 15px; padding-right: 8px; padding-top: 8px; padding-bottom: 8px;">
                             <ui:VisualElement class="stat-info-container-style" style="background-color: rgba(0, 0, 0, 0);">
                                 <ui:VisualElement class="stat-icon-style stat-image-style" style="background-image: resource(&apos;Sprites/Stats/Health&apos;);" />
@@ -45,8 +45,8 @@
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(184, 255, 0, 0.35);">
-                        <ui:Label text="Equipment" display-tooltip-when-elided="true" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; width: 100%; height: 25%; -unity-text-align: middle-center; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 20px;" />
+                    <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(0, 0, 0, 0); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.31);">
+                        <ui:Label text="Equipment" display-tooltip-when-elided="true" style="padding-left: 2px; padding-right: 2px; padding-top: 4px; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; width: 100%; height: 25%; -unity-text-align: middle-center; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 20px; color: rgb(0, 0, 0);" />
                         <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: space-around; padding-left: 8px; padding-right: 8px;">
                             <ui:VisualElement class="equipped-style" />
                             <ui:VisualElement class="equipped-style" />
@@ -54,16 +54,16 @@
                             <ui:VisualElement class="equipped-style" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(184, 255, 0, 0.35);">
-                        <ui:Label text="Trinkets" display-tooltip-when-elided="true" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; width: 100%; height: 25%; -unity-text-align: middle-center; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 20px;" />
+                    <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(0, 0, 0, 0); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.31);">
+                        <ui:Label text="Trinkets" display-tooltip-when-elided="true" style="padding-left: 2px; padding-right: 2px; padding-top: 4px; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; width: 100%; height: 25%; -unity-text-align: middle-center; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 20px; color: rgb(0, 0, 0);" />
                         <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: space-around; padding-left: 10px; padding-right: 10px;">
                             <ui:VisualElement class="equipped-style" />
                             <ui:VisualElement class="equipped-style" />
                             <ui:VisualElement class="equipped-style" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(184, 255, 0, 0.35);">
-                        <ui:Label text="Potions" display-tooltip-when-elided="true" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; width: 100%; height: 25%; -unity-text-align: middle-center; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 20px;" />
+                    <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(0, 0, 0, 0); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.31);">
+                        <ui:Label text="Potions" display-tooltip-when-elided="true" style="padding-left: 2px; padding-right: 2px; padding-top: 4px; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; width: 100%; height: 25%; -unity-text-align: middle-center; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 20px; color: rgb(0, 0, 0);" />
                         <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: space-around; padding-left: 10px; padding-right: 10px;">
                             <ui:VisualElement class="equipped-style" />
                             <ui:VisualElement class="equipped-style" />
@@ -71,7 +71,37 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="inventory-container" style="width: 60%; height: 100%; flex-shrink: 0; background-color: rgba(151, 0, 176, 0.36);" />
+                <ui:VisualElement name="inventory-container" style="width: 60%; height: 100%; flex-shrink: 0; background-color: rgb(63, 38, 24); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; border-left-width: 0; border-right-width: 4px; border-top-width: 4px; border-bottom-width: 4px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);">
+                    <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgb(103, 63, 39); justify-content: space-around; align-items: center; flex-direction: row; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.31);">
+                        <ui:VisualElement class="type-button-style" style="background-image: resource(&apos;UI/Shared/Armor&apos;);" />
+                        <ui:VisualElement class="type-button-style" style="background-image: resource(&apos;UI/Shared/Weapon&apos;);" />
+                        <ui:VisualElement class="type-button-style" style="background-image: resource(&apos;UI/Shared/Potion&apos;);" />
+                        <ui:VisualElement class="type-button-style" style="background-image: resource(&apos;UI/Shared/Trinket&apos;);" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex-grow: 1; flex-direction: column-reverse;">
+                        <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 30%; background-color: rgb(189, 146, 82); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.31);">
+                            <ui:VisualElement style="flex-shrink: 0; width: 100%; height: 25%; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); flex-direction: row; justify-content: space-between; align-items: center; background-color: rgba(0, 0, 0, 0);">
+                                <ui:Label text="Name" display-tooltip-when-elided="false" enable-rich-text="false" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 4px; padding-right: 0; padding-top: 0; padding-bottom: 0; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 20px; color: rgb(0, 0, 0);" />
+                                <ui:Label text="Cost" display-tooltip-when-elided="true" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 4px; padding-top: 0; padding-bottom: 0; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 20px; color: rgb(0, 0, 0);" />
+                            </ui:VisualElement>
+                            <ui:VisualElement style="flex-grow: 1; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">
+                                <ui:Label text="Super long description that should fit in at least 3 lines and yes idk what else to type there because recently I have been very unaware..." display-tooltip-when-elided="false" enable-rich-text="false" style="flex-grow: 1; flex-shrink: 1; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 4px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px; color: rgb(0, 0, 0); white-space: normal; font-size: 12px;" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:ScrollView name="inventory-view" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="flex-grow: 1; background-color: rgb(103, 63, 39); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.31);">
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                            <ui:VisualElement class="inventory-item-style" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
