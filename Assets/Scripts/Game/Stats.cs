@@ -34,20 +34,23 @@ namespace Project.Game
 
         [Order(4)]
         public int BaseMana { get; set; }
-        
+
         [Order(5)]
+        public int BaseArmor { get; set; }
+
+        [Order(6)]
         public float BaseEvasion { get; set; }
         
-        [Order(6)]
+        [Order(7)]
         public float BasePrecision { get; set; }
         
-        [Order(7)]
+        [Order(8)]
         public float BaseCritChance { get; set; }
         
-        [Order(8)]
+        [Order(9)]
         public float BaseCritMultiplier { get; set; }
         
-        [Order(9)]
+        [Order(10)]
         public Sprite Sprite
         {
             get => this.m_sprite;
@@ -61,6 +64,7 @@ namespace Project.Game
             this.BaseHealth = 0;
             this.BaseDamage = 0;
             this.BaseMana = 0;
+            this.BaseArmor = 0;
             this.BaseEvasion = 0.0f;
             this.BasePrecision = 0.0f;
             this.BaseCritChance = 0.0f;

@@ -8,7 +8,7 @@ namespace Project.Game
 {
     public class RaceInfo : IDisposable
     {
-        private static readonly string ms_defaultPath = "Sprites/Races/DEFAULT_RACE";
+        private static readonly string ms_defaultPath = "Sprites/Races/DefaultRace";
 
         private Sprite m_sprite;
         private string m_name;
