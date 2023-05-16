@@ -13,7 +13,7 @@ namespace Project.Items
         Leggings,
     }
 
-    public class Armor : IItem, IDisposable
+    public class ArmorData : IItem, IDisposable
     {
         private Sprite m_sprite;
         private string m_desc;
@@ -39,7 +39,7 @@ namespace Project.Items
         public float PrecisionReduction { get; set; }
 
         [Order(5)]
-        public float EvasionAdditive { get; set; }
+        public float EvasionAddition { get; set; }
 
         [Order(6)]
         public int Price { get; set; }
@@ -48,7 +48,7 @@ namespace Project.Items
         public Sprite Sprite
         {
             get => this.m_sprite;
-            set => this.m_sprite = value == null ? null : ResourceManager.DefaultSprite;
+            set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
         [Order(8)]
@@ -58,14 +58,14 @@ namespace Project.Items
             set => this.m_desc = value ?? String.Empty;
         }
 
-        public Armor()
+        public ArmorData()
         {
             this.m_name = String.Empty;
             this.m_desc = String.Empty;
             this.Value = 0;
             this.Price = 0;
             this.PrecisionReduction = 0.0f;
-            this.EvasionAdditive = 0.0f;
+            this.EvasionAddition = 0.0f;
             this.m_sprite = ResourceManager.DefaultSprite;
         }
 

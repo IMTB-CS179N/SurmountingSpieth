@@ -6,7 +6,21 @@ using UnityEngine;
 
 namespace Project.Game
 {
-    public class Stats : IDisposable
+    public struct EntityStats
+    {
+        public int MaxHealth;
+        public int MaxMana;
+        public int CurHealth;
+        public int CurMana;
+        public int Armor;
+        public int Damage;
+        public float Evasion;
+        public float Precision;
+        public float CritChance;
+        public float CritMultiplier;
+    }
+
+    public class BaseStats : IDisposable
     {
         private Sprite m_sprite;
         private string m_class;
@@ -27,28 +41,28 @@ namespace Project.Game
         }
 
         [Order(2)]
-        public int BaseHealth { get; set; }
+        public int Health { get; set; }
         
         [Order(3)]
-        public int BaseDamage { get; set; }
+        public int Damage { get; set; }
 
         [Order(4)]
-        public int BaseMana { get; set; }
+        public int Mana { get; set; }
 
         [Order(5)]
-        public int BaseArmor { get; set; }
+        public int Armor { get; set; }
 
         [Order(6)]
-        public float BaseEvasion { get; set; }
+        public float Evasion { get; set; }
         
         [Order(7)]
-        public float BasePrecision { get; set; }
+        public float Precision { get; set; }
         
         [Order(8)]
-        public float BaseCritChance { get; set; }
+        public float CritChance { get; set; }
         
         [Order(9)]
-        public float BaseCritMultiplier { get; set; }
+        public float CritMultiplier { get; set; }
         
         [Order(10)]
         public Sprite Sprite
@@ -57,18 +71,18 @@ namespace Project.Game
             set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
-        public Stats()
+        public BaseStats()
         {
             this.m_race = String.Empty;
             this.m_class = String.Empty;
-            this.BaseHealth = 0;
-            this.BaseDamage = 0;
-            this.BaseMana = 0;
-            this.BaseArmor = 0;
-            this.BaseEvasion = 0.0f;
-            this.BasePrecision = 0.0f;
-            this.BaseCritChance = 0.0f;
-            this.BaseCritMultiplier = 0.0f;
+            this.Health = 0;
+            this.Damage = 0;
+            this.Mana = 0;
+            this.Armor = 0;
+            this.Evasion = 0.0f;
+            this.Precision = 0.0f;
+            this.CritChance = 0.0f;
+            this.CritMultiplier = 0.0f;
             this.m_sprite = ResourceManager.DefaultSprite;
 
         }

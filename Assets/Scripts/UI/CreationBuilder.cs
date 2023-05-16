@@ -302,7 +302,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseHealth;
+                    var value = stats[i].Health;
 
                     if (value < min)
                     {
@@ -322,7 +322,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseMana;
+                    var value = stats[i].Mana;
 
                     if (value < min)
                     {
@@ -342,7 +342,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseDamage;
+                    var value = stats[i].Damage;
 
                     if (value < min)
                     {
@@ -362,7 +362,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseArmor;
+                    var value = stats[i].Armor;
 
                     if (value < min)
                     {
@@ -382,7 +382,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseEvasion;
+                    var value = stats[i].Evasion;
 
                     if (value < min)
                     {
@@ -401,7 +401,7 @@ namespace Project.UI
             this.UpdateStatistics(null);
         }
 
-        private void UpdateStatistics(Stats stats)
+        private void UpdateStatistics(BaseStats stats)
         {
             var root = this.UI.rootVisualElement;
 
@@ -442,34 +442,34 @@ namespace Project.UI
             {
                 if (healthBar is not null)
                 {
-                    healthBar.value = RemapToRange(stats.BaseHealth, this.m_minimumHealth, this.m_maximumHealth, 0.0f, 100.0f);
+                    healthBar.value = RemapToRange(stats.Health, this.m_minimumHealth, this.m_maximumHealth, 0.0f, 100.0f);
                 }
 
                 if (manaBar is not null)
                 {
-                    manaBar.value = RemapToRange(stats.BaseMana, this.m_minimumMana, this.m_maximumMana, 0.0f, 100.0f);
+                    manaBar.value = RemapToRange(stats.Mana, this.m_minimumMana, this.m_maximumMana, 0.0f, 100.0f);
                 }
 
                 if (damageBar is not null)
                 {
-                    damageBar.value = RemapToRange(stats.BaseDamage, this.m_minimumDamage, this.m_maximumDamage, 0.0f, 100.0f);
+                    damageBar.value = RemapToRange(stats.Damage, this.m_minimumDamage, this.m_maximumDamage, 0.0f, 100.0f);
                 }
 
                 if (armorBar is not null)
                 {
-                    armorBar.value = RemapToRange(stats.BaseArmor, this.m_minimumArmor, this.m_maximumArmor, 0.0f, 100.0f);
+                    armorBar.value = RemapToRange(stats.Armor, this.m_minimumArmor, this.m_maximumArmor, 0.0f, 100.0f);
                 }
 
                 if (evasionBar is not null)
                 {
-                    evasionBar.value = RemapToRange(stats.BaseEvasion, this.m_minimumEvasion, this.m_maximumEvasion, 0.0f, 100.0f);
+                    evasionBar.value = RemapToRange(stats.Evasion, this.m_minimumEvasion, this.m_maximumEvasion, 0.0f, 100.0f);
                 }
             }
         }
 
         private void UpdateCharacterAndFinish()
         {
-            var stats = default(Stats);
+            var stats = default(BaseStats);
 
             if (this.IsFinishButtonInteractable())
             {

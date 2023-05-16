@@ -11,6 +11,10 @@
     border-right-color: rgb(0, 0, 0);
     border-top-color: rgb(0, 0, 0);
     border-bottom-color: rgb(0, 0, 0);
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .stat-image-style {
@@ -87,7 +91,6 @@
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     background-color: rgb(189, 146, 82);
-    background-image: resource('UI/Shared/SelectedItemBackground');
     padding-left: 5px;
     padding-right: 5px;
     padding-top: 5px;
@@ -100,10 +103,9 @@
     border-right-width: 1px;
     border-top-width: 1px;
     border-bottom-width: 1px;
-    border-left-color: rgba(0, 0, 0, 255);
-    border-right-color: rgba(0, 0, 0, 255);
-    border-top-color: rgba(0, 0, 0, 255);
-    border-bottom-color: rgba(0, 0, 0, 255);
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
     flex-shrink: 0;
-    -unity-background-image-tint-color: rgba(255, 255, 255, 0);
 }

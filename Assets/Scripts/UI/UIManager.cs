@@ -8,6 +8,7 @@ namespace Project.UI
     {
         public enum ScreenType
         {
+            Invalid = -1,
             Main,
             InGame,
             Battle,
@@ -21,7 +22,8 @@ namespace Project.UI
 
         public static UIManager Instance => UIManager.ms_instance == null ? (UIManager.ms_instance = Object.FindFirstObjectByType<UIManager>()) : UIManager.ms_instance;
 
-        private ScreenType m_currentType;
+        private ScreenType m_currType;
+        private ScreenType m_nextType;
 
         [SerializeField]
         private UIBuilder MainUI;
@@ -46,7 +48,8 @@ namespace Project.UI
 
         private void Awake()
         {
-            this.m_currentType = ScreenType.Main;
+            this.m_currType = ScreenType.Main;
+            this.m_nextType = ScreenType.Invalid;
 
             if (this.MainUI != null)
             {
@@ -112,23 +115,32 @@ namespace Project.UI
             }
         }
 
+        private void Update()
+        {
+            if (this.m_nextType != ScreenType.Invalid)
+            {
+                var prev = this.GetCurrentlyEnabledUI();
+
+                if (prev != null)
+                {
+                    prev.enabled = false;
+                }
+
+                this.m_currType = this.m_nextType;
+                this.m_nextType = ScreenType.Invalid;
+
+                var next = this.GetCurrentlyEnabledUI();
+
+                if (next != null)
+                {
+                    next.enabled = true;
+                }
+            }
+        }
+
         public void PerformScreenChange(ScreenType type)
         {
-            var prev = this.GetCurrentlyEnabledUI();
-
-            if (prev != null)
-            {
-                prev.enabled = false;
-            }
-
-            this.m_currentType = type;
-
-            var next = this.GetCurrentlyEnabledUI();
-
-            if (next != null)
-            {
-                next.enabled = true;
-            }
+            this.m_nextType = type;
         }
 
         public UIBuilder GetUI(ScreenType type)
@@ -148,7 +160,7 @@ namespace Project.UI
 
         public UIBuilder GetCurrentlyEnabledUI()
         {
-            return this.m_currentType switch
+            return this.m_currType switch
             {
                 ScreenType.Main => this.MainUI,
                 ScreenType.InGame => this.InGameUI,

@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace Project.Items
 {
-    public class Trinket : IItem, IDisposable
+    public class PotionData : IItem, IDisposable
     {
         private Sprite m_sprite;
-        private string m_stat;
+        private string m_effect;
         private string m_desc;
         private string m_name;
 
@@ -21,17 +21,17 @@ namespace Project.Items
         }
 
         [Order(1)]
-        public bool IsWeaponTrinket { get; set; }
-
-        [Order(2)]
-        public string StatName
+        public string Effect
         {
-            get => this.m_stat;
-            set => this.m_stat = value ?? String.Empty;
+            get => this.m_effect;
+            set => this.m_effect = value ?? String.Empty;
         }
 
+        [Order(2)]
+        public float Modifier { get; set; }
+
         [Order(3)]
-        public float StatModify { get; set; }
+        public int Duration { get; set; }
 
         [Order(4)]
         public int Price { get; set; }
@@ -50,13 +50,13 @@ namespace Project.Items
             set => this.m_desc = value ?? String.Empty;
         }
 
-        public Trinket()
+        public PotionData()
         {
+            this.Price = 0;
+            this.Modifier = 0.0f;
             this.m_name = String.Empty;
             this.m_desc = String.Empty;
-            this.m_stat = String.Empty;
-            this.StatModify = 0.0f;
-            this.Price = 0;
+            this.m_effect = String.Empty;
             this.m_sprite = ResourceManager.DefaultSprite;
         }
 

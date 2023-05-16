@@ -31,20 +31,22 @@ namespace Project
 
         public static readonly string CharacterDataPath = "Data/Characters.csv";
 
+        public static readonly string DisallowPath = "UI/Shared/DisallowIcon";
+
         public static readonly string SelectedItemPath = "UI/Shared/SelectedItemBackground";
 
         private static readonly Dictionary<string, Texture2D> ms_loadedTextures = new();
         private static readonly Dictionary<string, Sprite> ms_loadedSprites = new();
 
-        private static Trinket[] ms_trinkets;
-        private static Potion[] ms_potions;
-        private static Weapon[] ms_weapons;
-        private static Armor[] ms_armors;
+        private static TrinketData[] ms_trinkets;
+        private static PotionData[] ms_potions;
+        private static WeaponData[] ms_weapons;
+        private static ArmorData[] ms_armors;
 
         private static AbilityData[] ms_abilities;
         private static ClassInfo[] ms_classes;
         private static RaceInfo[] ms_races;
-        private static Stats[] ms_stats;
+        private static BaseStats[] ms_stats;
 
         private static Texture2D ms_defaultTexture;
         private static Sprite ms_defaultSprite;
@@ -53,7 +55,7 @@ namespace Project
 
         public static Sprite DefaultSprite => ms_defaultSprite == null ? (ms_defaultSprite = Resources.Load<Sprite>(DefaultSpritePath)) : ms_defaultSprite;
 
-        public static IReadOnlyList<Stats> Stats => ms_stats ??= AssetParser.ParseFromCSV<Stats>(CharacterDataPath, true);
+        public static IReadOnlyList<BaseStats> Stats => ms_stats ??= AssetParser.ParseFromCSV<BaseStats>(CharacterDataPath, true);
 
         public static IReadOnlyList<RaceInfo> Races => ms_races ??= AssetParser.ParseFromCSV<RaceInfo>(RaceDataPath, true);
 
@@ -61,13 +63,13 @@ namespace Project
 
         public static IReadOnlyList<AbilityData> Abilities => ms_abilities ??= AssetParser.ParseFromCSV<AbilityData>(AbilityDataPath, true);
 
-        public static IReadOnlyList<Armor> Armors => ms_armors ??= AssetParser.ParseFromCSV<Armor>(ArmorDataPath, true).Sorted();
+        public static IReadOnlyList<ArmorData> Armors => ms_armors ??= AssetParser.ParseFromCSV<ArmorData>(ArmorDataPath, true).Sorted();
 
-        public static IReadOnlyList<Weapon> Weapons => ms_weapons ??= AssetParser.ParseFromCSV<Weapon>(WeaponDataPath, true).Sorted();
+        public static IReadOnlyList<WeaponData> Weapons => ms_weapons ??= AssetParser.ParseFromCSV<WeaponData>(WeaponDataPath, true).Sorted();
 
-        public static IReadOnlyList<Potion> Potions => ms_potions ??= AssetParser.ParseFromCSV<Potion>(PotionDataPath, true).Sorted();
+        public static IReadOnlyList<PotionData> Potions => ms_potions ??= AssetParser.ParseFromCSV<PotionData>(PotionDataPath, true).Sorted();
 
-        public static IReadOnlyList<Trinket> Trinkets => ms_trinkets ??= AssetParser.ParseFromCSV<Trinket>(TrinketDataPath, true).Sorted();
+        public static IReadOnlyList<TrinketData> Trinkets => ms_trinkets ??= AssetParser.ParseFromCSV<TrinketData>(TrinketDataPath, true).Sorted();
 
         public static Texture2D LoadTexture2D(string path)
         {

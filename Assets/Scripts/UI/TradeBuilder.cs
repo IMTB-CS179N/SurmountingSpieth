@@ -28,6 +28,10 @@ namespace Project.UI
 
             public bool Locked => this.m_locked;
 
+            public bool Hovered => this.m_hovered;
+
+            public bool Pressed => this.m_pressed;
+
             public readonly VisualElement Image;
 
             public IconElement(IItem item, bool isPlayers)
@@ -55,7 +59,7 @@ namespace Project.UI
                 this.style.paddingLeft = 5;
                 this.style.paddingRight = 5;
 
-                this.style.backgroundColor = ms_unlockedBackColor;
+                this.style.backgroundColor = ms_unlockedBackIdledColor;
                 this.style.unityBackgroundImageTintColor = Color.clear;
                 this.style.backgroundImage = new StyleBackground(ResourceManager.LoadSprite(ResourceManager.SelectedItemPath));
 
@@ -89,8 +93,6 @@ namespace Project.UI
             {
                 this.m_locked = true;
 
-                this.style.backgroundColor = ms_lockedBackColor;
-
                 if (this.m_hovered)
                 {
                     this.Hover();
@@ -108,8 +110,6 @@ namespace Project.UI
             public void Unlock()
             {
                 this.m_locked = false;
-
-                this.style.backgroundColor = ms_unlockedBackColor;
 
                 if (this.m_hovered)
                 {
@@ -130,6 +130,7 @@ namespace Project.UI
                 this.m_hovered = false;
                 this.m_pressed = false;
 
+                this.style.backgroundColor = this.m_locked ? ms_lockedBackIdledColor : ms_unlockedBackIdledColor;
                 this.Image.style.unityBackgroundImageTintColor = this.m_locked ? ms_lockedIdledTint : ms_unlockedIdledTint;
             }
 
@@ -138,6 +139,7 @@ namespace Project.UI
                 this.m_hovered = true;
                 this.m_pressed = false;
 
+                this.style.backgroundColor = this.m_locked ? ms_lockedBackHoverColor : ms_unlockedBackHoverColor;
                 this.Image.style.unityBackgroundImageTintColor = this.m_locked ? ms_lockedHoverTint : ms_unlockedHoverTint;
             }
 
@@ -146,6 +148,7 @@ namespace Project.UI
                 this.m_hovered = false;
                 this.m_pressed = true;
 
+                this.style.backgroundColor = this.m_locked ? ms_lockedBackPressColor : ms_unlockedBackPressColor;
                 this.Image.style.unityBackgroundImageTintColor = this.m_locked ? ms_lockedPressTint : ms_unlockedPressTint;
             }
         }
@@ -177,12 +180,18 @@ namespace Project.UI
         private static readonly Color ms_unlockedIdledTint = new Color32(255, 255, 255, 255);
         private static readonly Color ms_unlockedHoverTint = new Color32(200, 200, 200, 255);
         private static readonly Color ms_unlockedPressTint = new Color32(170, 170, 170, 255);
-        private static readonly Color ms_unlockedBackColor = new Color32(101, 59, 28, 255);
+
+        private static readonly Color ms_unlockedBackIdledColor = new Color32(101, 59, 28, 255);
+        private static readonly Color ms_unlockedBackHoverColor = new Color32(86, 47, 20, 255);
+        private static readonly Color ms_unlockedBackPressColor = new Color32(75, 40, 15, 255);
 
         private static readonly Color ms_lockedIdledTint = new Color32(100, 100, 100, 255);
         private static readonly Color ms_lockedHoverTint = new Color32(75, 75, 75, 255);
         private static readonly Color ms_lockedPressTint = new Color32(50, 50, 50, 255);
-        private static readonly Color ms_lockedBackColor = new Color32(61, 29, 14, 255);
+
+        private static readonly Color ms_lockedBackIdledColor = new Color32(61, 29, 14, 255);
+        private static readonly Color ms_lockedBackHoverColor = new Color32(48, 20, 9, 255);
+        private static readonly Color ms_lockedBackPressColor = new Color32(40, 15, 5, 255);
 
         private static readonly Color ms_activeTint = new Color32(150, 150, 150, 255);
         private static readonly Color ms_selectTint = new Color32(255, 255, 255, 255);
@@ -319,10 +328,10 @@ namespace Project.UI
 
                     this.CreateIconElement(this.m_playerView, item, this.m_playerInventory, true, this.m_currentTab switch
                     {
-                        Tab.Armor => Player.Instance.PurchaseArmor(Unsafe.As<Armor>(item)),
-                        Tab.Weapon => Player.Instance.PurchaseWeapon(Unsafe.As<Weapon>(item)),
-                        Tab.Potion => Player.Instance.PurchasePotion(Unsafe.As<Potion>(item)),
-                        Tab.Trinket => Player.Instance.PurchaseTrinket(Unsafe.As<Trinket>(item)),
+                        Tab.Armor => Player.Instance.PurchaseArmor(Unsafe.As<ArmorData>(item)),
+                        Tab.Weapon => Player.Instance.PurchaseWeapon(Unsafe.As<WeaponData>(item)),
+                        Tab.Potion => Player.Instance.PurchasePotion(Unsafe.As<PotionData>(item)),
+                        Tab.Trinket => Player.Instance.PurchaseTrinket(Unsafe.As<TrinketData>(item)),
                         _ => throw new Exception("The current tab is invalid"),
                     });
 
@@ -509,48 +518,51 @@ namespace Project.UI
         {
             var icon = new IconElement(item, isPlayers);
 
-            icon.RegisterCallback<MouseLeaveEvent>(e =>
+            icon.RegisterCallback<PointerLeaveEvent>(e =>
             {
                 icon.Idle();
             });
 
-            icon.RegisterCallback<MouseEnterEvent>(e =>
+            icon.RegisterCallback<PointerEnterEvent>(e =>
             {
                 icon.Hover();
             });
 
-            icon.RegisterCallback<MouseDownEvent>(e =>
+            icon.RegisterCallback<PointerDownEvent>(e =>
             {
                 icon.Press();
             });
 
-            icon.RegisterCallback<MouseUpEvent>(e =>
+            icon.RegisterCallback<PointerUpEvent>(e =>
             {
-                icon.Hover();
-
-                int index = elements.IndexOf(icon);
-
-                if (index != this.m_selectedIndex || icon.IsPlayers == this.m_isFocusedOnSeller)
+                if (icon.Pressed && e.button == 0)
                 {
-                    if (this.m_selectedIndex >= 0)
-                    {
-                        var selected = this.m_isFocusedOnSeller
-                            ? this.m_sellerInventory[this.m_selectedIndex]
-                            : this.m_playerInventory[this.m_selectedIndex];
+                    int index = elements.IndexOf(icon);
 
-                        selected.Deselect();
+                    if (index != this.m_selectedIndex || icon.IsPlayers == this.m_isFocusedOnSeller)
+                    {
+                        if (this.m_selectedIndex >= 0)
+                        {
+                            var selected = this.m_isFocusedOnSeller
+                                ? this.m_sellerInventory[this.m_selectedIndex]
+                                : this.m_playerInventory[this.m_selectedIndex];
+
+                            selected.Deselect();
+                        }
+
+                        icon.Select();
+
+                        this.m_selectedIndex = index;
+
+                        this.m_isFocusedOnSeller = !icon.IsPlayers;
+
+                        this.UpdateDisplayedItem(icon.Item);
                     }
 
-                    icon.Select();
-
-                    this.m_selectedIndex = index;
-
-                    this.m_isFocusedOnSeller = !icon.IsPlayers;
-
-                    this.UpdateDisplayedItem(icon.Item);
+                    Debug.Log($"Currently selected item is \"{icon.Item.Name}\"!");
                 }
 
-                Debug.Log($"Currently selected item is \"{icon.Item.Name}\"!");
+                icon.Hover();
             });
 
             if (index < 0 || index >= elements.Count)
@@ -619,7 +631,14 @@ namespace Project.UI
 
             if (price is not null)
             {
-                price.text = item is null ? String.Empty : "$" + item.Price.ToString();
+                if (item is null)
+                {
+                    price.text = String.Empty;
+                }
+                else
+                {
+                    price.text = "$" + (this.m_isFocusedOnSeller ? item.Price.ToString() : ((int)(item.Price * Player.SellMultiplier)).ToString());
+                }
             }
 
             if (image is not null)
