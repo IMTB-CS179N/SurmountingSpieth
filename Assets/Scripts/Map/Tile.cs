@@ -21,6 +21,10 @@ namespace Project
         }
 
         int m_yValue { get; set; }
+        public TileType m_tileType;
+
+        // public Sprite TileSprite;
+        public string SpritePath;
 
         public bool IsClickable()
         {
@@ -32,8 +36,10 @@ namespace Project
             m_yValue = yValue;
         }
 
-        public TileType m_tileType;
-        public Sprite TileSprite;
+        public Sprite GetSprite()
+        {
+            return ResourceManager.LoadSprite(SpritePath);
+        }
     }
 
     public class BackgroundInfo : CellInfo
@@ -42,9 +48,10 @@ namespace Project
             : base(yValue)
         {
             var SpriteName = type.ToString("G");
-            string path = "Map/PathTiles/" + SpriteName;
+            // string path = "Map/PathTiles/" + SpriteName;
+            SpritePath = "Map/PathTiles/" + SpriteName;
             // TileSprite = Resources.Load<Sprite>(path);
-            TileSprite = ResourceManager.LoadSprite(path);
+            // TileSprite = ResourceManager.LoadSprite(path);
             m_tileType = type;
         }
     }
@@ -55,7 +62,8 @@ namespace Project
             : base(yValue)
         {
             // TileSprite = Resources.Load<Sprite>("Map/Trade_Post");
-            TileSprite = ResourceManager.LoadSprite("Map/Trade_Post");
+            // TileSprite = ResourceManager.LoadSprite("Map/Trade_Post");
+            SpritePath = "Map/Trade_Post";
             m_tileType = TileType.Shop;
         }
     }
@@ -68,7 +76,8 @@ namespace Project
             : base(yValue)
         {
             m_enemies = enemies;
-            TileSprite = ResourceManager.LoadSprite("Sprites/Characters/Dragonborn cleric");
+            // TileSprite = ResourceManager.LoadSprite("Sprites/Characters/Dragonborn cleric");
+            SpritePath = "Sprites/Characters/Dragonborn cleric";
             m_tileType = TileType.Battle;
         }
     }
@@ -77,6 +86,14 @@ namespace Project
     {
         CellInfo[] cells = new CellInfo[5];
         int m_index { get; set; }
+
+        public ColumnInfo()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                cells[i] = new BackgroundInfo(i, CellInfo.TileType.Blank);
+            }
+        }
 
         public ColumnInfo(int index, CellInfo[] newCells)
         {
@@ -97,7 +114,7 @@ namespace Project
 
         public Sprite GetSprite(int tileRow)
         {
-            return cells[tileRow].TileSprite;
+            return cells[tileRow].GetSprite();
         }
 
         public CellInfo GetCell(int index)
