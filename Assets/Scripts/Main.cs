@@ -24,11 +24,11 @@ namespace Project
 
             if (collider)
             {
-                var clickObj = collider.transform.gameObject.GetComponent<OnClick>();
+                var clickObj = collider.transform.gameObject.GetComponent<Click>();
 
                 if (clickObj)
                 {
-                    clickObj.Click();
+                    clickObj.TriggerClick();
                 }
             }
         }

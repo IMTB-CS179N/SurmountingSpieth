@@ -107,6 +107,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1491098966658643831}
   - component: {fileID: -2160577616738894173}
+  - component: {fileID: 919169053673107278}
   m_Layer: 0
   m_Name: Shop
   m_TagString: Untagged
@@ -123,7 +124,7 @@ Transform:
   m_GameObject: {fileID: 1491098966658643830}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 4}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6625597154099858848}
@@ -156,3 +157,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 8, y: 8}
   m_EdgeRadius: 0
+--- !u!114 &919169053673107278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1491098966658643830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08416f3dbf0144dfb84b9a4d23dcaf9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
