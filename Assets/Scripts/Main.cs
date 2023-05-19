@@ -1,3 +1,4 @@
+using Project.Game;
 using Project.Input;
 
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace Project
 
         private void Start()
         {
+            PotionFactory.Initialize();
+            TrinketFactory.Initialize();
         }
 
         private void Update()

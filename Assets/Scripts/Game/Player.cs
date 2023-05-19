@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using UnityEngine;
+
 namespace Project.Game
 {
     public class Player
@@ -18,52 +20,74 @@ namespace Project.Game
 
         private static Player ms_instance;
 
-        private readonly List<Trinket> m_trinkets;
-        private readonly List<Potion> m_potions;
-        private readonly List<Weapon> m_weapons;
+        private readonly List<TrinketData> m_trinkets;
+        private readonly List<PotionData> m_potions;
+        private readonly List<WeaponData> m_weapons;
+        private readonly List<ArmorData> m_armors;
         private readonly List<Effect> m_effects;
-        private readonly List<Armor> m_armors;
         private readonly Ability[] m_abilities;
-        private readonly Stats m_stats;
+        private readonly BaseStats m_baseStats;
 
-        private Weapon m_equippedWeapon;
-        private Armor m_equippedArmor;
+        private readonly Potion[] m_equippedPotions;
 
-        private int m_maxHealth;
-        private int m_maxMana;
-        private int m_curHealth;
-        private int m_curMana;
-        private int m_armor;
-        private int m_damage;
-        private float m_evasion;
-        private float m_precision;
-        private float m_critChance;
-        private float m_critMultiplier;
+        private readonly WeaponTrinket[] m_weaponTrinkets;
+        private Weapon m_weapon;
+
+        private readonly ArmorTrinket[] m_leggingsTrinkets;
+        private Armor m_leggings;
+
+        private readonly ArmorTrinket[] m_chestplateTrinkets;
+        private Armor m_chestplate;
+
+        private readonly ArmorTrinket[] m_helmetTrinkets;
+        private Armor m_helmet;
+
+        private EntityStats m_stats;
         private int m_money;
+
+        public const int MaxPotionSlots = 3;
 
         public static readonly float SellMultiplier = 0.8f;
 
+        public static readonly int HealthRegeneration = 20;
+
+        public static readonly int ManaRegeneration = 10;
+
+        public static readonly int InitialPlayerBank = 10000;
+
         public static Player Instance => ms_instance ?? throw new Exception("Cannot access player when not in game");
 
-        public bool IsDead => this.m_curHealth <= 0;
+        public bool IsDead => this.m_stats.CurHealth <= 0;
 
-        public int MaximumHealth => this.m_maxHealth;
-
-        public int CurrentHealth => this.m_curHealth;
-
-        public int MaximumMana => this.m_maxMana;
-
-        public int CurrentMana => this.m_curMana;
+        public ref readonly EntityStats Stats => ref this.m_stats;
 
         public int Money => this.m_money;
 
-        public IReadOnlyList<Armor> Armors => this.m_armors;
+        public Armor Helmet => this.m_helmet;
 
-        public IReadOnlyList<Weapon> Weapons => this.m_weapons;
+        public Armor Chestplate => this.m_chestplate;
 
-        public IReadOnlyList<Potion> Potions => this.m_potions;
+        public Armor Leggings => this.m_leggings;
 
-        public IReadOnlyList<Trinket> Trinkets => this.m_trinkets;
+        public Weapon Weapon => this.m_weapon;
+
+        public IReadOnlyList<ArmorTrinket> HelmetTrinkets => this.m_helmetTrinkets;
+
+        public IReadOnlyList<ArmorTrinket> ChestplateTrinkets => this.m_chestplateTrinkets;
+
+        public IReadOnlyList<ArmorTrinket> LeggingsTrinkets => this.m_leggingsTrinkets;
+
+        public IReadOnlyList<WeaponTrinket> WeaponTrinkets => this.m_weaponTrinkets;
+
+        public IReadOnlyList<Potion> EquippedPotions => this.m_equippedPotions;
+
+        public IReadOnlyList<ArmorData> Armors => this.m_armors;
+
+        public IReadOnlyList<WeaponData> Weapons => this.m_weapons;
+
+        public IReadOnlyList<PotionData> Potions => this.m_potions;
+
+        public IReadOnlyList<TrinketData> Trinkets => this.m_trinkets;
 
         public IReadOnlyList<Effect> Effects => this.m_effects;
 
@@ -78,68 +102,181 @@ namespace Project.Game
                 throw new ArgumentException($"Player initialization failure: cannot find stats for race \"{race}\" and class \"{@class}\"");
             }
 
-            this.m_stats = stats;
+            this.m_baseStats = stats;
             this.m_armors = new();
             this.m_weapons = new();
             this.m_potions = new();
             this.m_effects = new();
             this.m_trinkets = new();
             this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == @class).Select(_ => new Ability(_)).ToArray();
+
+            this.m_equippedPotions = new Potion[Player.MaxPotionSlots];
+            this.m_helmetTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
+            this.m_chestplateTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
+            this.m_leggingsTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
+            this.m_weaponTrinkets = new WeaponTrinket[Weapon.MaxTrinketSlots];
+
+            this.m_money = Player.InitialPlayerBank;
+
+            this.RecalculateStats();
         }
 
 
 
         private void RecalculateStats()
         {
-            this.RecalculateHealth();
-            this.RecalculateMana();
-            this.RecalculateArmor();
-            this.RecalculateDamage();
-            this.RecalculateEvasion();
-            this.RecalculatePrecision();
-            this.RecalculateCritChance();
-            this.RecalculateCritMultiplier();
+            this.m_stats.MaxHealth = this.m_baseStats.Health;
+            this.m_stats.MaxMana = this.m_baseStats.Mana;
+            this.m_stats.Armor = this.m_baseStats.Armor;
+            this.m_stats.Damage = this.m_baseStats.Damage;
+            this.m_stats.Evasion = this.m_baseStats.Evasion;
+            this.m_stats.Precision = this.m_baseStats.Precision;
+            this.m_stats.CritChance = this.m_baseStats.CritChance;
+            this.m_stats.CritMultiplier = this.m_baseStats.CritMultiplier;
+
+            if (this.m_helmet is not null)
+            {
+                var stats = this.m_helmet.Stats;
+
+                var trinkets = this.m_helmetTrinkets;
+
+                if (trinkets is not null)
+                {
+                    for (int i = 0; i < trinkets.Length; ++i)
+                    {
+                        trinkets[i]?.ModifyStats(ref stats);
+                    }
+                }
+
+                this.m_stats.Armor += stats.Armor;
+                this.m_stats.Evasion += stats.Evasion;
+                this.m_stats.Precision += stats.Precision;
+            }
+
+            if (this.m_chestplate is not null)
+            {
+                var stats = this.m_chestplate.Stats;
+
+                var trinkets = this.m_chestplateTrinkets;
+
+                if (trinkets is not null)
+                {
+                    for (int i = 0; i < trinkets.Length; ++i)
+                    {
+                        trinkets[i]?.ModifyStats(ref stats);
+                    }
+                }
+
+                this.m_stats.Armor += stats.Armor;
+                this.m_stats.Evasion += stats.Evasion;
+                this.m_stats.Precision += stats.Precision;
+            }
+
+            if (this.m_leggings is not null)
+            {
+                var stats = this.m_leggings.Stats;
+
+                var trinkets = this.m_leggingsTrinkets;
+
+                if (trinkets is not null)
+                {
+                    for (int i = 0; i < trinkets.Length; ++i)
+                    {
+                        trinkets[i]?.ModifyStats(ref stats);
+                    }
+                }
+
+                this.m_stats.Armor += stats.Armor;
+                this.m_stats.Evasion += stats.Evasion;
+                this.m_stats.Precision += stats.Precision;
+            }
+
+            if (this.m_weapon is not null)
+            {
+                var stats = this.m_weapon.Stats;
+
+                var trinkets = this.m_weaponTrinkets;
+
+                if (trinkets is not null)
+                {
+                    for (int i = 0; i < trinkets.Length; ++i)
+                    {
+                        trinkets[i]?.ModifyStats(ref stats);
+                    }
+                }
+
+                this.m_stats.Damage += stats.Damage;
+                this.m_stats.Precision += stats.Precision;
+                this.m_stats.CritChance += stats.CritChance;
+                this.m_stats.CritMultiplier += stats.CritMultiplier;
+            }
+
+            for (int i = 0; i < this.m_effects.Count; ++i)
+            {
+                this.m_effects[i].ModifyStats(ref this.m_stats);
+            }
+
+            this.m_stats.CurHealth = Mathf.Clamp(this.m_stats.CurHealth, 0, this.m_stats.MaxHealth);
+            this.m_stats.CurMana = Mathf.Clamp(this.m_stats.CurMana, 0, this.m_stats.MaxMana);
+            this.m_stats.Evasion = Mathf.Clamp01(this.m_stats.Evasion);
+            this.m_stats.Precision = Mathf.Clamp(this.m_stats.Precision, 0.0f, Single.PositiveInfinity);
+            this.m_stats.CritChance = Mathf.Clamp01(this.m_stats.CritChance);
         }
 
-        private void RecalculateHealth()
+        private void UnattachPotion(PotionData potion)
         {
-            this.m_maxHealth = this.m_stats.BaseHealth; // #TODO calculate with effects, armor, weapons and such
-
+            for (int i = 0; i < this.m_equippedPotions.Length; ++i)
+            {
+                if (this.m_equippedPotions[i]?.IsPotionDataSame(potion) ?? false)
+                {
+                    this.m_equippedPotions[i] = null;
+                }
+            }
         }
 
-        private void RecalculateMana()
+        private bool UnattachTrinket(TrinketData trinket)
         {
-            this.m_maxMana = this.m_stats.BaseMana; // #TODO calculate with effects, armor, weapons and such
-        }
+            for (int i = 0; i < this.m_helmetTrinkets.Length; ++i)
+            {
+                if (this.m_helmetTrinkets[i]?.IsTrinketDataSame(trinket) ?? false)
+                {
+                    this.m_helmetTrinkets[i] = null;
 
-        private void RecalculateArmor()
-        {
-            this.m_armor = 0; // #TODO calculate with effects, armor, weapons and such
-        }
+                    return true;
+                }
+            }
 
-        private void RecalculateDamage()
-        {
-            this.m_damage = this.m_stats.BaseDamage; // #TODO calculate with effects, armor, weapons and such
-        }
+            for (int i = 0; i < this.m_chestplateTrinkets.Length; ++i)
+            {
+                if (this.m_chestplateTrinkets[i]?.IsTrinketDataSame(trinket) ?? false)
+                {
+                    this.m_chestplateTrinkets[i] = null;
 
-        private void RecalculateEvasion()
-        {
-            this.m_evasion = this.m_stats.BaseEvasion; // #TODO calculate with effects, armor, weapons and such
-        }
+                    return true;
+                }
+            }
 
-        private void RecalculatePrecision()
-        {
-            this.m_precision = this.m_stats.BasePrecision; // #TODO calculate with effects, armor, weapons and such
-        }
+            for (int i = 0; i < this.m_leggingsTrinkets.Length; ++i)
+            {
+                if (this.m_leggingsTrinkets[i]?.IsTrinketDataSame(trinket) ?? false)
+                {
+                    this.m_leggingsTrinkets[i] = null;
 
-        private void RecalculateCritChance()
-        {
-            this.m_critChance = this.m_stats.BaseCritChance; // #TODO calculate with effects, armor, weapons and such
-        }
+                    return true;
+                }
+            }
 
-        private void RecalculateCritMultiplier()
-        {
-            this.m_critMultiplier = this.m_stats.BaseCritMultiplier; // #TODO calculate with effects, armor, weapons and such
+            for (int i = 0; i < this.m_weaponTrinkets.Length; ++i)
+            {
+                if (this.m_weaponTrinkets[i]?.IsTrinketDataSame(trinket) ?? false)
+                {
+                    this.m_weaponTrinkets[i] = null;
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
 
@@ -157,16 +294,13 @@ namespace Project.Game
             {
                 var effect = this.m_effects[i];
 
-                effect.Cooldown();
+                effect.Cooldown(ref this.m_stats);
 
                 if (!effect.IsLasting)
                 {
                     this.m_effects.RemoveAt(i);
                 }
             }
-
-            // #TODO other stuff
-
 
             // recalculate stats only at the end
 
@@ -184,7 +318,7 @@ namespace Project.Game
                     return AbilityUsage.OnCooldown;
                 }
 
-                if (this.m_curMana < ability.ManaCost)
+                if (this.m_stats.CurMana < ability.ManaCost)
                 {
                     return AbilityUsage.NotEnoughMana;
                 }
@@ -204,7 +338,7 @@ namespace Project.Game
                     return AbilityUsage.OnCooldown;
                 }
 
-                if (this.m_curMana < ability.ManaCost)
+                if (this.m_stats.CurMana < ability.ManaCost)
                 {
                     return AbilityUsage.NotEnoughMana;
                 }
@@ -215,39 +349,584 @@ namespace Project.Game
             return AbilityUsage.DoesNotExist;
         }
 
-        public void ComputeDamage(int abilityIndex, out int damage, out bool canMiss)
+
+
+        public void EquipHelmet(int index)
         {
-            if (this.CanUseAbility(abilityIndex) == AbilityUsage.CanUse)
+            if (index < 0 || index >= this.m_armors.Count)
             {
-                var ability = this.m_abilities[abilityIndex];
-
-                damage = (int)(this.m_damage * ability.DamageMultiplier);
-
-                canMiss = ability.CanMiss;
-
-                ability.PutOnCooldown();
+                this.m_helmet = null;
             }
             else
             {
-                damage = this.m_damage;
+                var armor = this.m_armors[index];
 
-                canMiss = true;
+                if (armor.SlotType != ArmorSlotType.Helmet)
+                {
+                    throw new Exception($"Armor at index {index} is not a Helmet armor");
+                }
+
+                this.m_helmet = new Armor(armor);
             }
+
+            this.m_helmetTrinkets.AsSpan().Clear();
+
+            this.RecalculateStats();
         }
 
-        public void DealDamage(int damage)
+        public void EquipHelmet(ArmorData armor)
         {
-            this.m_curHealth -= (int)(damage * (100.0f / (100.0f + this.m_armor)));
-
-            if (this.m_curHealth < 0)
+            if (armor is null)
             {
-                this.m_curHealth = 0;
+                this.m_helmet = null;
             }
+            else
+            {
+                int index = this.m_armors.IndexOf(armor);
+
+                if (index < 0)
+                {
+                    throw new Exception("Armor is not in the inventory");
+                }
+
+                if (armor.SlotType != ArmorSlotType.Helmet)
+                {
+                    throw new Exception($"Armor {armor.Name} is not a Helmet armor");
+                }
+
+                this.m_helmet = new Armor(armor);
+            }
+
+            this.m_helmetTrinkets.AsSpan().Clear();
+
+            this.RecalculateStats();
+        }
+
+        public void EquipChestplate(int index)
+        {
+            if (index < 0 || index >= this.m_armors.Count)
+            {
+                this.m_chestplate = null;
+            }
+            else
+            {
+                var armor = this.m_armors[index];
+
+                if (armor.SlotType != ArmorSlotType.Chestplate)
+                {
+                    throw new Exception($"Armor at index {index} is not a Chestplate armor");
+                }
+
+                this.m_chestplate = new Armor(armor);
+            }
+
+            this.m_chestplateTrinkets.AsSpan().Clear();
+
+            this.RecalculateStats();
+        }
+
+        public void EquipChestplate(ArmorData armor)
+        {
+            if (armor is null)
+            {
+                this.m_chestplate = null;
+            }
+            else
+            {
+                int index = this.m_armors.IndexOf(armor);
+
+                if (index < 0)
+                {
+                    throw new Exception("Armor is not in the inventory");
+                }
+
+                if (armor.SlotType != ArmorSlotType.Chestplate)
+                {
+                    throw new Exception($"Armor {armor.Name} is not a chestplate armor");
+                }
+
+                this.m_chestplate = new Armor(armor);
+            }
+
+            this.m_chestplateTrinkets.AsSpan().Clear();
+
+            this.RecalculateStats();
+        }
+
+        public void EquipLeggings(int index)
+        {
+            if (index < 0 || index >= this.m_armors.Count)
+            {
+                this.m_leggings = null;
+            }
+            else
+            {
+                var armor = this.m_armors[index];
+
+                if (armor.SlotType != ArmorSlotType.Leggings)
+                {
+                    throw new Exception($"Armor at index {index} is not a leggings armor");
+                }
+
+                this.m_leggings = new Armor(armor);
+            }
+
+            this.m_leggingsTrinkets.AsSpan().Clear();
+
+            this.RecalculateStats();
+        }
+
+        public void EquipLeggings(ArmorData armor)
+        {
+            if (armor is null)
+            {
+                this.m_leggings = null;
+            }
+            else
+            {
+                int index = this.m_armors.IndexOf(armor);
+
+                if (index < 0)
+                {
+                    throw new Exception("Armor is not in the inventory");
+                }
+
+                if (armor.SlotType != ArmorSlotType.Leggings)
+                {
+                    throw new Exception($"Armor {armor.Name} is not a leggings armor");
+                }
+
+                this.m_leggings = new Armor(armor);
+            }
+
+            this.m_leggingsTrinkets.AsSpan().Clear();
+
+            this.RecalculateStats();
+        }
+
+        public void EquipWeapon(int index)
+        {
+            if (index < 0 || index >= this.m_weapons.Count)
+            {
+                this.m_weapon = null;
+            }
+            else
+            {
+                this.m_weapon = new Weapon(this.m_weapons[index]);
+            }
+
+            this.m_weaponTrinkets.AsSpan().Clear();
+
+            this.RecalculateStats();
+        }
+
+        public void EquipWeapon(WeaponData weapon)
+        {
+            if (weapon is null)
+            {
+                this.m_weapon = null;
+            }
+            else
+            {
+                int index = this.m_weapons.IndexOf(weapon);
+
+                if (index < 0)
+                {
+                    throw new Exception("Weapon is not in the inventory");
+                }
+
+                this.m_weapon = new Weapon(weapon);
+            }
+
+            this.m_weaponTrinkets.AsSpan().Clear();
+
+            this.RecalculateStats();
+        }
+
+        public void EquipPotion(int slot, int index)
+        {
+            if (slot < 0)
+            {
+                throw new Exception("Potion slot number cannot be negative");
+            }
+
+            if (slot >= this.m_equippedPotions.Length)
+            {
+                throw new Exception($"Trying to set potion for slot {slot} when maximum slot count is {this.m_equippedPotions.Length}");
+            }
+
+            if (index < 0 || index >= this.m_potions.Count)
+            {
+                this.m_equippedPotions[slot] = null;
+            }
+            else
+            {
+                var potion = this.m_potions[slot];
+
+                this.UnattachPotion(potion);
+
+                this.m_equippedPotions[slot] = PotionFactory.Create(potion); 
+            }
+        }
+
+        public void EquipPotion(int slot, PotionData potion)
+        {
+            if (slot < 0)
+            {
+                throw new Exception("Potion slot number cannot be negative");
+            }
+
+            if (slot >= this.m_equippedPotions.Length)
+            {
+                throw new Exception($"Trying to set potion for slot {slot} when maximum slot count is {this.m_equippedPotions.Length}");
+            }
+
+            if (potion is null)
+            {
+                this.m_equippedPotions[slot] = null;
+            }
+            else
+            {
+                int index = this.m_potions.IndexOf(potion);
+
+                if (index < 0)
+                {
+                    throw new Exception("Potion is not in the inventory");
+                }
+
+                this.UnattachPotion(potion);
+
+                this.m_equippedPotions[slot] = PotionFactory.Create(potion);
+            }
+        }
+
+        public void EquipHelmetTrinket(int slot, int index)
+        {
+            if (this.m_helmet is null)
+            {
+                throw new Exception("Unable to equip helmet trinket because helmet is not equipped");
+            }
+
+            if (slot < 0)
+            {
+                throw new Exception("Trinket slot number cannot be negative");
+            }
+
+            if (slot >= this.m_helmet.MaxTrinketCount)
+            {
+                throw new Exception($"Trying to set helmet trinket for slot {slot} when maximum slot count is {this.m_helmet.MaxTrinketCount}");
+            }
+
+            if (index < 0 || index >= this.m_trinkets.Count)
+            {
+                this.m_helmetTrinkets[slot] = null;
+            }
+            else
+            {
+                var trinket = this.m_trinkets[index];
+
+                if (trinket.IsWeaponTrinket)
+                {
+                    throw new Exception($"Trinket {trinket.Name} cannot be applied to helmet because it is a weapon-only trinket");
+                }
+
+                this.UnattachTrinket(trinket);
+
+                this.m_helmetTrinkets[slot] = TrinketFactory.Create(trinket) as ArmorTrinket;
+            }
+
+            this.RecalculateStats();
+        }
+
+        public void EquipHelmetTrinket(int slot, TrinketData trinket)
+        {
+            if (this.m_helmet is null)
+            {
+                throw new Exception("Unable to equip helmet trinket because helmet is not equipped");
+            }
+
+            if (slot < 0)
+            {
+                throw new Exception("Trinket slot number cannot be negative");
+            }
+
+            if (slot >= this.m_helmet.MaxTrinketCount)
+            {
+                throw new Exception($"Trying to set helmet trinket for slot {slot} when maximum slot count is {this.m_helmet.MaxTrinketCount}");
+            }
+
+            if (trinket is null)
+            {
+                this.m_helmetTrinkets[slot] = null;
+            }
+            else
+            {
+                int index = this.m_trinkets.IndexOf(trinket);
+
+                if (index < 0)
+                {
+                    throw new Exception("Trinket is not in the inventory");
+                }
+
+                if (trinket.IsWeaponTrinket)
+                {
+                    throw new Exception($"Trinket {trinket.Name} cannot be applied to helmet because it is a weapon-only trinket");
+                }
+
+                this.UnattachTrinket(trinket);
+
+                this.m_helmetTrinkets[slot] = TrinketFactory.Create(trinket) as ArmorTrinket;
+            }
+
+            this.RecalculateStats();
+        }
+
+        public void EquipChestplateTrinket(int slot, int index)
+        {
+            if (this.m_chestplate is null)
+            {
+                throw new Exception("Unable to equip chestplate trinket because chestplate is not equipped");
+            }
+
+            if (slot < 0)
+            {
+                throw new Exception("Trinket slot number cannot be negative");
+            }
+
+            if (slot >= this.m_chestplate.MaxTrinketCount)
+            {
+                throw new Exception($"Trying to set chestplate trinket for slot {slot} when maximum slot count is {this.m_chestplate.MaxTrinketCount}");
+            }
+
+            if (index < 0 || index >= this.m_trinkets.Count)
+            {
+                this.m_chestplateTrinkets[slot] = null;
+            }
+            else
+            {
+                var trinket = this.m_trinkets[index];
+
+                if (trinket.IsWeaponTrinket)
+                {
+                    throw new Exception($"Trinket {trinket.Name} cannot be applied to chestplate because it is a weapon-only trinket");
+                }
+
+                this.UnattachTrinket(trinket);
+
+                this.m_chestplateTrinkets[slot] = TrinketFactory.Create(trinket) as ArmorTrinket;
+            }
+
+            this.RecalculateStats();
+        }
+
+        public void EquipChestplateTrinket(int slot, TrinketData trinket)
+        {
+            if (this.m_chestplate is null)
+            {
+                throw new Exception("Unable to equip chestplate trinket because chestplate is not equipped");
+            }
+
+            if (slot < 0)
+            {
+                throw new Exception("Trinket slot number cannot be negative");
+            }
+
+            if (slot >= this.m_chestplate.MaxTrinketCount)
+            {
+                throw new Exception($"Trying to set chestplate trinket for slot {slot} when maximum slot count is {this.m_chestplate.MaxTrinketCount}");
+            }
+
+            if (trinket is null)
+            {
+                this.m_chestplateTrinkets[slot] = null;
+            }
+            else
+            {
+                int index = this.m_trinkets.IndexOf(trinket);
+
+                if (index < 0)
+                {
+                    throw new Exception("Trinket is not in the inventory");
+                }
+
+                if (trinket.IsWeaponTrinket)
+                {
+                    throw new Exception($"Trinket {trinket.Name} cannot be applied to chestplate because it is a weapon-only trinket");
+                }
+
+                this.UnattachTrinket(trinket);
+
+                this.m_chestplateTrinkets[slot] = TrinketFactory.Create(trinket) as ArmorTrinket;
+            }
+
+            this.RecalculateStats();
+        }
+
+        public void EquipLeggingsTrinket(int slot, int index)
+        {
+            if (this.m_leggings is null)
+            {
+                throw new Exception("Unable to equip leggings trinket because leggings is not equipped");
+            }
+
+            if (slot < 0)
+            {
+                throw new Exception("Trinket slot number cannot be negative");
+            }
+
+            if (slot >= this.m_leggings.MaxTrinketCount)
+            {
+                throw new Exception($"Trying to set leggings trinket for slot {slot} when maximum slot count is {this.m_leggings.MaxTrinketCount}");
+            }
+
+            if (index < 0 || index >= this.m_trinkets.Count)
+            {
+                this.m_leggingsTrinkets[slot] = null;
+            }
+            else
+            {
+                var trinket = this.m_trinkets[index];
+
+                if (trinket.IsWeaponTrinket)
+                {
+                    throw new Exception($"Trinket {trinket.Name} cannot be applied to leggings because it is a weapon-only trinket");
+                }
+
+                this.UnattachTrinket(trinket);
+
+                this.m_leggingsTrinkets[slot] = TrinketFactory.Create(trinket) as ArmorTrinket;
+            }
+
+            this.RecalculateStats();
+        }
+
+        public void EquipLeggingsTrinket(int slot, TrinketData trinket)
+        {
+            if (this.m_leggings is null)
+            {
+                throw new Exception("Unable to equip leggings trinket because leggings is not equipped");
+            }
+
+            if (slot < 0)
+            {
+                throw new Exception("Trinket slot number cannot be negative");
+            }
+
+            if (slot >= this.m_leggings.MaxTrinketCount)
+            {
+                throw new Exception($"Trying to set leggings trinket for slot {slot} when maximum slot count is {this.m_leggings.MaxTrinketCount}");
+            }
+
+            if (trinket is null)
+            {
+                this.m_leggingsTrinkets[slot] = null;
+            }
+            else
+            {
+                int index = this.m_trinkets.IndexOf(trinket);
+
+                if (index < 0)
+                {
+                    throw new Exception("Trinket is not in the inventory");
+                }
+
+                if (trinket.IsWeaponTrinket)
+                {
+                    throw new Exception($"Trinket {trinket.Name} cannot be applied to leggings because it is a weapon-only trinket");
+                }
+
+                this.UnattachTrinket(trinket);
+
+                this.m_leggingsTrinkets[slot] = TrinketFactory.Create(trinket) as ArmorTrinket;
+            }
+
+            this.RecalculateStats();
+        }
+
+        public void EquipWeaponTrinket(int slot, int index)
+        {
+            if (this.m_weapon is null)
+            {
+                throw new Exception("Unable to equip weapon trinket because weapon is not equipped");
+            }
+
+            if (slot < 0)
+            {
+                throw new Exception("Trinket slot number cannot be negative");
+            }
+
+            if (slot >= this.m_weapon.MaxTrinketCount)
+            {
+                throw new Exception($"Trying to set weapon trinket for slot {slot} when maximum slot count is {this.m_weapon.MaxTrinketCount}");
+            }
+
+            if (index < 0 || index >= this.m_trinkets.Count)
+            {
+                this.m_weaponTrinkets[slot] = null;
+            }
+            else
+            {
+                var trinket = this.m_trinkets[index];
+
+                if (!trinket.IsWeaponTrinket)
+                {
+                    throw new Exception($"Trinket {trinket.Name} cannot be applied to helmet because it is an armor-only trinket");
+                }
+
+                this.UnattachTrinket(trinket);
+
+                this.m_weaponTrinkets[slot] = TrinketFactory.Create(trinket) as WeaponTrinket;
+            }
+
+            this.RecalculateStats();
+        }
+
+        public void EquipWeaponTrinket(int slot, TrinketData trinket)
+        {
+            if (this.m_weapon is null)
+            {
+                throw new Exception("Unable to equip weapon trinket because weapon is not equipped");
+            }
+
+            if (slot < 0)
+            {
+                throw new Exception("Trinket slot number cannot be negative");
+            }
+
+            if (slot >= this.m_weapon.MaxTrinketCount)
+            {
+                throw new Exception($"Trying to set weapon trinket for slot {slot} when maximum slot count is {this.m_weapon.MaxTrinketCount}");
+            }
+
+            if (trinket is null)
+            {
+                this.m_weaponTrinkets[slot] = null;
+            }
+            else
+            {
+                int index = this.m_trinkets.IndexOf(trinket);
+
+                if (index < 0)
+                {
+                    throw new Exception("Trinket is not in the inventory");
+                }
+
+                if (!trinket.IsWeaponTrinket)
+                {
+                    throw new Exception($"Trinket {trinket.Name} cannot be applied to weapon because it is an armor-only trinket");
+                }
+
+                this.UnattachTrinket(trinket);
+
+                this.m_weaponTrinkets[slot] = TrinketFactory.Create(trinket) as WeaponTrinket;
+            }
+
+            this.RecalculateStats();
         }
 
 
 
-        public int PurchaseArmor(Armor armor)
+        public int PurchaseArmor(ArmorData armor)
         {
             if (armor is null)
             {
@@ -268,7 +947,7 @@ namespace Project.Game
             return index;
         }
 
-        public int PurchaseWeapon(Weapon weapon)
+        public int PurchaseWeapon(WeaponData weapon)
         {
             if (weapon is null)
             {
@@ -289,7 +968,7 @@ namespace Project.Game
             return index;
         }
 
-        public int PurchasePotion(Potion potion)
+        public int PurchasePotion(PotionData potion)
         {
             if (potion is null)
             {
@@ -310,7 +989,7 @@ namespace Project.Game
             return index;
         }
 
-        public int PurchaseTrinket(Trinket trinket)
+        public int PurchaseTrinket(TrinketData trinket)
         {
             if (trinket is null)
             {
@@ -331,49 +1010,62 @@ namespace Project.Game
             return index;
         }
 
-        public void SellArmor(Armor armor)
+        public void SellArmor(ArmorData armor)
         {
             if (armor is not null && this.m_armors.Remove(armor))
             {
                 this.m_money += (int)(armor.Price * Player.SellMultiplier);
 
-                if (Object.ReferenceEquals(armor, this.m_equippedArmor))
+                if (this.m_helmet is not null && this.m_helmet.IsArmorDataSame(armor))
                 {
-                    this.m_equippedArmor = null;
+                    this.EquipHelmet(null);
+                }
 
-                    this.RecalculateStats();
+                if (this.m_chestplate is not null && this.m_chestplate.IsArmorDataSame(armor))
+                {
+                    this.EquipChestplate(null);
+                }
+
+                if (this.m_leggings is not null && this.m_leggings.IsArmorDataSame(armor))
+                {
+                    this.EquipLeggings(null);
                 }
             }
         }
 
-        public void SellWeapon(Weapon weapon)
+        public void SellWeapon(WeaponData weapon)
         {
             if (weapon is not null && this.m_weapons.Remove(weapon))
             {
                 this.m_money += (int)(weapon.Price * Player.SellMultiplier);
 
-                if (Object.ReferenceEquals(weapon, this.m_equippedWeapon))
+                if (this.m_weapon is not null && this.m_weapon.IsWeaponDataSame(weapon))
                 {
-                    this.m_equippedWeapon = null;
-
-                    this.RecalculateStats();
+                    this.EquipWeapon(null);
                 }
             }
         }
 
-        public void SellPotion(Potion potion)
+        public void SellPotion(PotionData potion)
         {
             if (potion is not null && this.m_potions.Remove(potion))
             {
                 this.m_money += (int)(potion.Price * Player.SellMultiplier);
+
+                // #TODO
             }
         }
 
-        public void SellTrinket(Trinket trinket)
+        public void SellTrinket(TrinketData trinket)
         {
             if (trinket is not null && this.m_trinkets.Remove(trinket))
             {
                 this.m_money += (int)(trinket.Price * Player.SellMultiplier);
+
+                if (this.UnattachTrinket(trinket))
+                {
+                    this.RecalculateStats();
+                }
             }
         }
 
@@ -385,11 +1077,19 @@ namespace Project.Game
 
                 this.m_money += (int)(armor.Price * Player.SellMultiplier);
 
-                if (Object.ReferenceEquals(armor, this.m_equippedArmor))
+                if (this.m_helmet is not null && this.m_helmet.IsArmorDataSame(armor))
                 {
-                    this.m_equippedArmor = null;
+                    this.EquipHelmet(null);
+                }
 
-                    this.RecalculateStats();
+                if (this.m_chestplate is not null && this.m_chestplate.IsArmorDataSame(armor))
+                {
+                    this.EquipChestplate(null);
+                }
+
+                if (this.m_leggings is not null && this.m_leggings.IsArmorDataSame(armor))
+                {
+                    this.EquipLeggings(null);
                 }
 
                 this.m_armors.RemoveAt(index);
@@ -404,11 +1104,9 @@ namespace Project.Game
 
                 this.m_money += (int)(weapon.Price * Player.SellMultiplier);
 
-                if (Object.ReferenceEquals(weapon, this.m_equippedWeapon))
+                if (this.m_weapon is not null && this.m_weapon.IsWeaponDataSame(weapon))
                 {
-                    this.m_equippedWeapon = null;
-
-                    this.RecalculateStats();
+                    this.EquipWeapon(null);
                 }
 
                 this.m_weapons.RemoveAt(index);
@@ -434,6 +1132,11 @@ namespace Project.Game
                 var trinket = this.m_trinkets[index];
 
                 this.m_money += (int)(trinket.Price * Player.SellMultiplier);
+
+                if (this.UnattachTrinket(trinket))
+                {
+                    this.RecalculateStats();
+                }
 
                 this.m_trinkets.RemoveAt(index);
             }

@@ -1,6 +1,6 @@
-Bard,sprite
-Rogue,sprite
-Paladin,sprite
-Wizard,sprite
-Cleric,sprite
-Barbarian,sprite
+Bard,"Sprites/Classes/Bard"
+Rogue,"Sprites/Classes/Rogue"
+Paladin,"Sprites/Classes/Paladin"
+Wizard,"Sprites/Classes/Wizard"
+Cleric,"Sprites/Classes/Cleric"
+Barbarian,"Sprites/Classes/Barbarian"

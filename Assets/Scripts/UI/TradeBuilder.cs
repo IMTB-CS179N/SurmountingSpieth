@@ -28,6 +28,10 @@ namespace Project.UI
 
             public bool Locked => this.m_locked;
 
+            public bool Hovered => this.m_hovered;
+
+            public bool Pressed => this.m_pressed;
+
             public readonly VisualElement Image;
 
             public IconElement(IItem item, bool isPlayers)
@@ -55,7 +59,7 @@ namespace Project.UI
                 this.style.paddingLeft = 5;
                 this.style.paddingRight = 5;
 
-                this.style.backgroundColor = ms_unlockedBackColor;
+                this.style.backgroundColor = ms_unlockedBackIdledColor;
                 this.style.unityBackgroundImageTintColor = Color.clear;
                 this.style.backgroundImage = new StyleBackground(ResourceManager.LoadSprite(ResourceManager.SelectedItemPath));
 
@@ -89,8 +93,6 @@ namespace Project.UI
             {
                 this.m_locked = true;
 
-                this.style.backgroundColor = ms_lockedBackColor;
-
                 if (this.m_hovered)
                 {
                     this.Hover();
@@ -108,8 +110,6 @@ namespace Project.UI
             public void Unlock()
             {
                 this.m_locked = false;
-
-                this.style.backgroundColor = ms_unlockedBackColor;
 
                 if (this.m_hovered)
                 {
@@ -130,6 +130,7 @@ namespace Project.UI
                 this.m_hovered = false;
                 this.m_pressed = false;
 
+                this.style.backgroundColor = this.m_locked ? ms_lockedBackIdledColor : ms_unlockedBackIdledColor;
                 this.Image.style.unityBackgroundImageTintColor = this.m_locked ? ms_lockedIdledTint : ms_unlockedIdledTint;
             }
 
@@ -138,6 +139,7 @@ namespace Project.UI
                 this.m_hovered = true;
                 this.m_pressed = false;
 
+                this.style.backgroundColor = this.m_locked ? ms_lockedBackHoverColor : ms_unlockedBackHoverColor;
                 this.Image.style.unityBackgroundImageTintColor = this.m_locked ? ms_lockedHoverTint : ms_unlockedHoverTint;
             }
 
@@ -146,6 +148,7 @@ namespace Project.UI
                 this.m_hovered = false;
                 this.m_pressed = true;
 
+                this.style.backgroundColor = this.m_locked ? ms_lockedBackPressColor : ms_unlockedBackPressColor;
                 this.Image.style.unityBackgroundImageTintColor = this.m_locked ? ms_lockedPressTint : ms_unlockedPressTint;
             }
         }
@@ -156,6 +159,8 @@ namespace Project.UI
             Weapon,
             Potion,
             Trinket,
+            Action, // technically not a tab, but used for press info
+            Count,
         }
 
         private const string kArmorButton = "armor-button";
@@ -177,18 +182,25 @@ namespace Project.UI
         private static readonly Color ms_unlockedIdledTint = new Color32(255, 255, 255, 255);
         private static readonly Color ms_unlockedHoverTint = new Color32(200, 200, 200, 255);
         private static readonly Color ms_unlockedPressTint = new Color32(170, 170, 170, 255);
-        private static readonly Color ms_unlockedBackColor = new Color32(101, 59, 28, 255);
 
-        private static readonly Color ms_lockedIdledTint = new Color32(120, 120, 120, 255);
-        private static readonly Color ms_lockedHoverTint = new Color32(95, 95, 95, 255);
-        private static readonly Color ms_lockedPressTint = new Color32(70, 70, 70, 255);
-        private static readonly Color ms_lockedBackColor = new Color32(61, 29, 14, 255);
+        private static readonly Color ms_unlockedBackIdledColor = new Color32(101, 59, 28, 255);
+        private static readonly Color ms_unlockedBackHoverColor = new Color32(86, 47, 20, 255);
+        private static readonly Color ms_unlockedBackPressColor = new Color32(75, 40, 15, 255);
+
+        private static readonly Color ms_lockedIdledTint = new Color32(100, 100, 100, 255);
+        private static readonly Color ms_lockedHoverTint = new Color32(75, 75, 75, 255);
+        private static readonly Color ms_lockedPressTint = new Color32(50, 50, 50, 255);
+
+        private static readonly Color ms_lockedBackIdledColor = new Color32(61, 29, 14, 255);
+        private static readonly Color ms_lockedBackHoverColor = new Color32(48, 20, 9, 255);
+        private static readonly Color ms_lockedBackPressColor = new Color32(40, 15, 5, 255);
 
         private static readonly Color ms_activeTint = new Color32(150, 150, 150, 255);
-        private static readonly Color ms_selectTint = new Color32(60, 20, 185, 255);
+        private static readonly Color ms_selectTint = new Color32(255, 255, 255, 255);
 
         private readonly List<IconElement> m_playerInventory = new();
         private readonly List<IconElement> m_sellerInventory = new();
+        private readonly bool[] m_pressed = new bool[(int)Tab.Count];
 
         private ScrollView m_playerView;
         private ScrollView m_sellerView;
@@ -208,6 +220,9 @@ namespace Project.UI
             this.m_playerView = this.UI.rootVisualElement.Q<ScrollView>(kPlayerInventory);
             this.m_sellerView = this.UI.rootVisualElement.Q<ScrollView>(kSellerInventory);
 
+            this.m_playerView.Clear();
+            this.m_sellerView.Clear();
+
             this.SetupArmorButton();
             this.SetupWeaponButton();
             this.SetupPotionButton();
@@ -223,10 +238,16 @@ namespace Project.UI
 
         private void OnDisableEvent()
         {
-            this.ResetInventories();
+            this.m_selectedIndex = -1;
+            this.m_isFocusedOnSeller = false;
+
+            this.m_playerInventory.Clear();
+            this.m_sellerInventory.Clear();
 
             this.m_playerView = null;
             this.m_sellerView = null;
+
+            this.m_pressed.AsSpan().Clear();
 
             this.m_currentTab = Tab.Armor;
         }
@@ -240,30 +261,30 @@ namespace Project.UI
 
         private void SetupArmorButton()
         {
-            this.SetupCallbacksInternal(kArmorButton, Key.A, () => this.ReinitializeAll(Tab.Armor));
+            this.SetupCallbacksInternal(kArmorButton, Tab.Armor, Key.A, () => this.ReinitializeAll(Tab.Armor));
         }
 
         private void SetupWeaponButton()
         {
-            this.SetupCallbacksInternal(kWeaponButton, Key.W, () => this.ReinitializeAll(Tab.Weapon));
+            this.SetupCallbacksInternal(kWeaponButton, Tab.Weapon, Key.W, () => this.ReinitializeAll(Tab.Weapon));
         }
 
         private void SetupPotionButton()
         {
-            this.SetupCallbacksInternal(kPotionButton, Key.P, () => this.ReinitializeAll(Tab.Potion));
+            this.SetupCallbacksInternal(kPotionButton, Tab.Potion, Key.P, () => this.ReinitializeAll(Tab.Potion));
         }
 
         private void SetupTrinketButton()
         {
-            this.SetupCallbacksInternal(kTrinketButton, Key.T, () => this.ReinitializeAll(Tab.Trinket));
+            this.SetupCallbacksInternal(kTrinketButton, Tab.Trinket, Key.T, () => this.ReinitializeAll(Tab.Trinket));
         }
 
         private void SetupActionButton()
         {
-            this.SetupCallbacksInternal(kActionButton, Key.S, () => this.PerformInventoryAction());
+            this.SetupCallbacksInternal(kActionButton, Tab.Action, Key.S, () => this.PerformInventoryAction());
         }
 
-        private void SetupCallbacksInternal(string name, Key key, Action onMouseUp)
+        private void SetupCallbacksInternal(string name, Tab tab, Key key, Action onMouseUp)
         {
             var element = this.UI.rootVisualElement.Q<VisualElement>(name);
 
@@ -271,24 +292,42 @@ namespace Project.UI
             {
                 element.RegisterCallback<MouseLeaveEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_unlockedIdledTint;
+                    if (element.pickingMode == PickingMode.Position)
+                    {
+                        this.m_pressed[(int)tab] = false;
+
+                        element.style.unityBackgroundImageTintColor = ms_unlockedIdledTint;
+                    }
                 });
 
                 element.RegisterCallback<MouseEnterEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_unlockedHoverTint;
+                    if (element.pickingMode == PickingMode.Position)
+                    {
+                        this.m_pressed[(int)tab] = false;
+
+                        element.style.unityBackgroundImageTintColor = ms_unlockedHoverTint;
+                    }
                 });
 
                 element.RegisterCallback<MouseDownEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_unlockedPressTint;
+                    if (element.pickingMode == PickingMode.Position && e.button == 0)
+                    {
+                        this.m_pressed[(int)tab] = true;
+
+                        element.style.unityBackgroundImageTintColor = ms_unlockedPressTint;
+                    }
                 });
 
                 element.RegisterCallback<MouseUpEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_unlockedHoverTint;
+                    if (element.pickingMode == PickingMode.Position && e.button == 0 && this.m_pressed[(int)tab])
+                    {
+                        this.m_pressed[(int)tab] = false;
 
-                    onMouseUp?.Invoke();
+                        onMouseUp?.Invoke();
+                    }
                 });
 
                 this.BindKeyAction(key, onMouseUp);
@@ -305,10 +344,10 @@ namespace Project.UI
 
                     this.CreateIconElement(this.m_playerView, item, this.m_playerInventory, true, this.m_currentTab switch
                     {
-                        Tab.Armor => Player.Instance.PurchaseArmor(Unsafe.As<Armor>(item)),
-                        Tab.Weapon => Player.Instance.PurchaseWeapon(Unsafe.As<Weapon>(item)),
-                        Tab.Potion => Player.Instance.PurchasePotion(Unsafe.As<Potion>(item)),
-                        Tab.Trinket => Player.Instance.PurchaseTrinket(Unsafe.As<Trinket>(item)),
+                        Tab.Armor => Player.Instance.PurchaseArmor(Unsafe.As<ArmorData>(item)),
+                        Tab.Weapon => Player.Instance.PurchaseWeapon(Unsafe.As<WeaponData>(item)),
+                        Tab.Potion => Player.Instance.PurchasePotion(Unsafe.As<PotionData>(item)),
+                        Tab.Trinket => Player.Instance.PurchaseTrinket(Unsafe.As<TrinketData>(item)),
                         _ => throw new Exception("The current tab is invalid"),
                     });
 
@@ -339,6 +378,8 @@ namespace Project.UI
                             break;
                     }
 
+                    this.m_playerView[this.m_selectedIndex].Blur();
+
                     this.m_playerView.RemoveAt(this.m_selectedIndex);
 
                     this.m_playerInventory.RemoveAt(this.m_selectedIndex);
@@ -354,18 +395,18 @@ namespace Project.UI
 
         private void ReinitializeAll(Tab newTab)
         {
-            this.SetCurrentButtonTint(Color.white);
+            this.SetCurrentButtonStatus(false);
 
             this.ResetInventories();
 
             this.m_currentTab = newTab;
 
-            this.SetCurrentButtonTint(ms_activeTint);
+            this.SetCurrentButtonStatus(true);
 
             this.SetupInventories();
         }
 
-        private void SetCurrentButtonTint(Color color)
+        private void SetCurrentButtonStatus(bool active)
         {
             var root = this.UI.rootVisualElement;
 
@@ -380,7 +421,18 @@ namespace Project.UI
 
             if (button is not null)
             {
-                button.style.unityBackgroundImageTintColor = color;
+                if (active)
+                {
+                    button.style.unityBackgroundImageTintColor = ms_activeTint;
+
+                    button.pickingMode = PickingMode.Ignore;
+                }
+                else
+                {
+                    button.style.unityBackgroundImageTintColor = Color.white;
+
+                    button.pickingMode = PickingMode.Position;
+                }
             }
         }
 
@@ -388,11 +440,22 @@ namespace Project.UI
         {
             this.ResetFocusedElement();
 
+            if (this.m_playerView is not null && this.m_playerInventory.Count > 0)
+            {
+                this.m_playerView.ScrollTo(this.m_playerInventory[0]);
+
+                this.m_playerView.Clear();
+            }
+
+            if (this.m_sellerView is not null && this.m_sellerInventory.Count > 0)
+            {
+                this.m_sellerView.ScrollTo(this.m_sellerInventory[0]);
+
+                this.m_sellerView.Clear();
+            }
+
             this.m_playerInventory.Clear();
             this.m_sellerInventory.Clear();
-
-            this.m_playerView?.Clear();
-            this.m_sellerView?.Clear();
         }
 
         private void ResetFocusedElement()
@@ -461,6 +524,8 @@ namespace Project.UI
                         break;
                 }
 
+                view.MarkDirtyRepaint();
+
                 this.RecalculatePurchasableItems();
             }
         }
@@ -482,48 +547,51 @@ namespace Project.UI
         {
             var icon = new IconElement(item, isPlayers);
 
-            icon.RegisterCallback<MouseLeaveEvent>(e =>
+            icon.RegisterCallback<PointerLeaveEvent>(e =>
             {
                 icon.Idle();
             });
 
-            icon.RegisterCallback<MouseEnterEvent>(e =>
+            icon.RegisterCallback<PointerEnterEvent>(e =>
             {
                 icon.Hover();
             });
 
-            icon.RegisterCallback<MouseDownEvent>(e =>
+            icon.RegisterCallback<PointerDownEvent>(e =>
             {
                 icon.Press();
             });
 
-            icon.RegisterCallback<MouseUpEvent>(e =>
+            icon.RegisterCallback<PointerUpEvent>(e =>
             {
-                icon.Hover();
-
-                int index = elements.IndexOf(icon);
-
-                if (index != this.m_selectedIndex)
+                if (icon.Pressed && e.button == 0)
                 {
-                    if (this.m_selectedIndex >= 0)
-                    {
-                        var selected = this.m_isFocusedOnSeller
-                            ? this.m_sellerInventory[this.m_selectedIndex]
-                            : this.m_playerInventory[this.m_selectedIndex];
+                    int index = elements.IndexOf(icon);
 
-                        selected.Deselect();
+                    if (index != this.m_selectedIndex || icon.IsPlayers == this.m_isFocusedOnSeller)
+                    {
+                        if (this.m_selectedIndex >= 0)
+                        {
+                            var selected = this.m_isFocusedOnSeller
+                                ? this.m_sellerInventory[this.m_selectedIndex]
+                                : this.m_playerInventory[this.m_selectedIndex];
+
+                            selected.Deselect();
+                        }
+
+                        icon.Select();
+
+                        this.m_selectedIndex = index;
+
+                        this.m_isFocusedOnSeller = !icon.IsPlayers;
+
+                        this.UpdateDisplayedItem(icon.Item);
                     }
 
-                    icon.Select();
-
-                    this.m_selectedIndex = index;
-
-                    this.m_isFocusedOnSeller = !icon.IsPlayers;
-
-                    this.UpdateDisplayedItem(icon.Item);
+                    Debug.Log($"Currently selected item is \"{icon.Item.Name}\"!");
                 }
 
-                Debug.Log($"Currently selected item is \"{icon.Item.Name}\"!");
+                icon.Hover();
             });
 
             if (index < 0 || index >= elements.Count)
@@ -583,6 +651,8 @@ namespace Project.UI
             if (name is not null)
             {
                 name.text = item is null ? String.Empty : item.Name;
+
+                name.style.fontSize = GetFontSizeForString(name.text);
             }
 
             if (desc is not null)
@@ -592,7 +662,14 @@ namespace Project.UI
 
             if (price is not null)
             {
-                price.text = item is null ? String.Empty : "$" + item.Price.ToString();
+                if (item is null)
+                {
+                    price.text = String.Empty;
+                }
+                else
+                {
+                    price.text = "$" + (this.m_isFocusedOnSeller ? item.Price.ToString() : ((int)(item.Price * Player.SellMultiplier)).ToString());
+                }
             }
 
             if (image is not null)
@@ -624,6 +701,36 @@ namespace Project.UI
 
                 action.pickingMode = PickingMode.Ignore;
             }
+        }
+
+        private static int GetFontSizeForString(string value)
+        {
+            if (value is null || value.Length < 18)
+            {
+                return 20;
+            }
+
+            if (value.Length < 20)
+            {
+                return 18;
+            }
+
+            if (value.Length < 22)
+            {
+                return 16;
+            }
+
+            if (value.Length < 25)
+            {
+                return 14;
+            }
+
+            if (value.Length < 30)
+            {
+                return 12;
+            }
+
+            return 10;
         }
     }
 }

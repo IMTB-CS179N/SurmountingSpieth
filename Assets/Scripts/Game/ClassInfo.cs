@@ -8,7 +8,7 @@ namespace Project.Game
 {
     public class ClassInfo : IDisposable
     {
-        private static readonly string ms_defaultPath = "Sprites/Classes/DEFAULT_CLASS";
+        private static readonly string ms_defaultPath = "Sprites/Classes/DefaultClass";
 
         private Sprite m_sprite;
         private string m_name;
