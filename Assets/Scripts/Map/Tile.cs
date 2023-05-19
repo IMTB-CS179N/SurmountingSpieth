@@ -21,14 +21,14 @@ namespace Project
         }
 
         int m_yValue { get; set; }
-        public TileType m_tileType;
+        public TileType tileType;
 
         // public Sprite TileSprite;
         public string SpritePath;
 
         public bool IsClickable()
         {
-            return (m_tileType == TileType.Shop || m_tileType == TileType.Battle);
+            return (tileType == TileType.Shop || tileType == TileType.Battle);
         }
 
         public CellInfo(int yValue)
@@ -52,33 +52,42 @@ namespace Project
             SpritePath = "Map/PathTiles/" + SpriteName;
             // TileSprite = Resources.Load<Sprite>(path);
             // TileSprite = ResourceManager.LoadSprite(path);
-            m_tileType = type;
+            tileType = type;
         }
     }
 
     public class ShopInfo : CellInfo
     {
-        public ShopInfo(int yValue)
+        public List<Trinket> trinkets { get; set; }
+        public List<Potion> potions { get; set; }
+        public List<Weapon> weapons { get; set; }
+        public List<Armor> armors { get; set; }
+
+        public ShopInfo(int yValue, int tier)
             : base(yValue)
         {
-            // TileSprite = Resources.Load<Sprite>("Map/Trade_Post");
-            // TileSprite = ResourceManager.LoadSprite("Map/Trade_Post");
+            // tier 3 (lowest) 70% tier 3 items 20% tier 2 items 10% tier 1 i
             SpritePath = "Map/Trade_Post";
-            m_tileType = TileType.Shop;
+            tileType = TileType.Shop;
         }
     }
 
     public class BattleInfo : CellInfo
     {
-        public List<Enemy> m_enemies = new List<Enemy>();
+        public List<Enemy> enemies = new List<Enemy>();
 
         public BattleInfo(int yValue, List<Enemy> enemies)
             : base(yValue)
         {
-            m_enemies = enemies;
+            this.enemies = enemies;
             // TileSprite = ResourceManager.LoadSprite("Sprites/Characters/Dragonborn cleric");
             SpritePath = "Sprites/Characters/Dragonborn cleric";
-            m_tileType = TileType.Battle;
+            tileType = TileType.Battle;
+        }
+
+        public List<Enemy> GetEnemies()
+        {
+            return enemies;
         }
     }
 
@@ -131,7 +140,7 @@ namespace Project
                     // return new BattleInfo(yValue, new List<Enemy>());
                     return new BackgroundInfo(yValue, CellInfo.TileType.Blank);
                 case 1:
-                    return new ShopInfo(yValue);
+                    return new ShopInfo(yValue, 0);
                 default:
                     break;
             }
