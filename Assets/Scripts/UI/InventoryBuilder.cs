@@ -1222,7 +1222,6 @@ namespace Project.UI
         private Label m_itemCostLabel;
         private Label m_itemDescLabel;
 
-        private bool m_closedHovered;
         private bool m_closedPressed;
 
         protected override void BindEvents()
@@ -1256,7 +1255,6 @@ namespace Project.UI
 
         private void OnDisableEvent()
         {
-            this.m_closedHovered = false;
             this.m_closedPressed = false;
 
             this.m_back = null;
@@ -1293,7 +1291,6 @@ namespace Project.UI
             {
                 this.m_back.RegisterCallback<PointerLeaveEvent>(e =>
                 {
-                    this.m_closedHovered = false;
                     this.m_closedPressed = false;
 
                     this.m_back.style.unityBackgroundImageTintColor = Color.black;
@@ -1301,7 +1298,6 @@ namespace Project.UI
 
                 this.m_back.RegisterCallback<PointerEnterEvent>(e =>
                 {
-                    this.m_closedHovered = true;
                     this.m_closedPressed = false;
 
                     this.m_back.style.unityBackgroundImageTintColor = (Color)new Color32(255, 100, 100, 255);
@@ -1311,7 +1307,6 @@ namespace Project.UI
                 {
                     if (e.button == 0)
                     {
-                        this.m_closedHovered = false;
                         this.m_closedPressed = true;
 
                         this.m_back.style.unityBackgroundImageTintColor = (Color)new Color32(200, 0, 0, 255);
@@ -1324,7 +1319,6 @@ namespace Project.UI
                     {
                         if (this.m_closedPressed)
                         {
-                            this.m_closedHovered = true;
                             this.m_closedPressed = false;
 
                             this.m_back.style.unityBackgroundImageTintColor = (Color)new Color32(255, 100, 100, 255);

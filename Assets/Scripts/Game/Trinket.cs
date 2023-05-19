@@ -67,7 +67,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = false;
 
-        public const string StatName = "Armor";
+        public const string StatName = "armor";
 
         public readonly int ExtraArmorValue;
 
@@ -91,7 +91,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = false;
 
-        public const string StatName = "Evasion";
+        public const string StatName = "evasion";
 
         public readonly float ExtraEvasionValue;
 
@@ -115,7 +115,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = true;
 
-        public const string StatName = "Armor";
+        public const string StatName = "armor";
 
         public readonly float ExtraArmorPercentage;
 
@@ -139,7 +139,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = true;
 
-        public const string StatName = "Evasion";
+        public const string StatName = "evasion";
 
         public readonly float ExtraEvasionPercentage;
 
@@ -163,7 +163,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = false;
 
-        public const string StatName = "Damage";
+        public const string StatName = "damage";
 
         public readonly int ExtraDamageValue;
 
@@ -187,7 +187,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = false;
 
-        public const string StatName = "Precision";
+        public const string StatName = "precision";
 
         public readonly float ExtraPrecisionValue;
 
@@ -211,7 +211,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = false;
 
-        public const string StatName = "CritChance";
+        public const string StatName = "critical chance";
 
         public readonly float ExtraCritChanceValue;
 
@@ -235,7 +235,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = false;
 
-        public const string StatName = "CritMultiplier";
+        public const string StatName = "critical multiplier";
 
         public readonly float ExtraCritMultiplierValue;
 
@@ -259,7 +259,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = true;
 
-        public const string StatName = "Damage";
+        public const string StatName = "damage";
 
         public readonly float ExtraDamagePercentage;
 
@@ -283,7 +283,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = true;
 
-        public const string StatName = "Precision";
+        public const string StatName = "precision";
 
         public readonly float ExtraPrecisionPercentage;
 
@@ -307,7 +307,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = true;
 
-        public const string StatName = "CritChance";
+        public const string StatName = "critical chance";
 
         public readonly float ExtraCritChancePercentage;
 
@@ -331,7 +331,7 @@ namespace Project.Game
     {
         public const bool IsPercentage = true;
 
-        public const string StatName = "CritMultiplier";
+        public const string StatName = "critical multiplier";
 
         public readonly float ExtraCritMultiplierPercentage;
 

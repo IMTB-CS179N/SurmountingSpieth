@@ -9,7 +9,6 @@ namespace Project.Items
     public class WeaponData : IItem, IDisposable
     {
         private Sprite m_sprite;
-        private string m_desc;
         private string m_name;
 
         [Order(0)]
@@ -44,17 +43,11 @@ namespace Project.Items
             set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
-        [Order(8)]
-        public string Description
-        {
-            get => this.m_desc;
-            set => this.m_desc = value ?? String.Empty;
-        }
+        public string Description => this.CreateDescription();
 
         public WeaponData()
         {
             this.m_name = String.Empty;
-            this.m_desc = String.Empty;
             this.Damage = 7;
             this.CritChance = 0.5f;
             this.CritMultiplier = 0.5f;
@@ -65,6 +58,16 @@ namespace Project.Items
 
         public void Dispose()
         {
+        }
+
+        private string CreateDescription()
+        {
+            return "Increases " +
+                $"damage by {this.Damage} points, " +
+                $"crit. chance by {this.CritChance * 100.0f}%, " +
+                $"crit. mult. by {this.CritMultiplier * 100.0f}%, " +
+                $"precision by {this.Precision} points and has " +
+                $"{this.MaxTrinketCount} trinket slots.";
         }
     }
 }

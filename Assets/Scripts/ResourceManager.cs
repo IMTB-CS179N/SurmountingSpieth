@@ -155,7 +155,7 @@ namespace Project
         {
             if (items is not null && items.Length > 0)
             {
-                Array.Sort(items, (x, y) => x.Price.CompareTo(y.Price));
+                //Array.Sort(items, (x, y) => x.Price.CompareTo(y.Price));
             }
 
             return items;

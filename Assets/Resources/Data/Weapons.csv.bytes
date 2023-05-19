@@ -1,4 +1,15 @@
-Weapon1,0,20,0.02,0.4,50,500,sprite,"This is a weapon that gives 20 damage, 2% crit chance, 40% crit damage, 50 precision, and has 0 trinket slots"
-Weapon2,1,40,0.05,0.3,40,500,sprite,"This is a weapon that gives 40 damage, 5% crit chance, 30% crit damage, 40 precision, and has 1 trinket slots"
-Weapon3,2,60,0.08,0.4,30,500,sprite,"This is a weapon that gives 60 damage, 8% crit chance, 40% crit damage, 30 precision, and has 2 trinket slots"
-Weapon4,3,80,0.10,0.3,20,500,sprite,"This is a weapon that gives 80 damage, 10% crit chance, 30% crit damage, 20 precision, and has 3 trinket slots"
+Axe,0,15,0.15,0.3,30,100,Sprites/Weapons/Axe
+Dagger,0,20,0.1,0.5,20,100,Sprites/Weapons/Dagger
+Dead Fish,0,17,0.05,0.2,30,100,Sprites/Weapons/DeadFish
+Bow,1,28,0.1,0.6,45,200,Sprites/Weapons/Bow
+Wand,1,33,0.05,0.6,55,200,Sprites/Weapons/Wand
+Hammer,1,38,0.15,0.4,60,200,Sprites/Weapons/Hammer
+Short Sword,1,34,0.12,0.5,65,200,Sprites/Weapons/ShortSword
+Mace,1,32,0.1,0.4,60,200,Sprites/Weapons/Mace
+Spear,2,66,0.13,0.7,60,400,Sprites/Weapons/Spear
+Bongos,2,62,0.1,0.5,70,400,Sprites/Weapons/Bongos
+Throwing Knives,2,55,0.17,0.5,60,400,Sprites/Weapons/ThrowingKnives
+Lute,2,70,0.14,0.9,80,400,Sprites/Weapons/Lute
+Crossbow,3,85,0.2,1.3,75,700,Sprites/Weapons/Crossbow
+Staff,3,110,0.1,0.8,90,700,Sprites/Weapons/Staff
+Great Sword,3,95,0.14,1,100,700,Sprites/Weapons/GreatSword

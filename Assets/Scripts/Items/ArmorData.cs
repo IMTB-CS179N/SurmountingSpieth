@@ -16,7 +16,6 @@ namespace Project.Items
     public class ArmorData : IItem, IDisposable
     {
         private Sprite m_sprite;
-        private string m_desc;
         private string m_name;
 
         [Order(0)]
@@ -51,17 +50,11 @@ namespace Project.Items
             set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
-        [Order(8)]
-        public string Description
-        {
-            get => this.m_desc;
-            set => this.m_desc = value ?? String.Empty;
-        }
+        public string Description => this.GetDescription();
 
         public ArmorData()
         {
             this.m_name = String.Empty;
-            this.m_desc = String.Empty;
             this.Value = 0;
             this.Price = 0;
             this.PrecisionReduction = 0.0f;
@@ -71,6 +64,15 @@ namespace Project.Items
 
         public void Dispose()
         {
+        }
+
+        private string GetDescription()
+        {
+            return $"Increases " +
+                $"armor value by {this.Value} points, " +
+                $"evasion by {this.EvasionAddition * 100.0f}%, reduces " +
+                $"precision by {this.PrecisionReduction} points and has " +
+                $"{this.MaxTrinketCount} trinket slots.";
         }
     }
 }

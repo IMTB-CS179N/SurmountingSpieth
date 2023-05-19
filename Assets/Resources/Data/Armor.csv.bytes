@@ -1,3 +1,18 @@
-Armor1,Helmet,0,30,7,0.02,200,"Sprites/Armor/Light_Armor","This is armor that gives 30 armor, 2% evasion, has 0 trinket slots"
-Armor2,Helmet,1,60,7,0.02,600,"Sprites/Armor/Medium_Armor","This is armor that gives 60 armor, 2% evasion, has 1 trinket slot"
-Armor3,Helmet,2,90,7,0.02,1000,"Sprites/Armor/Heavy_Armor","This is armor that gives 90 armor, 2% evasion, has 2 trinket slots"
+Light Helm,Helmet,0,30,4,0.01,60,Sprites/Armor/LightHelmet
+Light Chestplate,Chestplate,0,50,9,0.03,110,Sprites/Armor/LightChestplate
+Light Leggings,Leggings,0,40,7,0.02,80,Sprites/Armor/LightLeggings
+Leather Helm,Helmet,0,20,3,0.025,60,Sprites/Armor/LeatherHelmet
+Leather Chestplate,Chestplate,0,40,7,0.04,110,Sprites/Armor/LeatherChestplate
+Leather Leggings,Leggings,0,30,5,0.035,80,Sprites/Armor/LeatherLeggings
+Medium Helm,Helmet,1,50,5,0.02,130,Sprites/Armor/MediumHelmet
+Medium Chestplate,Chestplate,1,70,11,0.04,200,Sprites/Armor/MediumChestplate
+Medium Leggings,Leggings,1,60,9,0.03,170,Sprites/Armor/MediumLeggings
+Chainmail Helm,Helmet,1,35,4,0.035,130,Sprites/Armor/ChainmailHelmet
+Chainmail Chestplate,Chestplate,1,55,9,0.065,200,Sprites/Armor/ChainmailChestplate
+Chainmail Leggings,Leggings,1,45,7,0.05,170,Sprites/Armor/ChainmailLeggings
+Heavy Helm,Helmet,2,65,6,0.02,250,Sprites/Armor/HeavyHelmet
+Heavy Chestplate,Chestplate,2,100,13,0.04,400,Sprites/Armor/HeavyChestplate
+Heavy Leggings,Leggings,2,85,11,0.04,300,Sprites/Armor/HeavyLeggings
+Dragonscale Helm,Helmet,2,50,5,0.05,250,Sprites/Armor/DragonscaleHelmet
+Dragonscale Chestplate,Chestplate,2,75,11,0.08,400,Sprites/Armor/DragonscaleChestplate
+Dragonscale Leggings,Leggings,2,65,9,0.07,300,Sprites/Armor/DragonscaleLeggings

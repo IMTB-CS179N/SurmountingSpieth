@@ -29,7 +29,7 @@ namespace Project.Battle
                 return false; // if dodge is 100%, never hits (should never happen though?)
             }
 
-            var chance = precision * (1.0f - evasion);
+            var chance = (precision * 0.5f) * (1.0f - evasion);
 
             if (chance >= 1.0f)
             {

@@ -98,7 +98,12 @@ namespace Project.Game
 
         protected override void AffectStatsInternal(ref EntityStats stats)
         {
-            stats.CurHealth = Mathf.Clamp(stats.CurHealth - this.PoisonValue, 0, stats.MaxHealth);
+            stats.CurHealth -= this.PoisonValue;
+
+            if (stats.CurHealth < 0)
+            {
+                stats.CurHealth = 0;
+            }
         }
 
         private static string GetDescription(int value, int duration)
@@ -122,7 +127,12 @@ namespace Project.Game
 
         protected override void AffectStatsInternal(ref EntityStats stats)
         {
-            stats.CurHealth = Mathf.Clamp(stats.CurHealth - this.BurnValue, 0, stats.MaxHealth);
+            stats.CurHealth -= this.BurnValue;
+
+            if (stats.CurHealth < 0)
+            {
+                stats.CurHealth = 0;
+            }
         }
 
         private static string GetDescription(int value, int duration)
@@ -156,7 +166,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Reduces armor by {value} percent for {duration} turns";
+            return $"Reduces armor by {value}% for {duration} turns";
         }
     }
 
@@ -204,7 +214,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases damage by {value} percent for {duration} turns";
+            return $"Increases damage by {value}% for {duration} turns";
         }
     }
 
@@ -223,7 +233,12 @@ namespace Project.Game
 
         protected override void ApplyAllNowInternal(ref EntityStats stats)
         {
-            stats.CurHealth = Mathf.Clamp(stats.CurHealth + this.HealingValue, 0, stats.MaxHealth);
+            stats.CurHealth += this.HealingValue;
+
+            if (stats.CurHealth > stats.MaxHealth)
+            {
+                stats.CurHealth = stats.MaxHealth;
+            }
         }
 
         private static string GetDescription(int value)
@@ -247,7 +262,12 @@ namespace Project.Game
 
         protected override void ApplyAllNowInternal(ref EntityStats stats)
         {
-            stats.CurMana = Mathf.Clamp(stats.CurMana + this.SurgeValue, 0, stats.MaxMana);
+            stats.CurMana += this.SurgeValue;
+
+            if (stats.CurMana > stats.MaxMana)
+            {
+                stats.CurMana = stats.MaxMana;
+            }
         }
 
         private static string GetDescription(int value)
@@ -271,7 +291,12 @@ namespace Project.Game
 
         protected override void AffectStatsInternal(ref EntityStats stats)
         {
-            stats.CurHealth = Mathf.Clamp(stats.CurHealth + this.RegenerationValue, 0, stats.MaxHealth);
+            stats.CurHealth += this.RegenerationValue;
+
+            if (stats.CurHealth > stats.MaxHealth)
+            {
+                stats.CurHealth = stats.MaxHealth;
+            }
         }
 
         private static string GetDescription(int value, int duration)
@@ -291,6 +316,16 @@ namespace Project.Game
         public RenewalEffect(int value, int duration) : base(false, false, true, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
         {
             this.RenewalValue = value;
+        }
+
+        protected override void AffectStatsInternal(ref EntityStats stats)
+        {
+            stats.CurMana += this.RenewalValue;
+
+            if (stats.CurMana > stats.MaxMana)
+            {
+                stats.CurMana = stats.MaxMana;
+            }
         }
 
         private static string GetDescription(int value, int duration)
@@ -324,7 +359,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases damage by {value} percent for {duration} turns";
+            return $"Decreases damage by {value}% for {duration} turns";
         }
     }
 
@@ -343,7 +378,7 @@ namespace Project.Game
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.CritChance += this.LethalityValue * stats.CritChance;
+            stats.CritChance += this.LethalityValue;
 
             if (stats.CritChance > 1.0f)
             {
@@ -353,7 +388,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases critical chance by {value} percent for {duration} turns";
+            return $"Increases critical chance by {value}% for {duration} turns";
         }
     }
 
@@ -372,7 +407,7 @@ namespace Project.Game
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Evasion -= this.SlowValue * stats.Evasion;
+            stats.Evasion -= this.SlowValue;
 
             if (stats.Evasion < 0.0f)
             {
@@ -382,7 +417,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases evasion by {value} percent for {duration} turns";
+            return $"Decreases evasion by {value}% for {duration} turns";
         }
     }
 
@@ -401,7 +436,7 @@ namespace Project.Game
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Precision -= this.DizzynessValue * stats.Precision;
+            stats.Precision -= this.DizzynessValue;
 
             if (stats.Precision < 0.0f)
             {
@@ -411,7 +446,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases precision by {value} percent for {duration} turns";
+            return $"Decreases precision by {value} points for {duration} turns";
         }
     }
 
@@ -430,7 +465,7 @@ namespace Project.Game
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Evasion += this.FlowValue * stats.Evasion;
+            stats.Evasion += this.FlowValue;
 
             if (stats.Evasion > 1.0f)
             {
@@ -440,7 +475,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases evasion by {value} percent for {duration} turns";
+            return $"Increases evasion by {value}% for {duration} turns";
         }
     }
 
@@ -459,17 +494,12 @@ namespace Project.Game
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Precision += this.SharpnessValue * stats.Precision;
-
-            if (stats.Precision > 1.0f)
-            {
-                stats.Precision = 1.0f;
-            }
+            stats.Precision += this.SharpnessValue;
         }
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases precision by {value} percent for {duration} turns";
+            return $"Increases precision by {value} points for {duration} turns";
         }
     }
 }

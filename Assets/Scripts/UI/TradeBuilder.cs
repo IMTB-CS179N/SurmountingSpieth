@@ -159,6 +159,8 @@ namespace Project.UI
             Weapon,
             Potion,
             Trinket,
+            Action, // technically not a tab, but used for press info
+            Count,
         }
 
         private const string kArmorButton = "armor-button";
@@ -198,6 +200,7 @@ namespace Project.UI
 
         private readonly List<IconElement> m_playerInventory = new();
         private readonly List<IconElement> m_sellerInventory = new();
+        private readonly bool[] m_pressed = new bool[(int)Tab.Count];
 
         private ScrollView m_playerView;
         private ScrollView m_sellerView;
@@ -244,6 +247,8 @@ namespace Project.UI
             this.m_playerView = null;
             this.m_sellerView = null;
 
+            this.m_pressed.AsSpan().Clear();
+
             this.m_currentTab = Tab.Armor;
         }
 
@@ -256,30 +261,30 @@ namespace Project.UI
 
         private void SetupArmorButton()
         {
-            this.SetupCallbacksInternal(kArmorButton, Key.A, () => this.ReinitializeAll(Tab.Armor));
+            this.SetupCallbacksInternal(kArmorButton, Tab.Armor, Key.A, () => this.ReinitializeAll(Tab.Armor));
         }
 
         private void SetupWeaponButton()
         {
-            this.SetupCallbacksInternal(kWeaponButton, Key.W, () => this.ReinitializeAll(Tab.Weapon));
+            this.SetupCallbacksInternal(kWeaponButton, Tab.Weapon, Key.W, () => this.ReinitializeAll(Tab.Weapon));
         }
 
         private void SetupPotionButton()
         {
-            this.SetupCallbacksInternal(kPotionButton, Key.P, () => this.ReinitializeAll(Tab.Potion));
+            this.SetupCallbacksInternal(kPotionButton, Tab.Potion, Key.P, () => this.ReinitializeAll(Tab.Potion));
         }
 
         private void SetupTrinketButton()
         {
-            this.SetupCallbacksInternal(kTrinketButton, Key.T, () => this.ReinitializeAll(Tab.Trinket));
+            this.SetupCallbacksInternal(kTrinketButton, Tab.Trinket, Key.T, () => this.ReinitializeAll(Tab.Trinket));
         }
 
         private void SetupActionButton()
         {
-            this.SetupCallbacksInternal(kActionButton, Key.S, () => this.PerformInventoryAction());
+            this.SetupCallbacksInternal(kActionButton, Tab.Action, Key.S, () => this.PerformInventoryAction());
         }
 
-        private void SetupCallbacksInternal(string name, Key key, Action onMouseUp)
+        private void SetupCallbacksInternal(string name, Tab tab, Key key, Action onMouseUp)
         {
             var element = this.UI.rootVisualElement.Q<VisualElement>(name);
 
@@ -289,6 +294,8 @@ namespace Project.UI
                 {
                     if (element.pickingMode == PickingMode.Position)
                     {
+                        this.m_pressed[(int)tab] = false;
+
                         element.style.unityBackgroundImageTintColor = ms_unlockedIdledTint;
                     }
                 });
@@ -297,21 +304,30 @@ namespace Project.UI
                 {
                     if (element.pickingMode == PickingMode.Position)
                     {
+                        this.m_pressed[(int)tab] = false;
+
                         element.style.unityBackgroundImageTintColor = ms_unlockedHoverTint;
                     }
                 });
 
                 element.RegisterCallback<MouseDownEvent>(e =>
                 {
-                    if (element.pickingMode == PickingMode.Position)
+                    if (element.pickingMode == PickingMode.Position && e.button == 0)
                     {
+                        this.m_pressed[(int)tab] = true;
+
                         element.style.unityBackgroundImageTintColor = ms_unlockedPressTint;
                     }
                 });
 
                 element.RegisterCallback<MouseUpEvent>(e =>
                 {
-                    onMouseUp?.Invoke();
+                    if (element.pickingMode == PickingMode.Position && e.button == 0 && this.m_pressed[(int)tab])
+                    {
+                        this.m_pressed[(int)tab] = false;
+
+                        onMouseUp?.Invoke();
+                    }
                 });
 
                 this.BindKeyAction(key, onMouseUp);
@@ -424,11 +440,22 @@ namespace Project.UI
         {
             this.ResetFocusedElement();
 
+            if (this.m_playerView is not null && this.m_playerInventory.Count > 0)
+            {
+                this.m_playerView.ScrollTo(this.m_playerInventory[0]);
+
+                this.m_playerView.Clear();
+            }
+
+            if (this.m_sellerView is not null && this.m_sellerInventory.Count > 0)
+            {
+                this.m_sellerView.ScrollTo(this.m_sellerInventory[0]);
+
+                this.m_sellerView.Clear();
+            }
+
             this.m_playerInventory.Clear();
             this.m_sellerInventory.Clear();
-
-            this.m_playerView?.Clear();
-            this.m_sellerView?.Clear();
         }
 
         private void ResetFocusedElement()
@@ -496,6 +523,8 @@ namespace Project.UI
                         this.SetupViewFromItemList(view, ResourceManager.Trinkets, this.m_sellerInventory, false);
                         break;
                 }
+
+                view.MarkDirtyRepaint();
 
                 this.RecalculatePurchasableItems();
             }
@@ -622,6 +651,8 @@ namespace Project.UI
             if (name is not null)
             {
                 name.text = item is null ? String.Empty : item.Name;
+
+                name.style.fontSize = GetFontSizeForString(name.text);
             }
 
             if (desc is not null)
@@ -670,6 +701,36 @@ namespace Project.UI
 
                 action.pickingMode = PickingMode.Ignore;
             }
+        }
+
+        private static int GetFontSizeForString(string value)
+        {
+            if (value is null || value.Length < 18)
+            {
+                return 20;
+            }
+
+            if (value.Length < 20)
+            {
+                return 18;
+            }
+
+            if (value.Length < 22)
+            {
+                return 16;
+            }
+
+            if (value.Length < 25)
+            {
+                return 14;
+            }
+
+            if (value.Length < 30)
+            {
+                return 12;
+            }
+
+            return 10;
         }
     }
 }
