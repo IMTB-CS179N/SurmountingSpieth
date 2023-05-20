@@ -7,22 +7,19 @@ namespace Project.Game
 {
     public interface IEntity
     {
-        int Health { get; }
+        ref TurnStats TurnStats { get; }
 
-        int Armor { get; }
-        
-        int Damage { get; }
+        ref EntityStats EntityStats { get; }
 
-        int Precision { get; }
+        void AddEffect(Effect effect);
+    }
 
-        float DodgeChance { get; }
+    public struct TurnStats
+    {
+        public bool CanMove;
+    }
 
-        float CriticalChance { get; }
-        
-        float CriticalDamage { get; }
-
-        int DealDamage(int damage);
-
-        int ComputeDamage();
+    public class BattleStats
+    {
     }
 }
