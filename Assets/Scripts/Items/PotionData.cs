@@ -63,5 +63,10 @@ namespace Project.Items
         public void Dispose()
         {
         }
+
+        public PotionData Clone()
+        {
+            return (PotionData)this.MemberwiseClone();
+        }
     }
 }

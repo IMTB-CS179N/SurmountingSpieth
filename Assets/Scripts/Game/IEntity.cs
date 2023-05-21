@@ -16,7 +16,9 @@ namespace Project.Game
 
     public struct TurnStats
     {
-        public bool CanMove;
+        public bool BlockCurrentMove;
+        public bool RemovePositiveEffects;
+        public bool RemoveNegativeEffects;
     }
 
     public class BattleStats

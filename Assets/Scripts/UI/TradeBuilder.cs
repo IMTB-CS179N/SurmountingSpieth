@@ -4,7 +4,6 @@ using Project.Items;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -284,6 +283,11 @@ namespace Project.UI
             this.SetupCallbacksInternal(kActionButton, Tab.Action, Key.S, () => this.PerformInventoryAction());
         }
 
+        private void SetupBackButton()
+        {
+
+        }
+
         private void SetupCallbacksInternal(string name, Tab tab, Key key, Action onMouseUp)
         {
             var element = this.UI.rootVisualElement.Q<VisualElement>(name);
@@ -342,14 +346,25 @@ namespace Project.UI
                 {
                     var item = this.m_sellerInventory[this.m_selectedIndex].Item;
 
-                    this.CreateIconElement(this.m_playerView, item, this.m_playerInventory, true, this.m_currentTab switch
+                    int index = this.m_currentTab switch
                     {
                         Tab.Armor => Player.Instance.PurchaseArmor(Unsafe.As<ArmorData>(item)),
                         Tab.Weapon => Player.Instance.PurchaseWeapon(Unsafe.As<WeaponData>(item)),
                         Tab.Potion => Player.Instance.PurchasePotion(Unsafe.As<PotionData>(item)),
                         Tab.Trinket => Player.Instance.PurchaseTrinket(Unsafe.As<TrinketData>(item)),
                         _ => throw new Exception("The current tab is invalid"),
-                    });
+                    };
+
+                    IItem real = this.m_currentTab switch
+                    {
+                        Tab.Armor => Player.Instance.Armors[index],
+                        Tab.Weapon => Player.Instance.Weapons[index],
+                        Tab.Potion => Player.Instance.Potions[index],
+                        Tab.Trinket => Player.Instance.Trinkets[index],
+                        _ => throw new Exception("The current tab is invalid"),
+                    };
+
+                    this.CreateIconElement(this.m_playerView, real, this.m_playerInventory, true, index);
 
                     this.UpdateMoneyLabel();
 

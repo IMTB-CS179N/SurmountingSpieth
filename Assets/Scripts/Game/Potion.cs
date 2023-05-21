@@ -89,28 +89,6 @@ namespace Project.Game
         }
     }
 
-    public class PoisonPotion : Potion
-    {
-        public const string Effect = "Poison";
-
-        public PoisonPotion(PotionData data) : base(data)
-        {
-        }
-
-        public override Effect[] Use()
-        {
-            return new Effect[]
-            {
-                new PoisonEffect((int)this.Modifier, this.Duration),
-            };
-        }
-
-        public static void RegisterForFactory()
-        {
-            PotionFactory.Register(Effect, data => new PoisonPotion(data));
-        }
-    }
-
     public static class PotionFactory
     {
         private static readonly Dictionary<string, Func<PotionData, Potion>> ms_activatorMap = new();
@@ -144,7 +122,6 @@ namespace Project.Game
         {
             HealingPotion.RegisterForFactory();
             RegenerationPotion.RegisterForFactory();
-            PoisonPotion.RegisterForFactory();
         }
     }
 }

@@ -194,9 +194,21 @@ namespace Project.Game
             this.m_remainingCooldown = this.m_data.CooldownTime;
         }
 
-        public void ApplyAllyEffects(IEntity ally, IEntity[] enemies)
+        public void ApplyAllyEffects(IEntity ally)
         {
+            if (ally is null)
+            {
+                throw new ArgumentNullException(nameof(ally));
+            }
 
+            var effects = this.m_data.AllyEffects;
+            var modifys = this.m_data.AllyModifiers;
+            var duratio = this.m_data.AllyDurations;
+
+            for (int i = 0; i < effects.Length; ++i)
+            {
+                ally.AddEffect(EffectFactory.CreateEffect(effects[i], modifys[i], duratio[i], in ally.EntityStats));
+            }
         }
 
         public void ApplyEnemyEffects(IEntity ally, IEntity[] enemies, int targetEnemy)
@@ -224,7 +236,7 @@ namespace Project.Game
 
                 for (int i = 0; i < effects.Length; ++i)
                 {
-                    var effect = EffectFactory.CreateEffect(effects[i], modifys[i], duratio[i], ref ally.EntityStats);
+                    var effect = EffectFactory.CreateEffect(effects[i], modifys[i], duratio[i], in ally.EntityStats);
 
                     if (this.IsAreaOfEffect)
                     {

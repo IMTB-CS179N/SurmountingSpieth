@@ -942,7 +942,7 @@ namespace Project.Game
 
             int index = Player.BinarySearchInsertionPlace(armor, this.m_armors);
 
-            this.m_armors.Insert(index, armor);
+            this.m_armors.Insert(index, armor.Clone());
 
             return index;
         }
@@ -963,7 +963,7 @@ namespace Project.Game
 
             int index = Player.BinarySearchInsertionPlace(weapon, this.m_weapons);
 
-            this.m_weapons.Insert(index, weapon);
+            this.m_weapons.Insert(index, weapon.Clone());
 
             return index;
         }
@@ -984,7 +984,7 @@ namespace Project.Game
 
             int index = Player.BinarySearchInsertionPlace(potion, this.m_potions);
 
-            this.m_potions.Insert(index, potion);
+            this.m_potions.Insert(index, potion.Clone());
 
             return index;
         }
@@ -1005,7 +1005,7 @@ namespace Project.Game
 
             int index = Player.BinarySearchInsertionPlace(trinket, this.m_trinkets);
 
-            this.m_trinkets.Insert(index, trinket);
+            this.m_trinkets.Insert(index, trinket.Clone());
 
             return index;
         }
@@ -1052,7 +1052,7 @@ namespace Project.Game
             {
                 this.m_money += (int)(potion.Price * Player.SellMultiplier);
 
-                // #TODO
+                this.UnattachPotion(potion);
             }
         }
 

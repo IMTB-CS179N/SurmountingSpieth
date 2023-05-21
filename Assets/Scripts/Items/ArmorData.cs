@@ -66,6 +66,11 @@ namespace Project.Items
         {
         }
 
+        public ArmorData Clone()
+        {
+            return (ArmorData)this.MemberwiseClone();
+        }
+
         private string GetDescription()
         {
             return $"Increases " +

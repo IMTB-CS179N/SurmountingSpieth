@@ -63,6 +63,11 @@ namespace Project.Items
         {
         }
 
+        public TrinketData Clone()
+        {
+            return (TrinketData)this.MemberwiseClone();
+        }
+
         private string CreateDescription()
         {
             if (this.IsWeaponTrinket)

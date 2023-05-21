@@ -22,16 +22,15 @@ namespace Project.UI
         {
             this.OnUIEnabled += this.OnEnableEvent;
             this.OnUIDisabled += this.OnDisableEvent;
+        }
 
+        private void OnEnableEvent()
+        {
             this.SetupNewGameButton();
             this.SetupContinueButton();
             this.SetupSettingsButton();
             this.SetupQuestionButton();
             this.SetupCreditsButton();
-        }
-
-        private void OnEnableEvent()
-        {
         }
 
         private void OnDisableEvent()

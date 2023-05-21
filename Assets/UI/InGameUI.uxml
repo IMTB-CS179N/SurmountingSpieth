@@ -9,6 +9,9 @@
                 <ui:VisualElement name="save-layout" class="button-style button-layout-style">
                     <ui:VisualElement name="save-button" class="button-image-style" />
                 </ui:VisualElement>
+                <ui:VisualElement name="debugshop-layout" class="button-layout-style">
+                    <ui:VisualElement name="debugshop-button" class="button-image-style" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="back-button" style="flex-shrink: 0; width: 48px; height: 48px; background-image: resource(&apos;UI/Shared/NullItem&apos;);" />
         </ui:VisualElement>
@@ -22,8 +25,8 @@
                     <ui:Label text="$1000" display-tooltip-when-elided="true" name="money-label" style="-unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 24px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="main-button-layout" style="flex-shrink: 0; width: 150px; height: 40px; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-color: rgb(178, 120, 61);">
-                <ui:Label text="BATTLE" display-tooltip-when-elided="false" name="main-button-label" enable-rich-text="false" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); flex-grow: 1; flex-shrink: 1; -unity-text-align: middle-center; font-size: 32px;" />
+            <ui:VisualElement name="action-layout" style="flex-shrink: 0; width: 150px; height: 40px; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-color: rgb(178, 120, 61);">
+                <ui:Label text="BATTLE" display-tooltip-when-elided="false" name="action-button" enable-rich-text="false" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); flex-grow: 1; flex-shrink: 1; -unity-text-align: middle-center; font-size: 32px;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

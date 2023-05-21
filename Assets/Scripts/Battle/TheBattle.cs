@@ -36,5 +36,10 @@ namespace Project.Battle
         {
             return InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.V);
         }
+
+        public void StartBattle()
+        {
+            // #TODO
+        }
     }
 }
