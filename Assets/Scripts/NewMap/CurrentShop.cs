@@ -16,5 +16,10 @@ namespace Project
         void Start() { }
 
         void Update() { }
+
+        void SetShop(ShopInfo newShop)
+        {
+            currentShop = newShop;
+        }
     }
 }
