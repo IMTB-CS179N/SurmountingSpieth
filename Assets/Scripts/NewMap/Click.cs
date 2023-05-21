@@ -15,6 +15,10 @@ public class Click : MonoBehaviour
 
     public void TriggerClick()
     {
+        if (!clickable)
+        {
+            return;
+        }
         Debug.Log(
             "Moving to " + (this.transform.position - this.transform.parent.transform.position)
         );
