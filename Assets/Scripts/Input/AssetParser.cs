@@ -183,6 +183,10 @@ namespace Project.Input
 
                 property.SetValue(target, result);
             }
+            else if (property.PropertyType.IsEnum)
+            {
+                property.SetValue(target, Enum.Parse(property.PropertyType, value));
+            }
             else
             {
                 throw new Exception($"Unable to parse the property {property.Name} since it has unsupported parsing type");

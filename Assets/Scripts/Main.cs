@@ -1,3 +1,4 @@
+using Project.Game;
 using Project.Input;
 
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace Project
 
         private void Start()
         {
+            PotionFactory.Initialize();
+            TrinketFactory.Initialize();
         }
 
         private void Update()
@@ -24,11 +27,11 @@ namespace Project
 
             if (collider)
             {
-                var clickObj = collider.transform.gameObject.GetComponent<OnClick>();
+                var clickObj = collider.transform.gameObject.GetComponent<Click>();
 
                 if (clickObj)
                 {
-                    clickObj.Click();
+                    clickObj.TriggerClick();
                 }
             }
         }

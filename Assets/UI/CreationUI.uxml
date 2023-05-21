@@ -32,23 +32,23 @@
             </ui:VisualElement>
             <ui:VisualElement name="stats-layout" style="width: 100%; height: 35%; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px; flex-grow: 0; background-color: rgba(0, 0, 0, 0); justify-content: space-around;">
                 <ui:VisualElement name="health-layout" style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; justify-content: space-between;">
-                    <ui:VisualElement name="health-image" class="statistic-image" style="background-image: url(&apos;project://database/Packages/com.unity.collab-proxy/Editor/PlasticSCM/Assets/Images/iconaddedlocal@2x.png?fileID=2800000&amp;guid=a67b58d6cddcd4345b1e001340de5a76&amp;type=3#iconaddedlocal@2x&apos;);" />
+                    <ui:VisualElement name="health-image" class="statistic-image" style="background-image: resource(&apos;Sprites/Stats/Health&apos;);" />
                     <ui:ProgressBar value="0" name="health-bar" class="statistic-bar-background statistic-bar-progress statistic-bar" />
                 </ui:VisualElement>
                 <ui:VisualElement name="mana-layout" style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: space-between; align-items: center;">
-                    <ui:VisualElement name="mana-image" class="statistic-image" style="background-image: url(&apos;project://database/Packages/com.unity.2d.animation/Editor/Assets/SkinningModule/dotCyan.png?fileID=2800000&amp;guid=5b56cb1a6bd97f348b3a3b6f875aafd6&amp;type=3#dotCyan&apos;); -unity-background-scale-mode: scale-to-fit;" />
+                    <ui:VisualElement name="mana-image" class="statistic-image" style="background-image: resource(&apos;Sprites/Stats/Mana&apos;); -unity-background-scale-mode: scale-to-fit;" />
                     <ui:ProgressBar value="0" name="mana-bar" class="statistic-bar statistic-bar-background statistic-bar-progress" />
                 </ui:VisualElement>
                 <ui:VisualElement name="damage-layout" style="width: 100%; height: 20%; flex-shrink: 0; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; justify-content: space-between;">
-                    <ui:VisualElement name="damage-image" class="statistic-image" style="background-image: resource(&apos;Sprites/weapons/Short_Sword&apos;);" />
+                    <ui:VisualElement name="damage-image" class="statistic-image" style="background-image: resource(&apos;Sprites/Stats/Damage&apos;);" />
                     <ui:ProgressBar value="0" name="damage-bar" class="statistic-bar statistic-bar-background statistic-bar-progress" />
                 </ui:VisualElement>
-                <ui:VisualElement name="precision-layout" style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; justify-content: space-between;">
-                    <ui:VisualElement name="precision-image" class="statistic-image" style="background-image: resource(&apos;Sprites/weapons/Crossbow&apos;);" />
-                    <ui:ProgressBar value="0" name="precision-bar" class="statistic-bar statistic-bar-background statistic-bar-progress" />
+                <ui:VisualElement name="armor-layout" style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; justify-content: space-between;">
+                    <ui:VisualElement name="armor-image" class="statistic-image" style="background-image: resource(&apos;Sprites/Stats/Armor&apos;);" />
+                    <ui:ProgressBar value="0" name="armor-bar" class="statistic-bar statistic-bar-background statistic-bar-progress" />
                 </ui:VisualElement>
                 <ui:VisualElement name="evasion-layout" style="flex-shrink: 0; width: 100%; height: 20%; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; justify-content: space-between;">
-                    <ui:VisualElement name="evasion-image" class="statistic-image" style="background-image: url(&apos;project://database/Packages/com.unity.2d.animation/Editor/Assets/SkinningModule/Icons/Dark/d_Generate_Geometry@2x.png?fileID=2800000&amp;guid=80cc8d218dc9bee4091ecde845959866&amp;type=3#d_Generate_Geometry@2x&apos;);" />
+                    <ui:VisualElement name="evasion-image" class="statistic-image" style="background-image: resource(&apos;Sprites/Stats/Evasion&apos;);" />
                     <ui:ProgressBar value="0" name="evasion-bar" class="statistic-bar statistic-bar-background statistic-bar-progress" />
                 </ui:VisualElement>
             </ui:VisualElement>

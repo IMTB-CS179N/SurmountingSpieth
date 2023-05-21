@@ -56,11 +56,13 @@
 #player-scrollview .unity-scroll-view__content-container {
     flex-direction: row;
     flex-wrap: wrap;
+    overflow: hidden;
 }
 
 #seller-scrollview .unity-scroll-view__content-container {
     flex-direction: row;
     flex-wrap: wrap;
+    overflow: hidden;
 }
 
 .bottom-bar-label-style {

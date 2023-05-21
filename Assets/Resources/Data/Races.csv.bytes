@@ -1,5 +1,5 @@
-Human,sprite
-Dwarf,sprite
-Elf,sprite
-Dragonborn,sprite
-Orc,sprite
+Human,"Sprites/Races/Human"
+Dwarf,"Sprites/Races/Dwarf"
+Elf,"Sprites/Races/Elf"
+Dragonborn,"Sprites/Races/Dragonborn"
+Orc,"Sprites/Races/Orc"

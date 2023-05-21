@@ -1,4 +1,12 @@
-Flame trinket,2,-2,sprite
-Strength trinket,4,0,sprite
-Ice Trinket,1,-3,sprite
-Poison Trinket,3,-1,sprite
+Spike Trinket,FALSE,FALSE,TRUE,armor,30,100,Sprites/Trinkets/SpikeTrinket
+Ice Trinket,FALSE,TRUE,FALSE,armor,0.2,100,Sprites/Trinkets/IceTrinket
+Shadow Trinket,FALSE,FALSE,FALSE,evasion,0.03,100,Sprites/Trinkets/ShadowTrinket
+Wind Trinket,FALSE,TRUE,FALSE,evasion,0.05,100,Sprites/Trinkets/WindTrinket
+Rage Trinket,TRUE,FALSE,TRUE,damage,20,200,Sprites/Trinkets/RageTrinket
+Power Trinket,TRUE,TRUE,FALSE,damage,0.3,200,Sprites/Trinkets/PowerTrinket
+Eagle Trinket,TRUE,FALSE,TRUE,precision,40,200,Sprites/Trinkets/EagleTrinket
+Clarity Trinket,TRUE,TRUE,FALSE,precision,0.3,200,Sprites/Trinkets/ClarityTrinket
+Blood Trinket,TRUE,FALSE,FALSE,critical chance,0.05,200,Sprites/Trinkets/BloodTrinket
+Lightning Trinket,TRUE,TRUE,FALSE,critical chance,0.4,200,Sprites/Trinkets/LightningTrinket
+Headshot Trinket,TRUE,FALSE,FALSE,critical multiplier,0.5,200,Sprites/Trinkets/HeadshotTrinket
+Flame Trinket,TRUE,TRUE,FALSE,critical multipler,0.3,200,Sprites/Trinkets/FlameTrinket

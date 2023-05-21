@@ -11,6 +11,7 @@ namespace Project.Game
         private Sprite m_sprite;
         private string m_description;
         private string m_class;
+        private string m_type;
         private string m_name;
 
         [Order(0)]
@@ -26,13 +27,17 @@ namespace Project.Game
             get => this.m_name;
             set => this.m_name = value ?? String.Empty;
         }
-        
+
         [Order(2)]
+        public string Type
+        {
+            get => this.m_type;
+            set => this.m_type = value ?? String.Empty;
+        }
+
+        [Order(3)]
         public int ManaCost { get; set; }
         
-        [Order(3)]
-        public float DamageMultiplier { get; set; }
-
         [Order(4)]
         public bool CanMiss { get; set; }
 
@@ -60,8 +65,10 @@ namespace Project.Game
         {
             this.m_class = String.Empty;
             this.m_name = String.Empty;
+            this.m_type = String.Empty;
             this.ManaCost = 0;
-            this.DamageMultiplier = 0.0f;
+            this.CanMiss = true;
+            this.IsAOE = false;
             this.m_sprite = ResourceManager.DefaultSprite;
             this.m_description = String.Empty;
         }
@@ -86,8 +93,6 @@ namespace Project.Game
         public int ManaCost => this.m_data.ManaCost;
 
         public bool CanMiss => this.m_data.CanMiss;
-
-        public float DamageMultiplier => this.m_data.DamageMultiplier;
 
         public int CooldownTime => this.m_data.CooldownTime;
 

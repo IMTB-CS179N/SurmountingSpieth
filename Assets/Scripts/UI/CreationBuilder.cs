@@ -82,13 +82,13 @@ namespace Project.UI
         private const string kHealthBar = "health-bar";
         private const string kManaBar = "mana-bar";
         private const string kDamageBar = "damage-bar";
-        private const string kPrecisionBar = "precision-bar";
+        private const string kArmorBar = "armor-bar";
         private const string kEvasionBar = "evasion-bar";
 
         private static readonly Color ms_hoverTint = new Color32(200, 200, 200, 255);
         private static readonly Color ms_pressTint = new Color32(170, 170, 170, 255);
 
-        private static readonly Color ms_selectTint = new Color32(60, 20, 185, 255);
+        private static readonly Color ms_selectTint = Color.black;
 
         private readonly List<IconElement> m_classIcons = new();
         private readonly List<IconElement> m_raceIcons = new();
@@ -102,8 +102,8 @@ namespace Project.UI
         private float m_minimumDamage;
         private float m_maximumDamage;
 
-        private float m_minimumPrecision;
-        private float m_maximumPrecision;
+        private float m_minimumArmor;
+        private float m_maximumArmor;
 
         private float m_minimumEvasion;
         private float m_maximumEvasion;
@@ -289,8 +289,6 @@ namespace Project.UI
 
         private void SetupStatistics()
         {
-            var root = this.UI.rootVisualElement;
-
             var stats = ResourceManager.Stats;
             int count = stats.Count;
 
@@ -304,7 +302,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseHealth;
+                    var value = stats[i].Health;
 
                     if (value < min)
                     {
@@ -324,7 +322,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseMana;
+                    var value = stats[i].Mana;
 
                     if (value < min)
                     {
@@ -344,7 +342,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseDamage;
+                    var value = stats[i].Damage;
 
                     if (value < min)
                     {
@@ -364,7 +362,7 @@ namespace Project.UI
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BasePrecision;
+                    var value = stats[i].Armor;
 
                     if (value < min)
                     {
@@ -376,15 +374,15 @@ namespace Project.UI
                     }
                 }
 
-                this.m_maximumPrecision = max;
-                this.m_minimumPrecision = min;
+                this.m_maximumArmor = max;
+                this.m_minimumArmor = min;
 
                 min = Single.MaxValue;
                 max = Single.MinValue;
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var value = stats[i].BaseEvasion;
+                    var value = stats[i].Evasion;
 
                     if (value < min)
                     {
@@ -403,14 +401,14 @@ namespace Project.UI
             this.UpdateStatistics(null);
         }
 
-        private void UpdateStatistics(Stats stats)
+        private void UpdateStatistics(BaseStats stats)
         {
             var root = this.UI.rootVisualElement;
 
             var healthBar = root.Q<ProgressBar>(kHealthBar);
             var manaBar = root.Q<ProgressBar>(kManaBar);
             var damageBar = root.Q<ProgressBar>(kDamageBar);
-            var precisionBar = root.Q<ProgressBar>(kPrecisionBar);
+            var armorBar = root.Q<ProgressBar>(kArmorBar);
             var evasionBar = root.Q<ProgressBar>(kEvasionBar);
 
             if (stats is null)
@@ -430,9 +428,9 @@ namespace Project.UI
                     damageBar.value = 0.0f;
                 }
 
-                if (precisionBar is not null)
+                if (armorBar is not null)
                 {
-                    this.m_minimumPrecision = precisionBar.lowValue;
+                    this.m_minimumArmor = armorBar.lowValue;
                 }
 
                 if (evasionBar is not null)
@@ -444,34 +442,34 @@ namespace Project.UI
             {
                 if (healthBar is not null)
                 {
-                    healthBar.value = RemapToRange(stats.BaseHealth, this.m_minimumHealth, this.m_maximumHealth, 0.0f, 100.0f);
+                    healthBar.value = RemapToRange(stats.Health, this.m_minimumHealth, this.m_maximumHealth, 0.0f, 100.0f);
                 }
 
                 if (manaBar is not null)
                 {
-                    manaBar.value = RemapToRange(stats.BaseMana, this.m_minimumMana, this.m_maximumMana, 0.0f, 100.0f);
+                    manaBar.value = RemapToRange(stats.Mana, this.m_minimumMana, this.m_maximumMana, 0.0f, 100.0f);
                 }
 
                 if (damageBar is not null)
                 {
-                    damageBar.value = RemapToRange(stats.BaseDamage, this.m_minimumDamage, this.m_maximumDamage, 0.0f, 100.0f);
+                    damageBar.value = RemapToRange(stats.Damage, this.m_minimumDamage, this.m_maximumDamage, 0.0f, 100.0f);
                 }
 
-                if (precisionBar is not null)
+                if (armorBar is not null)
                 {
-                    precisionBar.value = RemapToRange(stats.BasePrecision, this.m_minimumPrecision, this.m_maximumPrecision, 0.0f, 100.0f);
+                    armorBar.value = RemapToRange(stats.Armor, this.m_minimumArmor, this.m_maximumArmor, 0.0f, 100.0f);
                 }
 
                 if (evasionBar is not null)
                 {
-                    evasionBar.value = RemapToRange(stats.BaseEvasion, this.m_minimumEvasion, this.m_maximumEvasion, 0.0f, 100.0f);
+                    evasionBar.value = RemapToRange(stats.Evasion, this.m_minimumEvasion, this.m_maximumEvasion, 0.0f, 100.0f);
                 }
             }
         }
 
         private void UpdateCharacterAndFinish()
         {
-            var stats = default(Stats);
+            var stats = default(BaseStats);
 
             if (this.IsFinishButtonInteractable())
             {
