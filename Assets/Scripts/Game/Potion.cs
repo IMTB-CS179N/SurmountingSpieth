@@ -16,6 +16,8 @@ namespace Project.Game
         public string Name => this.m_data.Name;
 
         public int Price => this.m_data.Price;
+        
+        public int Tier => this.m_data.Tier;
 
         public Sprite Sprite => this.m_data.Sprite;
 
