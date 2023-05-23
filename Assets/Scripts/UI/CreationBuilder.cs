@@ -541,6 +541,11 @@ namespace Project.UI
 
         private static float RemapToRange(float value, float inMin, float inMax, float outMin, float outMax)
         {
+            if (Mathf.Approximately(inMin, inMax))
+            {
+                return outMin;
+            }
+
             return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
         }
     }

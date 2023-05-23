@@ -1,5 +1,6 @@
 ﻿using Project.Battle;
 using Project.Game;
+using Project.Input;
 
 using System;
 using System.Runtime.CompilerServices;
@@ -192,7 +193,7 @@ namespace Project.UI
 
             this.m_soundButton = new HoverableButton(root.Q<VisualElement>(kSoundLayout), root.Q<VisualElement>(kSoundButton), () =>
             {
-                // #TODO DISABLE / ENABLE BUTTON
+                Main.Instance.EnableMusic = !Main.Instance.EnableMusic;
             });
         }
 
@@ -209,7 +210,7 @@ namespace Project.UI
 
                 if (this.m_currentAction == ActionType.Battle)
                 {
-                    TheBattle.Instance.StartBattle();
+                    BattleManager.Instance.StartBattle();
                 }
             });
 
@@ -340,6 +341,24 @@ namespace Project.UI
                 this.m_actionButton.Image.pickingMode = PickingMode.Position;
 
                 Unsafe.As<Label>(this.m_actionButton.Image).text = "ENTER";
+            }
+        }
+
+        private void Update()
+        {
+            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.N))
+            {
+                this.UpdateAction(ActionType.None);
+            }
+
+            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.B))
+            {
+                this.UpdateAction(ActionType.Battle);
+            }
+
+            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.E))
+            {
+                this.UpdateAction(ActionType.Enter);
             }
         }
     }

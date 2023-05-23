@@ -28,7 +28,7 @@ namespace Project
 
         private void Start()
         {
-            PotionFactory.Initialize();
+            EffectFactory.Initialize();
             TrinketFactory.Initialize();
         }
 

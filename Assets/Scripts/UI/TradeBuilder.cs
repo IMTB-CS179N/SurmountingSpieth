@@ -162,6 +162,8 @@ namespace Project.UI
             Count,
         }
 
+        private const string kBackButton = "back-button";
+
         private const string kArmorButton = "armor-button";
         private const string kWeaponButton = "weapon-button";
         private const string kPotionButton = "potion-button";
@@ -207,6 +209,7 @@ namespace Project.UI
         private bool m_isFocusedOnSeller = false;
         private int m_selectedIndex = -1;
         private Tab m_currentTab = Tab.Armor;
+        private bool m_backPressed = false;
 
         protected override void BindEvents()
         {
@@ -222,6 +225,7 @@ namespace Project.UI
             this.m_playerView.Clear();
             this.m_sellerView.Clear();
 
+            this.SetupBackButton();
             this.SetupArmorButton();
             this.SetupWeaponButton();
             this.SetupPotionButton();
@@ -239,6 +243,7 @@ namespace Project.UI
         {
             this.m_selectedIndex = -1;
             this.m_isFocusedOnSeller = false;
+            this.m_backPressed = false;
 
             this.m_playerInventory.Clear();
             this.m_sellerInventory.Clear();
@@ -285,7 +290,49 @@ namespace Project.UI
 
         private void SetupBackButton()
         {
+            var element = this.UI.rootVisualElement.Q<VisualElement>(kBackButton);
 
+            if (element is not null)
+            {
+                element.RegisterCallback<MouseLeaveEvent>(e =>
+                {
+                    this.m_backPressed = false;
+
+                    element.style.unityBackgroundImageTintColor = Color.black;
+                });
+
+                element.RegisterCallback<MouseEnterEvent>(e =>
+                {
+                    this.m_backPressed = false;
+
+                    element.style.unityBackgroundImageTintColor = (Color)new Color32(150, 0, 0, 255);
+                });
+
+                element.RegisterCallback<MouseDownEvent>(e =>
+                {
+                    if (e.button == 0)
+                    {
+                        this.m_backPressed = true;
+
+                        element.style.unityBackgroundImageTintColor = (Color)new Color32(115, 0, 0, 255);
+                    }
+                });
+
+                element.RegisterCallback<MouseUpEvent>(e =>
+                {
+                    if (e.button == 0)
+                    {
+                        if (this.m_backPressed)
+                        {
+                            this.m_backPressed = false;
+
+                            element.style.unityBackgroundImageTintColor = (Color)new Color32(150, 0, 0, 255);
+
+                            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+                        }
+                    }
+                });
+            }
         }
 
         private void SetupCallbacksInternal(string name, Tab tab, Key key, Action onMouseUp)

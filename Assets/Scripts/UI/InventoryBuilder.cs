@@ -1595,7 +1595,7 @@ namespace Project.UI
 
         private void UpdateDisplayedStatistics()
         {
-            ref readonly var stats = ref Player.Instance.Stats;
+            ref readonly var stats = ref Player.Instance.EntityStats;
 
             if (this.m_healthLabel is not null)
             {

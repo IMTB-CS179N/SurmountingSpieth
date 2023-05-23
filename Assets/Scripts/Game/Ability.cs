@@ -126,6 +126,7 @@ namespace Project.Game
     public class Ability
     {
         private readonly AbilityData m_data;
+        private readonly IEntity m_owner;
 
         private int m_remainingCooldown;
 
@@ -149,8 +150,15 @@ namespace Project.Game
 
         public Sprite Sprite => this.m_data.Sprite;
 
-        public Ability(AbilityData data)
+        public IEntity Owner => this.m_owner;
+
+        public Ability(IEntity owner, AbilityData data)
         {
+            if (owner is null)
+            {
+                throw new ArgumentNullException(nameof(owner));
+            }
+            
             if (data is null)
             {
                 throw new ArgumentNullException(nameof(data));
@@ -175,6 +183,8 @@ namespace Project.Game
             {
                 throw new Exception($"Ally effect mismatch: number of ally effects is {data.AllyEffects.Length} while number of ally durations {data.AllyDurations.Length}");
             }
+
+            this.m_owner = owner;
 
             this.m_data = data;
 

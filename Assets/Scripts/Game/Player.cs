@@ -8,16 +8,8 @@ using UnityEngine;
 
 namespace Project.Game
 {
-    public class Player
+    public class Player : IEntity
     {
-        public enum AbilityUsage
-        {
-            CanUse,
-            OnCooldown,
-            NotEnoughMana,
-            DoesNotExist,
-        }
-
         private static Player ms_instance;
 
         private readonly List<TrinketData> m_trinkets;
@@ -43,6 +35,7 @@ namespace Project.Game
         private Armor m_helmet;
 
         private EntityStats m_stats;
+        private TurnStats m_turn;
         private int m_money;
 
         public const int MaxPotionSlots = 3;
@@ -57,9 +50,13 @@ namespace Project.Game
 
         public static Player Instance => ms_instance ?? throw new Exception("Cannot access player when not in game");
 
-        public bool IsDead => this.m_stats.CurHealth <= 0;
+        public bool IsPlayer => true;
 
-        public ref readonly EntityStats Stats => ref this.m_stats;
+        public bool IsAlive => this.m_stats.CurHealth > 0;
+
+        public ref readonly EntityStats EntityStats => ref this.m_stats;
+
+        public ref readonly TurnStats TurnStats => ref this.m_turn;
 
         public int Money => this.m_money;
 
@@ -108,7 +105,7 @@ namespace Project.Game
             this.m_potions = new();
             this.m_effects = new();
             this.m_trinkets = new();
-            this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == @class).Select(_ => new Ability(_)).ToArray();
+            this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == @class).Select(_ => new Ability(this, _)).ToArray();
 
             this.m_equippedPotions = new Potion[Player.MaxPotionSlots];
             this.m_helmetTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
@@ -281,6 +278,14 @@ namespace Project.Game
 
 
 
+        public void Init()
+        {
+            this.RecalculateStats();
+
+            this.m_stats.CurHealth = this.m_stats.MaxHealth;
+            this.m_stats.CurMana = this.m_stats.MaxMana;
+        }
+
         public void Update()
         {
             // THIS IS CALLED ONLY WHEN PLAYER'S TURN
@@ -331,7 +336,7 @@ namespace Project.Game
 
         public AbilityUsage CanUseAbility(Ability ability)
         {
-            if (Array.IndexOf(this.m_abilities, ability) >= 0)
+            if (ability is not null && ability.Owner == this)
             {
                 if (ability.IsOnCooldown)
                 {
@@ -347,6 +352,23 @@ namespace Project.Game
             }
 
             return AbilityUsage.DoesNotExist;
+        }
+
+
+
+        public void ApplyDamage(int damage)
+        {
+            this.m_stats.CurHealth -= damage;
+
+            if (this.m_stats.CurHealth < 0)
+            {
+                this.m_stats.CurHealth = 0;
+            }
+        }
+
+        public void AddEffect(Effect effect)
+        {
+            // #TODO
         }
 
 
@@ -565,7 +587,7 @@ namespace Project.Game
 
                 this.UnattachPotion(potion);
 
-                this.m_equippedPotions[slot] = PotionFactory.Create(potion); 
+                this.m_equippedPotions[slot] = new Potion(potion);
             }
         }
 
@@ -596,7 +618,7 @@ namespace Project.Game
 
                 this.UnattachPotion(potion);
 
-                this.m_equippedPotions[slot] = PotionFactory.Create(potion);
+                this.m_equippedPotions[slot] = new Potion(potion);
             }
         }
 
