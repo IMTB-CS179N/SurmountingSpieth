@@ -67,10 +67,204 @@ namespace Project
             : base(yValue)
         {
             // tier 3 (lowest) 70% tier 3 items 20% tier 2 items 10% tier 1 i
+            weapons = new List<Weapon>();
+            trinkets = new List<Trinket>();
+            potions = new List<Potion>();
+            armors = new List<Armor>();
+            GenerateWeapons(tier);
+            GenerateTrinkets(tier);
+            GeneratePotions(tier);
+            GenerateArmors(tier);
             SpritePath = "Map/Trade_Post";
             tileType = TileType.Shop;
         }
+    public List<Weapon> GenerateWeapons(int tier)
+    {
+        int numTier1Items = 0;
+        int numTier2Items = 0;
+        int numTier3Items = 0;
+
+        // Calculate the distribution percentages based on the shop tier
+        if(tier == 1) {
+            numTier1Items = 3;
+            numTier2Items = 2;
+            numTier3Items = 1;
+        }
+        else if(tier == 2) {
+            numTier1Items = 1;
+            numTier2Items = 3;
+            numTier3Items = 2;
+        }
+        else if(tier == 3) {
+            numTier1Items = 1;
+            numTier2Items = 2;
+            numTier3Items = 3;
+        }
+        int numWeapons = Random.Range(4,7);
+        
+        for (int i = 0; i <= numWeapons; i++) {
+            if (i < numTier1Items) {
+                // Select a random tier 1 weapon from the available options
+                var tier1Weapons = ResourceManager.Weapons.Where(weaponData => weaponData.Tier == 1).ToList();
+                var randomWeapon = tier1Weapons[Random.Range(0, tier1Weapons.Count)];
+                weapons.Add(new Weapon(randomWeapon));
+            }
+            else if (i < (numTier1Items + numTier2Items)) {
+                // Select a random tier 2 weapon from the available options
+                var tier2Weapons = ResourceManager.Weapons.Where(weaponData => weaponData.Tier == 2).ToList();
+                var randomWeapon = tier2Weapons[Random.Range(0, tier2Weapons.Count)];
+                weapons.Add(new Weapon(randomWeapon));
+            }
+            else if(i < (numTier1Items + numTier2Items + numTier3Items)) {
+                // Select a random tier 3 weapon from the available options
+                var tier3Weapons = ResourceManager.Weapons.Where(weaponData => weaponData.Tier == 3).ToList();
+                var randomWeapon = tier3Weapons[Random.Range(0, tier3Weapons.Count)];
+                weapons.Add(new Weapon(randomWeapon));
+            }
+        }
+        return weapons;
     }
+    public List<Trinket> GenerateTrinkets(int tier) {
+        int numTier1Items = 0;
+        int numTier2Items = 0;
+        int numTier3Items = 0;
+
+        // Calculate the distribution percentages based on the shop tier
+        if(tier == 1) {
+            numTier1Items = 3;
+            numTier2Items = 2;
+            numTier3Items = 1;
+        }
+        else if(tier == 2) {
+            numTier1Items = 1;
+            numTier2Items = 3;
+            numTier3Items = 2;
+        }
+        else if(tier == 3) {
+            numTier1Items = 1;
+            numTier2Items = 2;
+            numTier3Items = 3;
+        }
+        int numTrinkets = Random.Range(4,7);
+         for (int i = 0; i <= numTrinkets; i++) {
+            if (i < numTier1Items) {
+                // Select a random tier 1 weapon from the available options
+                var tier1Trinkets = ResourceManager.Trinkets.Where(trinketData => trinketData.Tier == 1).ToList();
+                var randomTrinket = tier1Trinkets[Random.Range(0, tier1Trinkets.Count)];
+                trinkets.Add(TrinketFactory.Create(randomTrinket));
+            }
+            else if (i < (numTier1Items + numTier2Items)) {
+                // Select a random tier 2 weapon from the available options
+                var tier2Trinkets = ResourceManager.Trinkets.Where(trinketData => trinketData.Tier == 2).ToList();
+                var randomTrinket = tier2Trinkets[Random.Range(0, tier2Trinkets.Count)];
+                trinkets.Add(TrinketFactory.Create(randomTrinket));
+            }
+            else if(i < (numTier1Items + numTier2Items + numTier3Items)) {
+                // Select a random tier 3 weapon from the available options
+                var tier3Trinkets = ResourceManager.Trinkets.Where(trinketData => trinketData.Tier == 3).ToList();
+                var randomTrinket = tier3Trinkets[Random.Range(0, tier3Trinkets.Count)];
+                trinkets.Add(TrinketFactory.Create(randomTrinket));
+            }
+        }
+        return trinkets;
+    }
+
+    public List <Potion> GeneratePotions(int tier) {
+        float numItemsPerCategory = 5; // Number of items per category (weapons, armors, etc.)
+        int numTier1Items = 0;
+        int numTier2Items = 0;
+        int numTier3Items = 0;
+
+        // Calculate the distribution percentages based on the shop tier
+        if(tier == 1) {
+            numTier1Items = 3;
+            numTier2Items = 2;
+            numTier3Items = 1;
+        }
+        else if(tier == 2) {
+            numTier1Items = 1;
+            numTier2Items = 3;
+            numTier3Items = 2;
+        }
+        else if(tier == 3) {
+            numTier1Items = 1;
+            numTier2Items = 2;
+            numTier3Items = 3;
+        }
+        int numPotions = Random.Range(4,7);
+         for (int i = 0; i <= numPotions; i++) {
+            if (i < numTier1Items) {
+                // Select a random tier 1 weapon from the available options
+
+                var tier1Potions = ResourceManager.Potions.Where(potionData => potionData.Tier == 1).ToList();
+                var randomPotion = tier1Potions[Random.Range(0, tier1Potions.Count)];
+
+                potions.Add(PotionFactory.Create(randomPotion));
+            }
+            else if (i < (numTier1Items + numTier2Items)) {
+                // Select a random tier 2 weapon from the available options
+                var tier2Potions = ResourceManager.Potions.Where(potionData => potionData.Tier == 2).ToList();
+                var randomPotion = tier2Potions[Random.Range(0, tier2Potions.Count)];
+
+                potions.Add(PotionFactory.Create(randomPotion));
+            }
+            else if(i < (numTier1Items + numTier2Items + numTier3Items)) {
+                // Select a random tier 3 weapon from the available options
+
+                var tier3Potions = ResourceManager.Potions.Where(potionData => potionData.Tier == 3).ToList();
+                var randomPotion = tier3Potions[Random.Range(0, tier3Potions.Count)];
+
+                potions.Add(PotionFactory.Create(randomPotion));
+            }
+        }
+        return potions;
+    }
+
+    public List <Armor> GenerateArmors(int tier) {
+        int numTier1Items = 0;
+        int numTier2Items = 0;
+        int numTier3Items = 0;
+
+        // Calculate the distribution percentages based on the shop tier
+        if(tier == 1) {
+            numTier1Items = 3;
+            numTier2Items = 2;
+            numTier3Items = 1;
+        }
+        else if(tier == 2) {
+            numTier1Items = 1;
+            numTier2Items = 3;
+            numTier3Items = 2;
+        }
+        else if(tier == 3) {
+            numTier1Items = 1;
+            numTier2Items = 2;
+            numTier3Items = 3;
+        }
+        int numArmors = Random.Range(4,7);
+        for (int i = 0; i <= numArmors; i++) {
+            if (i < numTier1Items) {
+                // Select a random tier 1 weapon from the available options
+                var tier1Armors = ResourceManager.Armors.Where(armorData => armorData.Tier == 1).ToList();
+                var randomArmor = tier1Armors[Random.Range(0, tier1Armors.Count)];
+                armors.Add(new Armor(randomArmor));
+            }
+            else if (i < (numTier1Items + numTier2Items)) {
+                // Select a random tier 2 weapon from the available options
+                var tier2Armors = ResourceManager.Armors.Where(armorData => armorData.Tier == 2).ToList();
+                var randomArmor = tier2Armors[Random.Range(0, tier2Armors.Count)];
+                armors.Add(new Armor(randomArmor));
+            }
+            else if(i < (numTier1Items + numTier2Items + numTier3Items)) {
+                // Select a random tier 3 weapon from the available options
+                var tier3Armors = ResourceManager.Armors.Where(armorData => armorData.Tier == 3).ToList();
+                var randomArmor = tier3Armors[Random.Range(0, tier3Armors.Count)];
+                armors.Add(new Armor(randomArmor));
+            }
+        }
+        return armors;
+    }
+}
 
     public class BattleInfo : CellInfo
     {
