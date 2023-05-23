@@ -73,7 +73,7 @@ namespace Project
             armors = new List<Armor>();
             GenerateWeapons(tier);
             GenerateTrinkets(tier);
-            GeneratePotions(tier);
+            //GeneratePotions(tier);
             GenerateArmors(tier);
             SpritePath = "Map/Trade_Post";
             tileType = TileType.Shop;
@@ -169,7 +169,7 @@ namespace Project
         return trinkets;
     }
 
-    public List <Potion> GeneratePotions(int tier) {
+    /*public List <Potion> GeneratePotions(int tier) {
         float numItemsPerCategory = 5; // Number of items per category (weapons, armors, etc.)
         int numTier1Items = 0;
         int numTier2Items = 0;
@@ -218,7 +218,7 @@ namespace Project
             }
         }
         return potions;
-    }
+    }*/
 
     public List <Armor> GenerateArmors(int tier) {
         int numTier1Items = 0;
