@@ -18,6 +18,8 @@ namespace Project.Game
         public bool IsForWeapon => this.m_data.IsWeaponTrinket;
 
         public int Price => this.m_data.Price;
+        
+        public int Tier => this.m_data.Tier;
 
         public Sprite Sprite => this.m_data.Sprite;
 
