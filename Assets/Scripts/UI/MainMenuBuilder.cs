@@ -64,8 +64,6 @@ namespace Project.UI
 
                     this.OnNewGameEvent();
                 });
-
-                this.BindKeyAction(Key.N, this.OnNewGameEvent);
             }
         }
 
@@ -96,8 +94,6 @@ namespace Project.UI
 
                     this.OnContinueEvent();
                 });
-
-                this.BindKeyAction(Key.C, this.OnContinueEvent);
             }
         }
 
@@ -128,8 +124,6 @@ namespace Project.UI
 
                     this.OnSettingsEvent();
                 });
-
-                this.BindKeyAction(Key.S, this.OnSettingsEvent);
             }
         }
 
@@ -160,8 +154,6 @@ namespace Project.UI
 
                     this.OnQuestionEvent();
                 });
-
-                this.BindKeyAction(Key.Q, this.OnQuestionEvent);
             }
         }
 
@@ -192,8 +184,6 @@ namespace Project.UI
 
                     this.OnCreditsEvent();
                 });
-
-                this.BindKeyAction(Key.K, this.OnCreditsEvent);
             }
         }
 

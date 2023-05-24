@@ -20,6 +20,8 @@ namespace Project.Battle
 
         private static BattleManager ms_instance;
 
+        private bool m_isInBattle;
+
         private bool m_dPressed;
 
         public static BattleManager Instance => ms_instance == null ? (ms_instance = FindFirstObjectByType<BattleManager>()) : ms_instance;
@@ -32,35 +34,38 @@ namespace Project.Battle
 
         private void Update()
         {
-            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.P))
+            if (this.m_isInBattle)
             {
-                this.BattleUI.CurrentEntity = Player.Instance;
-            }
-
-            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.E))
-            {
-
-            }
-
-            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.N))
-            {
-                this.BattleUI.CurrentEntity = null;
-            }
-
-            if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.D))
-            {
-                if (!this.m_dPressed)
+                if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.P))
                 {
-                    this.m_dPressed = true;
-
-                    Player.Instance.ApplyDamage(20);
-
-                    this.BattleUI.UpdateInterface();
+                    this.BattleUI.CurrentEntity = Player.Instance;
                 }
-            }
-            else
-            {
-                this.m_dPressed = false;
+
+                if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.E))
+                {
+
+                }
+
+                if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.N))
+                {
+                    this.BattleUI.CurrentEntity = null;
+                }
+
+                if (InputProcessor.Instance.IsButtonPressed(UnityEngine.InputSystem.Key.D))
+                {
+                    if (!this.m_dPressed)
+                    {
+                        this.m_dPressed = true;
+
+                        Player.Instance.ApplyDamage(20);
+
+                        this.BattleUI.UpdateInterface();
+                    }
+                }
+                else
+                {
+                    this.m_dPressed = false;
+                }
             }
         }
 
@@ -69,6 +74,8 @@ namespace Project.Battle
             UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Battle);
 
             Player.Instance.Init();
+
+            this.m_isInBattle = true;
         }
     }
 }
