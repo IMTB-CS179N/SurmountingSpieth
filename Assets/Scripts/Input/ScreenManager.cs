@@ -52,10 +52,19 @@ namespace Project.Input
         {
             var ratio = this.m_screenHeight / resolution.y;
 
-            return new Vector2(point.x * (this.m_screenWidth / resolution.x) / ratio, point.y) * this.m_camera.orthographicSize;
+            return 2.0f * this.m_camera.orthographicSize * new Vector2(point.x * (this.m_screenWidth / resolution.x) / ratio, point.y);
         }
 
-        public Vector2 MapPointUsingUnitScale(Vector2 point)
+        public Vector2 WorldPositionToUnitScreenPoint(Vector2 point)
+        {
+            var ratio = this.m_screenHeight / this.m_screenWidth;
+
+            var size = this.m_camera.orthographicSize * 2.0f;
+
+            return new Vector2(point.x * ratio / size, point.y / size);
+        }
+
+        public Vector2 UnitScreenPointToWorldPosition(Vector2 point)
         {
             return this.MapPointBasedOnResolution(point, Vector2.one);
         }

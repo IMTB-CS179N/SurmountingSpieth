@@ -15,6 +15,12 @@ namespace Project
 
         public static Main Instance => Main.ms_instance == null ? (Main.ms_instance = Object.FindFirstObjectByType<Main>()) : Main.ms_instance;
 
+        public GameObject Player;
+        public GameObject Enemy1;
+        public GameObject Enemy2;
+        public GameObject Enemy3;
+        public GameObject Enemy4;
+
         public bool ShowAllTradeElements
         {
             get => this.m_showAllTrade;
@@ -44,21 +50,37 @@ namespace Project
             {
                 Debug.Log("Printing screen info...");
 
-                var resolution = new Vector2(Screen.width, Screen.height);
+                if (this.Player != null)
+                {
+                    var point = ScreenManager.Instance.WorldPositionToUnitScreenPoint(this.Player.transform.position);
 
-                Debug.Log($"Resolution: {resolution.x} x {resolution.y}");
+                    Debug.Log($"Player - unit screens point of Player is: {point}");
+                    Debug.Log($"Player - the world position of Player is: {ScreenManager.Instance.UnitScreenPointToWorldPosition(point)}");
+                }
 
-                var worldLeftTop = this.m_camera.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, 0.0f));
-                var worldRightBottom = this.m_camera.ScreenToWorldPoint(new Vector3(resolution.x, resolution.y, 0.0f));
+                if (this.Enemy1 != null)
+                {
+                    var point = ScreenManager.Instance.WorldPositionToUnitScreenPoint(this.Enemy1.transform.position);
 
-                Debug.Log($"World Dimensions along X-axis: {worldLeftTop.x} to {worldRightBottom.x}");
-                Debug.Log($"World Dimensions along Y-axis: {worldRightBottom.y} to {worldLeftTop.y}");
+                    Debug.Log($"Enemy1 - unit screens point of Enemy1 is: {point}");
+                    Debug.Log($"Enemy1 - the world position of Enemy1 is: {ScreenManager.Instance.UnitScreenPointToWorldPosition(point)}");
+                }
 
-                var mappedLeftTop = ScreenManager.Instance.MapPointBasedOnResolution(new Vector2(-0.5f, -0.5f), new Vector2(1.0f, 1.0f));
-                var mappedRightBottom = ScreenManager.Instance.MapPointBasedOnResolution(new Vector2(0.5f, 0.5f), new Vector2(1.0f, 1.0f));
+                if (this.Enemy2 != null)
+                {
+                    var point = ScreenManager.Instance.WorldPositionToUnitScreenPoint(this.Enemy2.transform.position);
 
-                Debug.Log($"Mapped Dimensions along X-axis: {mappedLeftTop.x} to {mappedRightBottom.x}");
-                Debug.Log($"Mapped Dimensions along Y-axis: {mappedRightBottom.y} to {mappedLeftTop.y}");
+                    Debug.Log($"Enemy2 - unit screens point of Enemy2 is: {point}");
+                    Debug.Log($"Enemy2 - the world position of Enemy2 is: {ScreenManager.Instance.UnitScreenPointToWorldPosition(point)}");
+                }
+
+                if (this.Enemy3 != null)
+                {
+                    var point = ScreenManager.Instance.WorldPositionToUnitScreenPoint(this.Enemy3.transform.position);
+
+                    Debug.Log($"Enemy3 - unit screens point of Enemy3 is: {point}");
+                    Debug.Log($"Enemy3 - the world position of Enemy3 is: {ScreenManager.Instance.UnitScreenPointToWorldPosition(point)}");
+                }
             }
         }
 
