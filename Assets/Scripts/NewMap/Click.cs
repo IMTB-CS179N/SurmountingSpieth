@@ -22,7 +22,7 @@ public class Click : MonoBehaviour
         Debug.Log(
             "Moving to " + (this.transform.position - this.transform.parent.transform.position)
         );
-        OverworldManager.Instance.SetMovePoint(
+        OverworldManager.Instance.SetDestination(
             this.transform.position - this.transform.parent.transform.position
         );
     }
