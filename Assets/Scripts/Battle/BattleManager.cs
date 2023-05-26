@@ -396,7 +396,15 @@ namespace Project.Battle
 
             Debug.Log("Performing enemy move...");
 
-            yield return new WaitForSeconds(2.0f);
+            yield return new WaitForSeconds(1.0f);
+
+            this.m_playerEntity.ApplyDamage(5);
+
+            this.BattleUI.UpdateInterface(); 
+
+            this.TryAddEnemyTextInformation(this.m_playerBehavior, false, false, 5);
+
+            yield return new WaitForSeconds(1.0f);
 
             this.m_currentRoutine = this.StartCoroutine(this.PerformPlayerMove());
         }
