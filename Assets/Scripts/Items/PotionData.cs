@@ -35,8 +35,11 @@ namespace Project.Items
 
         [Order(4)]
         public int Price { get; set; }
-
+        
         [Order(5)]
+        public int Tier { get; set; }
+
+        [Order(6)]
         public Sprite Sprite
         {
             get => this.m_sprite;
@@ -53,6 +56,7 @@ namespace Project.Items
         public PotionData()
         {
             this.Price = 0;
+            this.Tier = 1;
             this.Modifier = 0.0f;
             this.m_name = String.Empty;
             this.m_desc = String.Empty;

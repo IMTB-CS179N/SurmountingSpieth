@@ -40,8 +40,11 @@ namespace Project.Items
 
         [Order(6)]
         public int Price { get; set; }
-
+        
         [Order(7)]
+        public int Tier {get; set; }
+
+        [Order(8)]
         public Sprite Sprite
         {
             get => this.m_sprite;
@@ -56,6 +59,7 @@ namespace Project.Items
             this.m_stat = String.Empty;
             this.StatModify = 0.0f;
             this.Price = 0;
+            this.Tier = 1;
             this.m_sprite = ResourceManager.DefaultSprite;
         }
 

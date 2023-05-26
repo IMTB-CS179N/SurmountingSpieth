@@ -36,6 +36,8 @@ namespace Project.Game
         public float EvasionAddition => this.m_data.EvasionAddition;
 
         public int Price => this.m_data.Price;
+        
+        public int Tier => this.m_data.Tier;
 
         public Sprite Sprite => this.m_data.Sprite;
 
