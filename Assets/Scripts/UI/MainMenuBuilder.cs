@@ -1,8 +1,4 @@
-using Project.Game;
-using Project.Input;
-
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace Project.UI
@@ -11,12 +7,29 @@ namespace Project.UI
     {
         private const string kNewGameButton = "newgame-button";
         private const string kContinueButton = "continue-button";
-        private const string kSettingsButton = "settings-button";
-        private const string kQuestionButton = "question-button";
+        private const string kEndlessButton = "endless-button";
+        private const string kSoundButton = "sound-button";
         private const string kCreditsButton = "credits-button";
 
-        private static readonly Color ms_hoverTint = new Color32(200, 200, 200, 255);
-        private static readonly Color ms_pressTint = new Color32(170, 170, 170, 255);
+        private static readonly Color ms_idledColor = new Color32(175, 175, 175, 255);
+        private static readonly Color ms_hoverColor = new Color32(140, 140, 140, 255);
+        private static readonly Color ms_pressColor = new Color32(115, 115, 115, 255);
+        private static readonly Color ms_locksColor = new Color32(70, 70, 70, 255);
+
+        private VisualElement m_newgameButton;
+        private bool m_newgamePressed;
+
+        private VisualElement m_continueButton;
+        private bool m_continuePressed;
+
+        private VisualElement m_endlessButton;
+        private bool m_endlessPressed;
+
+        private VisualElement m_soundButton;
+        private bool m_soundPressed;
+
+        private VisualElement m_creditsButton;
+        private bool m_creditsPressed;
 
         protected override void BindEvents()
         {
@@ -28,192 +41,301 @@ namespace Project.UI
         {
             this.SetupNewGameButton();
             this.SetupContinueButton();
-            this.SetupSettingsButton();
-            this.SetupQuestionButton();
+            this.SetupEndlessButton();
+            this.SetupSoundButton();
             this.SetupCreditsButton();
         }
 
         private void OnDisableEvent()
         {
+            this.m_newgameButton = null;
+            this.m_continueButton = null;
+            this.m_endlessButton = null;
+            this.m_soundButton = null;
+            this.m_creditsButton = null;
+
+            this.m_newgamePressed = false;
+            this.m_continuePressed = false;
+            this.m_endlessPressed = false;
+            this.m_soundPressed = false;
+            this.m_creditsPressed = false;
         }
 
         private void SetupNewGameButton()
         {
-            var element = this.UI.rootVisualElement.Q<VisualElement>(kNewGameButton);
+            this.m_newgameButton = this.UI.rootVisualElement.Q<VisualElement>(kNewGameButton);
 
-            if (element is not null)
+            if (this.m_newgameButton is not null)
             {
-                element.RegisterCallback<MouseLeaveEvent>(e =>
+                this.m_newgameButton.RegisterCallback<PointerLeaveEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = Color.white;
+                    if (this.m_newgameButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_newgameButton.style.backgroundColor = ms_idledColor;
+
+                        this.m_newgamePressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseOverEvent>(e =>
+                this.m_newgameButton.RegisterCallback<PointerOverEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_newgameButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_newgameButton.style.backgroundColor = ms_hoverColor;
+
+                        this.m_newgamePressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseDownEvent>(e =>
+                this.m_newgameButton.RegisterCallback<PointerDownEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_pressTint;
+                    if (this.m_newgameButton.pickingMode == PickingMode.Position && e.button == 0)
+                    {
+                        this.m_newgameButton.style.backgroundColor = ms_pressColor;
+
+                        this.m_newgamePressed = true;
+                    }
                 });
 
-                element.RegisterCallback<MouseUpEvent>(e =>
+                this.m_newgameButton.RegisterCallback<PointerUpEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_newgameButton.pickingMode == PickingMode.Position && e.button == 0 && this.m_newgamePressed)
+                    {
+                        this.m_newgameButton.style.backgroundColor = ms_hoverColor;
 
-                    this.OnNewGameEvent();
+                        this.m_newgamePressed = false;
+
+                        UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Creation);
+                    }
                 });
             }
         }
 
         private void SetupContinueButton()
         {
-            var element = this.UI.rootVisualElement.Q<VisualElement>(kContinueButton);
+            this.m_continueButton = this.UI.rootVisualElement.Q<VisualElement>(kContinueButton);
 
-            if (element is not null)
+            if (this.m_continueButton is not null)
             {
-                element.RegisterCallback<MouseLeaveEvent>(e =>
+                if (Main.Instance.CanInitializeFromSaveData())
                 {
-                    element.style.unityBackgroundImageTintColor = Color.white;
+                    this.m_continueButton.pickingMode = PickingMode.Position;
+
+                    this.m_continueButton.style.backgroundColor = ms_idledColor;
+                }
+                else
+                {
+                    this.m_continueButton.pickingMode = PickingMode.Ignore;
+
+                    this.m_continueButton.style.backgroundColor = ms_locksColor;
+                }
+
+                this.m_continueButton.RegisterCallback<PointerLeaveEvent>(e =>
+                {
+                    if (this.m_continueButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_continueButton.style.backgroundColor = ms_idledColor;
+
+                        this.m_continuePressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseOverEvent>(e =>
+                this.m_continueButton.RegisterCallback<PointerOverEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_continueButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_continueButton.style.backgroundColor = ms_hoverColor;
+
+                        this.m_continuePressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseDownEvent>(e =>
+                this.m_continueButton.RegisterCallback<PointerDownEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_pressTint;
+                    if (this.m_continueButton.pickingMode == PickingMode.Position && e.button == 0)
+                    {
+                        this.m_continueButton.style.backgroundColor = ms_pressColor;
+
+                        this.m_continuePressed = true;
+                    }
                 });
 
-                element.RegisterCallback<MouseUpEvent>(e =>
+                this.m_continueButton.RegisterCallback<PointerUpEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_continueButton.pickingMode == PickingMode.Position && e.button == 0 && this.m_continuePressed)
+                    {
+                        this.m_continueButton.style.backgroundColor = ms_hoverColor;
 
-                    this.OnContinueEvent();
+                        this.m_continuePressed = false;
+
+                        Main.Instance.InitializeFromSaveData();
+
+                        UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+                    }
                 });
             }
         }
 
-        private void SetupSettingsButton()
+        private void SetupEndlessButton()
         {
-            var element = this.UI.rootVisualElement.Q<VisualElement>(kSettingsButton);
+            this.m_endlessButton = this.UI.rootVisualElement.Q<VisualElement>(kEndlessButton);
 
-            if (element is not null)
+            if (this.m_endlessButton is not null)
             {
-                element.RegisterCallback<MouseLeaveEvent>(e =>
+                // #TODO for now endless mode is disabled
+
+                this.m_endlessButton.pickingMode = PickingMode.Ignore;
+
+                this.m_endlessButton.style.backgroundColor = ms_locksColor;
+
+                this.m_endlessButton.RegisterCallback<PointerLeaveEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = Color.white;
+                    if (this.m_endlessButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_endlessButton.style.backgroundColor = ms_idledColor;
+
+                        this.m_endlessPressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseOverEvent>(e =>
+                this.m_endlessButton.RegisterCallback<PointerOverEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_endlessButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_endlessButton.style.backgroundColor = ms_hoverColor;
+
+                        this.m_endlessPressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseDownEvent>(e =>
+                this.m_endlessButton.RegisterCallback<PointerDownEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_pressTint;
+                    if (this.m_endlessButton.pickingMode == PickingMode.Position && e.button == 0)
+                    {
+                        this.m_endlessButton.style.backgroundColor = ms_pressColor;
+
+                        this.m_endlessPressed = true;
+                    }
                 });
 
-                element.RegisterCallback<MouseUpEvent>(e =>
+                this.m_endlessButton.RegisterCallback<PointerUpEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_endlessButton.pickingMode == PickingMode.Position && e.button == 0 && this.m_endlessPressed)
+                    {
+                        this.m_endlessButton.style.backgroundColor = ms_hoverColor;
 
-                    this.OnSettingsEvent();
+                        this.m_endlessPressed = false;
+
+                        // #TODO SETUP ENDLESS
+                    }
                 });
             }
         }
 
-        private void SetupQuestionButton()
+        private void SetupSoundButton()
         {
-            var element = this.UI.rootVisualElement.Q<VisualElement>(kQuestionButton);
+            this.m_soundButton = this.UI.rootVisualElement.Q<VisualElement>(kSoundButton);
 
-            if (element is not null)
+            if (this.m_soundButton is not null)
             {
-                element.RegisterCallback<MouseLeaveEvent>(e =>
+                this.m_soundButton.RegisterCallback<PointerLeaveEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = Color.white;
+                    if (this.m_soundButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_soundButton.style.backgroundColor = ms_idledColor;
+
+                        this.m_soundPressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseOverEvent>(e =>
+                this.m_soundButton.RegisterCallback<PointerOverEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_soundButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_soundButton.style.backgroundColor = ms_hoverColor;
+
+                        this.m_soundPressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseDownEvent>(e =>
+                this.m_soundButton.RegisterCallback<PointerDownEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_pressTint;
+                    if (this.m_soundButton.pickingMode == PickingMode.Position && e.button == 0)
+                    {
+                        this.m_soundButton.style.backgroundColor = ms_pressColor;
+
+                        this.m_soundPressed = true;
+                    }
                 });
 
-                element.RegisterCallback<MouseUpEvent>(e =>
+                this.m_soundButton.RegisterCallback<PointerUpEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_soundButton.pickingMode == PickingMode.Position && e.button == 0 && this.m_soundPressed)
+                    {
+                        this.m_soundButton.style.backgroundColor = ms_hoverColor;
 
-                    this.OnQuestionEvent();
+                        this.m_soundPressed = false;
+
+                        Main.Instance.EnableMusic = !Main.Instance.EnableMusic;
+                    }
                 });
             }
         }
 
         private void SetupCreditsButton()
         {
-            var element = this.UI.rootVisualElement.Q<VisualElement>(kCreditsButton);
+            this.m_creditsButton = this.UI.rootVisualElement.Q<VisualElement>(kCreditsButton);
 
-            if (element is not null)
+            if (this.m_creditsButton is not null)
             {
-                element.RegisterCallback<MouseLeaveEvent>(e =>
+                // #TODO for now credits are disabled
+
+                this.m_creditsButton.pickingMode = PickingMode.Ignore;
+
+                this.m_creditsButton.style.backgroundColor = ms_locksColor;
+
+                this.m_creditsButton.RegisterCallback<PointerLeaveEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = Color.white;
+                    if (this.m_creditsButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_creditsButton.style.backgroundColor = ms_idledColor;
+
+                        this.m_creditsPressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseOverEvent>(e =>
+                this.m_creditsButton.RegisterCallback<PointerOverEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_creditsButton.pickingMode == PickingMode.Position)
+                    {
+                        this.m_creditsButton.style.backgroundColor = ms_hoverColor;
+
+                        this.m_creditsPressed = false;
+                    }
                 });
 
-                element.RegisterCallback<MouseDownEvent>(e =>
+                this.m_creditsButton.RegisterCallback<PointerDownEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_pressTint;
+                    if (this.m_creditsButton.pickingMode == PickingMode.Position && e.button == 0)
+                    {
+                        this.m_creditsButton.style.backgroundColor = ms_pressColor;
+
+                        this.m_creditsPressed = true;
+                    }
                 });
 
-                element.RegisterCallback<MouseUpEvent>(e =>
+                this.m_creditsButton.RegisterCallback<PointerUpEvent>(e =>
                 {
-                    element.style.unityBackgroundImageTintColor = ms_hoverTint;
+                    if (this.m_creditsButton.pickingMode == PickingMode.Position && e.button == 0 && this.m_creditsPressed)
+                    {
+                        this.m_creditsButton.style.backgroundColor = ms_hoverColor;
 
-                    this.OnCreditsEvent();
+                        this.m_creditsPressed = false;
+
+                        // #TODO SETUP CREDITS
+                    }
                 });
             }
-        }
-
-        private void OnNewGameEvent()
-        {
-            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Creation);
-        }
-
-        private void OnContinueEvent()
-        {
-            // #TODO we have to show message box if there is no save game data
-
-            Player.InitializeFromSaveData();
-
-            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
-        }
-
-        private void OnSettingsEvent()
-        {
-
-        }
-
-        private void OnQuestionEvent()
-        {
-
-        }
-
-        private void OnCreditsEvent()
-        {
-
         }
     }
 }

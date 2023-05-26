@@ -20,6 +20,8 @@ namespace Project.Game
 
         public string Description => this.m_data.Description;
 
+        public string Effect => this.m_data.Effect;
+
         public float Modifier => this.m_data.Modifier;
 
         public int Duration => this.m_data.Duration;
@@ -43,7 +45,7 @@ namespace Project.Game
 
         public Effect Use(in EntityStats initial)
         {
-            return EffectFactory.CreateEffect(this.Name, this.Modifier, this.Duration, in initial);
+            return EffectFactory.CreateEffect(this.Effect, this.Modifier, this.Duration, in initial);
         }
     }
 }
