@@ -5,24 +5,47 @@ using UnityEngine;
 
 namespace Project.Game
 {
+    public enum AbilityUsage
+    {
+        CanUse,
+        OnCooldown,
+        NotEnoughMana,
+        DoesNotExist,
+    }
+
     public interface IEntity
     {
-        int Health { get; }
+        Sprite Sprite { get; }
 
-        int Armor { get; }
-        
-        int Damage { get; }
+        bool IsPlayer { get; }
 
-        int Precision { get; }
+        bool IsAlive { get; }
 
-        float DodgeChance { get; }
+        ref readonly TurnStats TurnStats { get; }
 
-        float CriticalChance { get; }
-        
-        float CriticalDamage { get; }
+        ref readonly EntityStats EntityStats { get; }
 
-        int DealDamage(int damage);
+        IReadOnlyList<Effect> Effects { get; }
 
-        int ComputeDamage();
+        IReadOnlyList<Ability> Abilities { get; }
+
+        IReadOnlyList<Potion> EquippedPotions { get; }
+
+        void AddEffect(Effect effect);
+
+        AbilityUsage CanUseAbility(int abilityIndex);
+
+        AbilityUsage CanUseAbility(Ability ability);
+    }
+
+    public struct TurnStats
+    {
+        public bool BlockCurrentMove;
+        public bool RemovePositiveEffects;
+        public bool RemoveNegativeEffects;
+    }
+
+    public class BattleStats
+    {
     }
 }

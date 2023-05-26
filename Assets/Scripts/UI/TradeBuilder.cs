@@ -4,7 +4,6 @@ using Project.Items;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -163,6 +162,8 @@ namespace Project.UI
             Count,
         }
 
+        private const string kBackButton = "back-button";
+
         private const string kArmorButton = "armor-button";
         private const string kWeaponButton = "weapon-button";
         private const string kPotionButton = "potion-button";
@@ -208,6 +209,7 @@ namespace Project.UI
         private bool m_isFocusedOnSeller = false;
         private int m_selectedIndex = -1;
         private Tab m_currentTab = Tab.Armor;
+        private bool m_backPressed = false;
 
         protected override void BindEvents()
         {
@@ -223,6 +225,7 @@ namespace Project.UI
             this.m_playerView.Clear();
             this.m_sellerView.Clear();
 
+            this.SetupBackButton();
             this.SetupArmorButton();
             this.SetupWeaponButton();
             this.SetupPotionButton();
@@ -240,6 +243,7 @@ namespace Project.UI
         {
             this.m_selectedIndex = -1;
             this.m_isFocusedOnSeller = false;
+            this.m_backPressed = false;
 
             this.m_playerInventory.Clear();
             this.m_sellerInventory.Clear();
@@ -282,6 +286,53 @@ namespace Project.UI
         private void SetupActionButton()
         {
             this.SetupCallbacksInternal(kActionButton, Tab.Action, Key.S, () => this.PerformInventoryAction());
+        }
+
+        private void SetupBackButton()
+        {
+            var element = this.UI.rootVisualElement.Q<VisualElement>(kBackButton);
+
+            if (element is not null)
+            {
+                element.RegisterCallback<MouseLeaveEvent>(e =>
+                {
+                    this.m_backPressed = false;
+
+                    element.style.unityBackgroundImageTintColor = Color.black;
+                });
+
+                element.RegisterCallback<MouseEnterEvent>(e =>
+                {
+                    this.m_backPressed = false;
+
+                    element.style.unityBackgroundImageTintColor = (Color)new Color32(150, 0, 0, 255);
+                });
+
+                element.RegisterCallback<MouseDownEvent>(e =>
+                {
+                    if (e.button == 0)
+                    {
+                        this.m_backPressed = true;
+
+                        element.style.unityBackgroundImageTintColor = (Color)new Color32(115, 0, 0, 255);
+                    }
+                });
+
+                element.RegisterCallback<MouseUpEvent>(e =>
+                {
+                    if (e.button == 0)
+                    {
+                        if (this.m_backPressed)
+                        {
+                            this.m_backPressed = false;
+
+                            element.style.unityBackgroundImageTintColor = (Color)new Color32(150, 0, 0, 255);
+
+                            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+                        }
+                    }
+                });
+            }
         }
 
         private void SetupCallbacksInternal(string name, Tab tab, Key key, Action onMouseUp)
@@ -342,14 +393,25 @@ namespace Project.UI
                 {
                     var item = this.m_sellerInventory[this.m_selectedIndex].Item;
 
-                    this.CreateIconElement(this.m_playerView, item, this.m_playerInventory, true, this.m_currentTab switch
+                    int index = this.m_currentTab switch
                     {
                         Tab.Armor => Player.Instance.PurchaseArmor(Unsafe.As<ArmorData>(item)),
                         Tab.Weapon => Player.Instance.PurchaseWeapon(Unsafe.As<WeaponData>(item)),
                         Tab.Potion => Player.Instance.PurchasePotion(Unsafe.As<PotionData>(item)),
                         Tab.Trinket => Player.Instance.PurchaseTrinket(Unsafe.As<TrinketData>(item)),
                         _ => throw new Exception("The current tab is invalid"),
-                    });
+                    };
+
+                    IItem real = this.m_currentTab switch
+                    {
+                        Tab.Armor => Player.Instance.Armors[index],
+                        Tab.Weapon => Player.Instance.Weapons[index],
+                        Tab.Potion => Player.Instance.Potions[index],
+                        Tab.Trinket => Player.Instance.Trinkets[index],
+                        _ => throw new Exception("The current tab is invalid"),
+                    };
+
+                    this.CreateIconElement(this.m_playerView, real, this.m_playerInventory, true, index);
 
                     this.UpdateMoneyLabel();
 

@@ -1,28 +1,45 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using UnityEngine;
 
 namespace Project.Game
 {
-    public abstract class Effect
+    public enum EffectType
     {
-        private readonly bool m_modifiesStats;
-        private readonly bool m_affectsStats;
-        private readonly bool m_isImmediate;
+        IsImmediate,
+        ModifyStats,
+        AffectStats,
+        SuperEffect,
+    }
+
+    public enum EffectSide
+    {
+        Neutral,
+        Positive,
+        Negative,
+    }
+
+    public class Effect
+    {
+        private readonly EffectType m_type;
+        private readonly EffectSide m_side;
         private readonly Sprite m_sprite;
         private readonly string m_description;
         private readonly string m_name;
+        private readonly float m_value;
         private int m_remainingDuration;
 
-        public bool IsImmediate => this.m_isImmediate;
+        public EffectType Type => this.m_type;
 
-        public bool ModifiesStats => this.m_modifiesStats;
-
-        public bool AffectsStats => this.m_affectsStats;
+        public EffectSide Side => this.m_side;
 
         public bool IsLasting => this.m_remainingDuration > 0;
 
         public int RemainingDuration => this.m_remainingDuration;
+
+        public float Value => this.m_value;
 
         public string Name => this.m_name;
 
@@ -30,15 +47,20 @@ namespace Project.Game
 
         public Sprite Sprite => this.m_sprite;
 
-        public Effect(bool isImmediate, bool modifiesStats, bool affectsStats, int duration, string name, string description, Sprite sprite)
+        public Effect(EffectType type, EffectSide side, float value, int duration, string name, string description, string spritePath)
         {
-            this.m_isImmediate = isImmediate;
-            this.m_modifiesStats = modifiesStats;
-            this.m_affectsStats = affectsStats;
+            if ((type == EffectType.IsImmediate || type == EffectType.SuperEffect) && duration != 0)
+            {
+                throw new Exception("Immediate and Super effects cannot have non-zero duration");
+            }
+
+            this.m_type = type;
+            this.m_side = side;
+            this.m_value = value;
             this.m_remainingDuration = duration;
             this.m_name = name ?? String.Empty;
             this.m_description = description ?? String.Empty;
-            this.m_sprite = sprite == null ? ResourceManager.DefaultSprite : sprite;
+            this.m_sprite = ResourceManager.LoadSprite(spritePath);
         }
 
         protected virtual void AffectStatsInternal(ref EntityStats stats)
@@ -53,33 +75,50 @@ namespace Project.Game
         {
         }
 
+        protected virtual void SuperEffectInternal(ref TurnStats stats)
+        {
+        }
+
         public void ModifyStats(ref EntityStats stats)
         {
-            if (this.m_modifiesStats)
+            if (this.m_type == EffectType.ModifyStats)
             {
                 this.ModifyStatsInternal(ref stats);
             }
         }
 
+        public void ApplyImmediate(ref EntityStats stats)
+        {
+            if (this.m_type == EffectType.IsImmediate)
+            {
+                this.ApplyAllNowInternal(ref stats);
+            }
+        }
+
         public void Cooldown(ref EntityStats stats)
         {
-            if (!this.IsLasting)
+            if (this.IsLasting)
             {
                 this.m_remainingDuration--;
 
-                if (this.m_affectsStats)
+                if (this.m_type == EffectType.AffectStats)
                 {
                     this.AffectStatsInternal(ref stats);
                 }
             }
         }
 
-        public void ApplyImmediate(ref EntityStats stats)
+        public void SuperAffect(ref TurnStats stats)
         {
-            if (this.m_isImmediate)
+            if (this.m_type == EffectType.SuperEffect)
             {
-                this.ApplyAllNowInternal(ref stats);
+                this.SuperEffectInternal(ref stats);
             }
+        }
+
+        public Effect Clone()
+        {
+            return (Effect)this.MemberwiseClone();
         }
     }
 
@@ -89,16 +128,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/PoisonEffect";
 
-        public readonly int PoisonValue;
-
-        public PoisonEffect(int value, int duration) : base(false, false, true, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public PoisonEffect(float value, int duration, in EntityStats initial) : base(EffectType.AffectStats, EffectSide.Negative, value * initial.Damage, duration, EffectName, GetDescription(value * initial.Damage, duration), SpritePath)
         {
-            this.PoisonValue = value;
         }
 
         protected override void AffectStatsInternal(ref EntityStats stats)
         {
-            stats.CurHealth -= this.PoisonValue;
+            stats.CurHealth -= (int)this.Value;
 
             if (stats.CurHealth < 0)
             {
@@ -106,9 +142,19 @@ namespace Project.Game
             }
         }
 
-        private static string GetDescription(int value, int duration)
+        private static string GetDescription(float value, int duration)
         {
-            return $"Reduces health for {value} points per turn over {duration} turns";
+            return $"Reduces health by {(int)value} points per turn over {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new PoisonEffect(value, duration, in initial);
+            }
         }
     }
 
@@ -118,16 +164,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/BurnEffect";
 
-        public readonly int BurnValue;
-
-        public BurnEffect(int value, int duration) : base(false, false, true, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public BurnEffect(float value, int duration, in EntityStats initial) : base(EffectType.AffectStats, EffectSide.Negative, value * initial.Damage, duration, EffectName, GetDescription(value * initial.Damage, duration), SpritePath)
         {
-            this.BurnValue = value;
         }
 
         protected override void AffectStatsInternal(ref EntityStats stats)
         {
-            stats.CurHealth -= this.BurnValue;
+            stats.CurHealth -= (int)this.Value;
 
             if (stats.CurHealth < 0)
             {
@@ -135,9 +178,19 @@ namespace Project.Game
             }
         }
 
-        private static string GetDescription(int value, int duration)
+        private static string GetDescription(float value, int duration)
         {
-            return $"Reduces health for {value} points per turn over {duration} turns";
+            return $"Reduces health by {(int)value} points per turn over {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new BurnEffect(value, duration, in initial);
+            }
         }
     }
 
@@ -147,16 +200,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/ShredEffect";
 
-        public readonly float ShredValue;
-
-        public ShredEffect(float value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public ShredEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Negative, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.ShredValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Armor -= (int)(stats.Armor * this.ShredValue);
+            stats.Armor -= (int)(stats.Armor * this.Value);
 
             if (stats.Armor < 0)
             {
@@ -166,7 +216,17 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Reduces armor by {value}% for {duration} turns";
+            return $"Reduces armor by {value * 100.0f}% for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new ShredEffect(value, duration);
+            }
         }
     }
 
@@ -176,21 +236,28 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/EmpowerEffect";
 
-        public readonly int DamageValue;
-
-        public EmpowerEffect(int value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public EmpowerEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.DamageValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Damage += this.DamageValue;
+            stats.Damage += (int)this.Value;
         }
 
-        private static string GetDescription(int value, int duration)
+        private static string GetDescription(float value, int duration)
         {
-            return $"Increases damage by {value} points for {duration} turns";
+            return $"Increases damage by {value} points for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new EmpowerEffect(value, duration);
+            }
         }
     }
 
@@ -200,21 +267,28 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/AmplifyEffect";
 
-        public readonly float DamageValue;
-
-        public AmplifyEffect(float value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public AmplifyEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.DamageValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Damage += (int)(stats.Damage * this.DamageValue);
+            stats.Damage += (int)(stats.Damage * this.Value);
         }
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases damage by {value}% for {duration} turns";
+            return $"Increases damage by {value * 100.0f}% for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new AmplifyEffect(value, duration);
+            }
         }
     }
 
@@ -224,16 +298,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/HealingEffect";
 
-        public readonly int HealingValue;
-
-        public HealingEffect(int value) : base(true, false, false, 0, EffectName, GetDescription(value), ResourceManager.LoadSprite(SpritePath))
+        public HealingEffect(float value) : base(EffectType.IsImmediate, EffectSide.Neutral, value, 0, EffectName, GetDescription(value), SpritePath)
         {
-            this.HealingValue = value;
         }
 
         protected override void ApplyAllNowInternal(ref EntityStats stats)
         {
-            stats.CurHealth += this.HealingValue;
+            stats.CurHealth += (int)this.Value;
 
             if (stats.CurHealth > stats.MaxHealth)
             {
@@ -241,9 +312,19 @@ namespace Project.Game
             }
         }
 
-        private static string GetDescription(int value)
+        private static string GetDescription(float value)
         {
-            return $"Restores {value} health points immediately";
+            return $"Restores {value} health points immediately.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new HealingEffect(value);
+            }
         }
     }
 
@@ -253,16 +334,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/SurgeEffect";
 
-        public readonly int SurgeValue;
-
-        public SurgeEffect(int value) : base(true, false, false, 0, EffectName, GetDescription(value), ResourceManager.LoadSprite(SpritePath))
+        public SurgeEffect(float value) : base(EffectType.IsImmediate, EffectSide.Neutral, value, 0, EffectName, GetDescription(value), SpritePath)
         {
-            this.SurgeValue = value;
         }
 
         protected override void ApplyAllNowInternal(ref EntityStats stats)
         {
-            stats.CurMana += this.SurgeValue;
+            stats.CurMana += (int)this.Value;
 
             if (stats.CurMana > stats.MaxMana)
             {
@@ -270,9 +348,19 @@ namespace Project.Game
             }
         }
 
-        private static string GetDescription(int value)
+        private static string GetDescription(float value)
         {
-            return $"Restores {value} mana points immediately";
+            return $"Restores {value} mana points immediately.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new SurgeEffect(value);
+            }
         }
     }
 
@@ -282,16 +370,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/RegenerationEffect";
 
-        public readonly int RegenerationValue;
-
-        public RegenerationEffect(int value, int duration) : base(false, false, true, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public RegenerationEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.RegenerationValue = value;
         }
 
         protected override void AffectStatsInternal(ref EntityStats stats)
         {
-            stats.CurHealth += this.RegenerationValue;
+            stats.CurHealth += (int)this.Value;
 
             if (stats.CurHealth > stats.MaxHealth)
             {
@@ -299,9 +384,19 @@ namespace Project.Game
             }
         }
 
-        private static string GetDescription(int value, int duration)
+        private static string GetDescription(float value, int duration)
         {
-            return $"Regenerates health for {value} points per turn over {duration} turns";
+            return $"Regenerates health for {value} points per turn over {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new RegenerationEffect(value, duration);
+            }
         }
     }
 
@@ -311,16 +406,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/RenewalEffect";
 
-        public readonly int RenewalValue;
-
-        public RenewalEffect(int value, int duration) : base(false, false, true, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public RenewalEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.RenewalValue = value;
         }
 
         protected override void AffectStatsInternal(ref EntityStats stats)
         {
-            stats.CurMana += this.RenewalValue;
+            stats.CurMana += (int)this.Value;
 
             if (stats.CurMana > stats.MaxMana)
             {
@@ -328,9 +420,19 @@ namespace Project.Game
             }
         }
 
-        private static string GetDescription(int value, int duration)
+        private static string GetDescription(float value, int duration)
         {
-            return $"Regenerates mana for {value} points per turn over {duration} turns";
+            return $"Regenerates mana for {value} points per turn over {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new RenewalEffect(value, duration);
+            }
         }
     }
 
@@ -340,16 +442,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/WeakenEffect";
 
-        public readonly float WeakenValue;
-
-        public WeakenEffect(float value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public WeakenEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.WeakenValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Damage -= (int)(this.WeakenValue * stats.Damage);
+            stats.Damage -= (int)(this.Value * stats.Damage);
 
             if (stats.Damage < 0)
             {
@@ -359,7 +458,17 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases damage by {value}% for {duration} turns";
+            return $"Decreases damage by {value * 100.0f}% for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new WeakenEffect(value, duration);
+            }
         }
     }
 
@@ -369,16 +478,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/LethalityEffect";
 
-        public readonly float LethalityValue;
-
-        public LethalityEffect(float value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public LethalityEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.LethalityValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.CritChance += this.LethalityValue;
+            stats.CritChance += this.Value;
 
             if (stats.CritChance > 1.0f)
             {
@@ -388,7 +494,48 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases critical chance by {value}% for {duration} turns";
+            return $"Increases critical chance by {value * 100.0f}% for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new LethalityEffect(value, duration);
+            }
+        }
+    }
+
+    public class ShatterEffect : Effect
+    {
+        public const string EffectName = "Shatter";
+
+        public const string SpritePath = "Sprites/Effects/ShatterEffect";
+
+        public ShatterEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        {
+        }
+
+        protected override void ModifyStatsInternal(ref EntityStats stats)
+        {
+            stats.CritMultiplier += this.Value;
+        }
+
+        private static string GetDescription(float value, int duration)
+        {
+            return $"Increases critical multiplier by {value * 100.0f}% for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new ShatterEffect(value, duration);
+            }
         }
     }
 
@@ -398,16 +545,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/SlowEffect";
 
-        public readonly float SlowValue;
-
-        public SlowEffect(float value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public SlowEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.SlowValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Evasion -= this.SlowValue;
+            stats.Evasion -= this.Value;
 
             if (stats.Evasion < 0.0f)
             {
@@ -417,7 +561,17 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases evasion by {value}% for {duration} turns";
+            return $"Decreases evasion by {value * 100.0f}% for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new SlowEffect(value, duration);
+            }
         }
     }
 
@@ -427,16 +581,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/DizzynessEffect";
 
-        public readonly float DizzynessValue;
-
-        public DizzynessEffect(float value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public DizzynessEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.DizzynessValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Precision -= this.DizzynessValue;
+            stats.Precision -= this.Value;
 
             if (stats.Precision < 0.0f)
             {
@@ -446,7 +597,17 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases precision by {value} points for {duration} turns";
+            return $"Decreases precision by {value * 100.0f} points for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new DizzynessEffect(value, duration);
+            }
         }
     }
 
@@ -456,16 +617,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/FlowEffect";
 
-        public readonly float FlowValue;
-
-        public FlowEffect(float value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public FlowEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.FlowValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Evasion += this.FlowValue;
+            stats.Evasion += this.Value;
 
             if (stats.Evasion > 1.0f)
             {
@@ -475,7 +633,17 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases evasion by {value}% for {duration} turns";
+            return $"Increases evasion by {value * 100.0f}% for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new FlowEffect(value, duration);
+            }
         }
     }
 
@@ -485,21 +653,208 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/SharpnessEffect";
 
-        public readonly float SharpnessValue;
-
-        public SharpnessEffect(float value, int duration) : base(false, true, false, duration, EffectName, GetDescription(value, duration), ResourceManager.LoadSprite(SpritePath))
+        public SharpnessEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
         {
-            this.SharpnessValue = value;
         }
 
         protected override void ModifyStatsInternal(ref EntityStats stats)
         {
-            stats.Precision += this.SharpnessValue;
+            stats.Precision += this.Value;
         }
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases precision by {value} points for {duration} turns";
+            return $"Increases precision by {value} points for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new SharpnessEffect(value, duration);
+            }
+        }
+    }
+
+    public class BarricadeEffect : Effect
+    {
+        public const string EffectName = "Barricade";
+
+        public const string SpritePath = "Sprites/Effects/BarricadeEffect";
+
+        public BarricadeEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        {
+        }
+
+        protected override void ModifyStatsInternal(ref EntityStats stats)
+        {
+            stats.Armor += (int)(stats.Armor * this.Value);
+        }
+
+        private static string GetDescription(float value, int duration)
+        {
+            return $"Increases armor by {value * 100.0f}% for {duration} turns.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new BarricadeEffect(value, duration);
+            }
+        }
+    }
+
+    public class CleanseEffect : Effect
+    {
+        public const string EffectName = "Cleanse";
+
+        public const string SpritePath = "Sprites/Effects/CleanseEffect";
+
+        public CleanseEffect() : base(EffectType.SuperEffect, EffectSide.Neutral, 0.0f, 0, EffectName, GetDescription(), SpritePath)
+        {
+        }
+
+        protected override void SuperEffectInternal(ref TurnStats stats)
+        {
+            stats.RemoveNegativeEffects = true;
+        }
+
+        private static string GetDescription()
+        {
+            return "Removes all negative effects immediately.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new CleanseEffect();
+            }
+        }
+    }
+
+    public class DispelEffect : Effect
+    {
+        public const string EffectName = "Dispel";
+
+        public const string SpritePath = "Sprites/Effects/DispelEffect";
+
+        public DispelEffect() : base(EffectType.SuperEffect, EffectSide.Neutral, 0.0f, 0, EffectName, GetDescription(), SpritePath)
+        {
+        }
+
+        protected override void SuperEffectInternal(ref TurnStats stats)
+        {
+            stats.RemovePositiveEffects = true;
+        }
+
+        private static string GetDescription()
+        {
+            return "Removes all positive effects immediately.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new DispelEffect();
+            }
+        }
+    }
+
+    public class StunEffect : Effect
+    {
+        public const string EffectName = "Stun";
+
+        public const string SpritePath = "Sprites/Effects/StunEffect";
+
+        public StunEffect() : base(EffectType.SuperEffect, EffectSide.Neutral, 0.0f, 0, EffectName, GetDescription(), SpritePath)
+        {
+        }
+
+        protected override void SuperEffectInternal(ref TurnStats stats)
+        {
+            stats.BlockCurrentMove = true;
+        }
+
+        private static string GetDescription()
+        {
+            return "Disables current move and abilities.";
+        }
+
+        public static void RegisterForFactory()
+        {
+            EffectFactory.Register(EffectName, Create);
+
+            static Effect Create(float value, int duration, in EntityStats initial)
+            {
+                return new StunEffect();
+            }
+        }
+    }
+
+    public static class EffectFactory
+    {
+        public delegate Effect Activator(float value, int duration, in EntityStats initial);
+
+        private static readonly Dictionary<string, Activator> ms_activatorMap = new();
+
+        public static void Register(string name, Activator activator)
+        {
+            if (String.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (activator is null)
+            {
+                throw new ArgumentNullException(nameof(activator));
+            }
+
+            ms_activatorMap[name] = activator;
+        }
+
+        public static Effect CreateEffect(string name, float value, int duration, in EntityStats initial)
+        {
+            if (ms_activatorMap.TryGetValue(name, out var activator))
+            {
+                return activator(value, duration, in initial);
+            }
+
+            throw new Exception($"Unable to create effect named {name}");
+        }
+
+        public static void Initialize()
+        {
+            PoisonEffect.RegisterForFactory();
+            BurnEffect.RegisterForFactory();
+            ShredEffect.RegisterForFactory();
+            EmpowerEffect.RegisterForFactory();
+            AmplifyEffect.RegisterForFactory();
+            HealingEffect.RegisterForFactory();
+            SurgeEffect.RegisterForFactory();
+            RegenerationEffect.RegisterForFactory();
+            RenewalEffect.RegisterForFactory();
+            WeakenEffect.RegisterForFactory();
+            LethalityEffect.RegisterForFactory();
+            ShatterEffect.RegisterForFactory();
+            SlowEffect.RegisterForFactory();
+            DizzynessEffect.RegisterForFactory();
+            FlowEffect.RegisterForFactory();
+            SharpnessEffect.RegisterForFactory();
+            BarricadeEffect.RegisterForFactory();
+            CleanseEffect.RegisterForFactory();
+            DispelEffect.RegisterForFactory();
+            StunEffect.RegisterForFactory();
         }
     }
 }

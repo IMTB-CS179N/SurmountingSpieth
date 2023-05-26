@@ -64,6 +64,11 @@ namespace Project.Items
         {
         }
 
+        public WeaponData Clone()
+        {
+            return (WeaponData)this.MemberwiseClone();
+        }
+
         private string CreateDescription()
         {
             return "Increases " +

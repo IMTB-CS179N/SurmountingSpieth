@@ -1,0 +1,18 @@
+Bard,Expertise,,"Sharpness, Healing",,"40, 25",,"3, 0",0,10,FALSE,5,Sprites/Abilities/Expertise,Proficiency bonus and health addition
+Bard,Blindside Wack,"Slow, Dizzyness",,"0.25, 30",,"3, 3",,1.3,20,FALSE,4,Sprites/Abilities/BlindsideWack,Thunder strikes from the sky
+Bard,Sound Shock,Stun,"Lethality, Amplify",1,"0.20, 0.25",1,"3, 3",1.6,30,FALSE,6,Sprites/Abilities/SoundShock,Sound wave that damages opponent
+Rogue,Venom Slash,Poison,,0.30,,6,,1,10,FALSE,5,Sprites/Abilities/VenomSlash,Double attack
+Rogue,Eviscerate,"Shred, Weaken",,"0.40, 0.25",,"3, 3",,1.5,20,FALSE,5,Sprites/Abilities/Eviscerate,Knife attack 
+Rogue,Bloody Storm,,"Flow, Lethality, Shatter",,"0.30, 0.30, 1.00",,"3, 3, 3",0,30,FALSE,6,Sprites/Abilities/BloodyStorm,Bolts of blood fall on all opponents and deals damage
+Paladin,Divine Intervention,,"Barricade, Cleanse",,"0.50, 0",,"3, 0",0,10,FALSE,5,Sprites/Abilities/DivineIntervention,Charge of holy power
+Paladin,Divine Swing,,"Amplify, Healing",,"0.15, 10",,"3,0",0,20,FALSE,4,Sprites/Abilities/DivineSwing,Swings weapon and deals damage to all opponents
+Paladin,Divine Charge,"Burn, Dispel, Slow",,"0.50, 0, 0.50",,"3, 0, 3",,1.4,30,TRUE,7,Sprites/Abilities/DivineCharge,Power of holy light that deals damage to all opponents
+Wizard,Spell Mastery,Weaken,Amplify,0.25,0.25,3,3,1,10,FALSE,4,Sprites/Abilities/SpellMastery,Proficiency bonus and health addition
+Wizard,Arcane Bolt,Dispel,,0,,0,,2,20,FALSE,4,Sprites/Abilities/ArcaneBolt,Bolt of energy that deals damage to all opponents
+Wizard,Thunderstorm,Stun,Regeneration,1,10,1,3,1.8,30,TRUE,7,Sprites/Abilities/Thunderstorm,Lightning strikesthat deals damage to all opponents
+Cleric,Blazing Light,,"Regeneration, Cleanse",,"6, 0",,"5, 0",1,10,FALSE,5,Sprites/Abilities/BlazingLight,Regeneration of health and mana
+Cleric,Confusing Ray,"Dizzyness, Slow, Dispel",,"0.25, 0.25, 0",,"3, 3, 0",,1.3,20,FALSE,4,Sprites/Abilities/ConfusingRay,Arrow with holy power that weakens an opponent
+Cleric,Sacrilige ,"Poison, Shred",,"0.35, 0.35",,"4, 3",,1.4,30,TRUE,6,Sprites/Abilities/Sacrilige,Attack with immense holy power
+Barbarian,Whirlwind Slash,Slow,,0.20,,2,,0.8,10,TRUE,2,Sprites/Abilities/WhirlwindSlash,Bolt of hatred energy that damages opponent
+Barbarian,Groundquake,Shred,,0.40,,3,,1.5,20,TRUE,4,Sprites/Abilities/Groundquake,Inflicts massage damage to an opponent
+Barbarian,Ancestral Warcry,,"Lethality, Shatter",,"0.50, 2.00",,"3, 3",0,30,FALSE,6,Sprites/Abilities/AncestralWarcry,Concentrated power of hatred that damages all opponents

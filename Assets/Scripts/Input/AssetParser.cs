@@ -157,6 +157,17 @@ namespace Project.Input
             {
                 property.SetValue(target, ResourceManager.LoadTexture2D(value));
             }
+            else if (property.PropertyType == typeof(string[]))
+            {
+                var splits = value.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < splits.Length; ++i)
+                {
+                    splits[i] = splits[i].Trim();
+                }
+
+                property.SetValue(target, splits);
+            }
             else if (property.PropertyType == typeof(int[]))
             {
                 var splits = value.Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -165,7 +176,7 @@ namespace Project.Input
 
                 for (int i = 0; i < result.Length; ++i)
                 {
-                    result[i] = Int32.Parse(splits[i]);
+                    result[i] = Int32.Parse(splits[i].Trim());
                 }
 
                 property.SetValue(target, result);
@@ -178,7 +189,7 @@ namespace Project.Input
 
                 for (int i = 0; i < result.Length; ++i)
                 {
-                    result[i] = Single.Parse(splits[i]);
+                    result[i] = Single.Parse(splits[i].Trim());
                 }
 
                 property.SetValue(target, result);
