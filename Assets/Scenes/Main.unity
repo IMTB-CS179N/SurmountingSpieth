@@ -168,6 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe99a6b79d56ce8488a1eec1549ba881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MainFont: {fileID: 11400000, guid: 561131c940c5ed947b120982a38ae148, type: 2}
 --- !u!114 &98165355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,7 +176,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 98165352}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
@@ -218,6 +219,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6b95afc562b5a14a9e2f87238b73896, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Speedster: 0.4
+  Player: {fileID: 1996520060}
+  Enemy1: {fileID: 599558810}
+  Enemy2: {fileID: 2018627913}
+  Enemy3: {fileID: 1092607467}
+  Enemy4: {fileID: 1899559615}
 --- !u!4 &296547412
 Transform:
   m_ObjectHideFlags: 0
@@ -288,6 +295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BattleUI: {fileID: 98165354}
+  EntityPrefab: {fileID: 5279165716753476498, guid: ae072308e7fce3a42a03037354b192a3, type: 3}
 --- !u!114 &296547419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,12 +481,12 @@ GameObject:
   - component: {fileID: 599558812}
   - component: {fileID: 599558811}
   m_Layer: 0
-  m_Name: Square (1)
+  m_Name: Enemy1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &599558811
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -520,7 +528,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: dc04d4bbf31df2c4a9cd239d28df98f4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 62d349fe69b91204b97feac307a897da, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -539,8 +547,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 599558810}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.7, y: 2.5, z: 0}
-  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
+  m_LocalPosition: {x: 2.5, y: 2.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -618,12 +626,12 @@ GameObject:
   - component: {fileID: 1092607469}
   - component: {fileID: 1092607468}
   m_Layer: 0
-  m_Name: Square (3)
+  m_Name: Enemy3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1092607468
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -665,7 +673,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: dc04d4bbf31df2c4a9cd239d28df98f4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 769e74181fb69bc44a92aefea1fb1bea, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -684,8 +692,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1092607467}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.5, y: 0.6, z: 0}
-  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
+  m_LocalPosition: {x: 5.2, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -946,12 +954,12 @@ GameObject:
   - component: {fileID: 1899559617}
   - component: {fileID: 1899559616}
   m_Layer: 0
-  m_Name: Square (4)
+  m_Name: Enemy4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1899559616
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -993,7 +1001,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: dc04d4bbf31df2c4a9cd239d28df98f4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1c8faa81f898ee84ab84d859497abc7d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1012,8 +1020,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1899559615}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.54, y: 0.5, z: 0}
-  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
+  m_LocalPosition: {x: 2.5, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1067,12 +1075,12 @@ GameObject:
   - component: {fileID: 1996520062}
   - component: {fileID: 1996520061}
   m_Layer: 0
-  m_Name: Square
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1996520061
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1133,7 +1141,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1996520060}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5, y: 1, z: 0}
+  m_LocalPosition: {x: -3.34, y: 0.67, z: 0}
   m_LocalScale: {x: 1.25, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1151,12 +1159,12 @@ GameObject:
   - component: {fileID: 2018627915}
   - component: {fileID: 2018627914}
   m_Layer: 0
-  m_Name: Square (2)
+  m_Name: Enemy2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &2018627914
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1198,7 +1206,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: dc04d4bbf31df2c4a9cd239d28df98f4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6c7640a02197e7647925f9cfec3ce206, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1217,8 +1225,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2018627913}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.3, y: -0.5, z: 0}
-  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
+  m_LocalPosition: {x: 5.2, y: 2.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

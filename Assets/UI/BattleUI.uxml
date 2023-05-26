@@ -7,7 +7,7 @@
             <ui:VisualElement name="sound-button" class="upper-button-style" style="background-color: rgb(209, 156, 76);" />
         </ui:VisualElement>
         <ui:VisualElement name="game-layout" picking-mode="Ignore" style="flex-grow: 1; flex-direction: column-reverse; justify-content: flex-start; align-items: center;">
-            <ui:VisualElement name="main-layout" style="width: 400px; height: 150px; background-color: rgb(189, 146, 82); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.39);">
+            <ui:VisualElement name="main-layout" picking-mode="Ignore" style="width: 400px; height: 150px; background-color: rgb(189, 146, 82); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.39); top: 170px; display: none;">
                 <ui:VisualElement name="effect-container" style="width: 100%; height: 20px; padding-left: 5px; padding-right: 5px; padding-top: 0; padding-bottom: 0; flex-shrink: 0; flex-wrap: wrap; flex-direction: row;">
                     <ui:VisualElement name="effect-1" class="effect-style" />
                     <ui:VisualElement name="effect-2" class="effect-style" />

@@ -20,6 +20,8 @@ namespace Project.UI
 
         public event Action OnUIDisabled;
 
+        public event Action OnUIUpdate;
+
         private void Awake()
         {
             this.BindEvents();
@@ -53,6 +55,8 @@ namespace Project.UI
                     }
                 }
             }
+
+            this.OnUIUpdate?.Invoke();
         }
 
         public void BindKeyAction(Key key, Action action)

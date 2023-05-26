@@ -9,8 +9,8 @@ Paladin,Divine Swing,,"Amplify, Healing",,"0.15, 10",,"3,0",0,20,FALSE,4,Sprites
 Paladin,Divine Charge,"Burn, Dispel, Slow",,"0.50, 0, 0.50",,"3, 0, 3",,1.4,30,TRUE,7,Sprites/Abilities/DivineCharge,Power of holy light that deals damage to all opponents
 Wizard,Spell Mastery,Weaken,Amplify,0.25,0.25,3,3,1,10,FALSE,4,Sprites/Abilities/SpellMastery,Proficiency bonus and health addition
 Wizard,Arcane Bolt,Dispel,,0,,0,,2,20,FALSE,4,Sprites/Abilities/ArcaneBolt,Bolt of energy that deals damage to all opponents
-Wizard,Thunderstorm,Stun,Regenaration,1,10,1,3,1.8,30,TRUE,7,Sprites/Abilities/Thunderstorm,Lightning strikesthat deals damage to all opponents
-Cleric,Blazing Light,,"Regenaration, Cleanse",,"6, 0",,"5, 0",1,10,FALSE,5,Sprites/Abilities/BlazingLight,Regeneration of health and mana
+Wizard,Thunderstorm,Stun,Regeneration,1,10,1,3,1.8,30,TRUE,7,Sprites/Abilities/Thunderstorm,Lightning strikesthat deals damage to all opponents
+Cleric,Blazing Light,,"Regeneration, Cleanse",,"6, 0",,"5, 0",1,10,FALSE,5,Sprites/Abilities/BlazingLight,Regeneration of health and mana
 Cleric,Confusing Ray,"Dizzyness, Slow, Dispel",,"0.25, 0.25, 0",,"3, 3, 0",,1.3,20,FALSE,4,Sprites/Abilities/ConfusingRay,Arrow with holy power that weakens an opponent
 Cleric,Sacrilige ,"Poison, Shred",,"0.35, 0.35",,"4, 3",,1.4,30,TRUE,6,Sprites/Abilities/Sacrilige,Attack with immense holy power
 Barbarian,Whirlwind Slash,Slow,,0.20,,2,,0.8,10,TRUE,2,Sprites/Abilities/WhirlwindSlash,Bolt of hatred energy that damages opponent

@@ -193,7 +193,7 @@ namespace Project.Game
 
         public void Cooldown()
         {
-            if (!this.IsOnCooldown)
+            if (this.IsOnCooldown)
             {
                 this.m_remainingCooldown--;
             }
@@ -221,24 +221,21 @@ namespace Project.Game
             }
         }
 
-        public void ApplyEnemyEffects(IEntity ally, IEntity[] enemies, int targetEnemy)
+        public void ApplyEnemyEffects(IEntity ally, IEntity enemy, bool isTarget)
         {
             if (ally is null)
             {
                 throw new ArgumentNullException(nameof(ally));
             }
 
-            if (enemies is null)
+            if (enemy is null)
             {
-                throw new ArgumentNullException(nameof(enemies));
+                throw new ArgumentNullException(nameof(enemy));
             }
 
-            if (targetEnemy < 0 || targetEnemy >= enemies.Length)
-            {
-                throw new IndexOutOfRangeException($"Out of range target enemy index, number of enemies is {enemies.Length}, target is {targetEnemy}");
-            }
+            // apply effect ONLY if this target enemy OR if effect is AOE
 
-            if (enemies.Length != 0)
+            if (isTarget || this.IsAreaOfEffect)
             {
                 var effects = this.m_data.EnemyEffects;
                 var modifys = this.m_data.EnemyModifiers;
@@ -246,19 +243,7 @@ namespace Project.Game
 
                 for (int i = 0; i < effects.Length; ++i)
                 {
-                    var effect = EffectFactory.CreateEffect(effects[i], modifys[i], duratio[i], in ally.EntityStats);
-
-                    if (this.IsAreaOfEffect)
-                    {
-                        for (int k = 0; k < enemies.Length; ++k)
-                        {
-                            enemies[k].AddEffect(effect.Clone());
-                        }
-                    }
-                    else
-                    {
-                        enemies[targetEnemy].AddEffect(effect);
-                    }
+                    enemy.AddEffect(EffectFactory.CreateEffect(effects[i], modifys[i], duratio[i], in ally.EntityStats));
                 }
             }
         }

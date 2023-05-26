@@ -50,6 +50,8 @@ namespace Project.Game
 
         public static Player Instance => ms_instance ?? throw new Exception("Cannot access player when not in game");
 
+        public Sprite Sprite => this.m_baseStats.Sprite;
+
         public bool IsPlayer => true;
 
         public bool IsAlive => this.m_stats.CurHealth > 0;
@@ -278,7 +280,7 @@ namespace Project.Game
 
 
 
-        public void Init()
+        public void InitBattle()
         {
             this.RecalculateStats();
 
@@ -286,9 +288,14 @@ namespace Project.Game
             this.m_stats.CurMana = this.m_stats.MaxMana;
         }
 
-        public void Update()
+        public void InitTurn()
         {
-            // THIS IS CALLED ONLY WHEN PLAYER'S TURN
+            this.m_turn = default;
+        }
+
+        public void Cooldown()
+        {
+            int count = this.m_effects.Count;
 
             for (int i = 0; i < this.m_abilities.Length; ++i)
             {
@@ -307,7 +314,50 @@ namespace Project.Game
                 }
             }
 
-            // recalculate stats only at the end
+            if (count > this.m_effects.Count)
+            {
+                this.RecalculateStats();
+            }
+        }
+
+        public void UsePotion(int potionIndex)
+        {
+            if (potionIndex >= 0 && potionIndex < this.m_equippedPotions.Length)
+            {
+                var potion = this.m_equippedPotions[potionIndex];
+
+                var effect = potion.Use(in this.m_stats);
+
+                this.m_equippedPotions[potionIndex] = null;
+
+                if (effect.Type == EffectType.IsImmediate)
+                {
+                    effect.ApplyImmediate(ref this.m_stats);
+                }
+                else // #TODO is cleanse potion, handle super
+                {
+                    this.m_effects.Add(effect);
+
+                    this.RecalculateStats();
+                }
+            }
+        }
+
+
+
+        public void ApplyDamage(int damage)
+        {
+            this.m_stats.CurHealth -= damage;
+
+            if (this.m_stats.CurHealth < 0)
+            {
+                this.m_stats.CurHealth = 0;
+            }
+        }
+
+        public void AddEffect(Effect effect)
+        {
+            this.m_effects.Add(effect);
 
             this.RecalculateStats();
         }
@@ -354,21 +404,53 @@ namespace Project.Game
             return AbilityUsage.DoesNotExist;
         }
 
-
-
-        public void ApplyDamage(int damage)
+        public void RemoveMana(int mana)
         {
-            this.m_stats.CurHealth -= damage;
+            this.m_stats.CurMana -= mana;
 
-            if (this.m_stats.CurHealth < 0)
+            if (this.m_stats.CurMana < 0)
             {
-                this.m_stats.CurHealth = 0;
+                this.m_stats.CurMana = 0;
             }
         }
 
-        public void AddEffect(Effect effect)
+        public void ApplyImmediateEffects()
         {
-            // #TODO
+            for (int i = this.m_effects.Count - 1; i >= 0; --i)
+            {
+                var effect = this.m_effects[i];
+
+                if (effect.Type == EffectType.IsImmediate)
+                {
+                    effect.ApplyImmediate(ref this.m_stats);
+
+                    this.m_effects.RemoveAt(i);
+                }
+                else if (effect.Type == EffectType.SuperEffect)
+                {
+                    effect.SuperAffect(ref this.m_turn);
+
+                    this.m_effects.RemoveAt(i);
+                }
+            }
+        }
+
+        public void RemoveEffectsOfSide(EffectSide side)
+        {
+            int initial = this.m_effects.Count;
+
+            for (int i = initial - 1; i >= 0; --i)
+            {
+                if (this.m_effects[i].Side == side)
+                {
+                    this.m_effects.RemoveAt(i);
+                }
+            }
+
+            if (initial != this.m_effects.Count)
+            {
+                this.RecalculateStats();
+            }
         }
 
 

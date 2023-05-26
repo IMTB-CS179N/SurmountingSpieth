@@ -21,7 +21,7 @@ namespace Project.Game
         Negative,
     }
 
-    public abstract class Effect
+    public class Effect
     {
         private readonly EffectType m_type;
         private readonly EffectSide m_side;
@@ -49,6 +49,11 @@ namespace Project.Game
 
         public Effect(EffectType type, EffectSide side, float value, int duration, string name, string description, string spritePath)
         {
+            if ((type == EffectType.IsImmediate || type == EffectType.SuperEffect) && duration != 0)
+            {
+                throw new Exception("Immediate and Super effects cannot have non-zero duration");
+            }
+
             this.m_type = type;
             this.m_side = side;
             this.m_value = value;
@@ -92,11 +97,11 @@ namespace Project.Game
 
         public void Cooldown(ref EntityStats stats)
         {
-            if (!this.IsLasting)
+            if (this.IsLasting)
             {
                 this.m_remainingDuration--;
 
-                if (this.m_type == EffectType.ModifyStats)
+                if (this.m_type == EffectType.AffectStats)
                 {
                     this.AffectStatsInternal(ref stats);
                 }
@@ -211,7 +216,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Reduces armor by {value}% for {duration} turns.";
+            return $"Reduces armor by {value * 100.0f}% for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -242,7 +247,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases damage by {(int)value} points for {duration} turns.";
+            return $"Increases damage by {value} points for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -273,7 +278,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases damage by {value}% for {duration} turns.";
+            return $"Increases damage by {value * 100.0f}% for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -309,7 +314,7 @@ namespace Project.Game
 
         private static string GetDescription(float value)
         {
-            return $"Restores {(int)value} health points immediately.";
+            return $"Restores {value} health points immediately.";
         }
 
         public static void RegisterForFactory()
@@ -381,7 +386,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Regenerates health for {(int)value} points per turn over {duration} turns.";
+            return $"Regenerates health for {value} points per turn over {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -417,7 +422,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Regenerates mana for {(int)value} points per turn over {duration} turns.";
+            return $"Regenerates mana for {value} points per turn over {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -453,7 +458,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases damage by {value}% for {duration} turns.";
+            return $"Decreases damage by {value * 100.0f}% for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -489,7 +494,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases critical chance by {value}% for {duration} turns.";
+            return $"Increases critical chance by {value * 100.0f}% for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -520,7 +525,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases critical multiplier by {value}% for {duration} turns.";
+            return $"Increases critical multiplier by {value * 100.0f}% for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -556,7 +561,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases evasion by {value}% for {duration} turns.";
+            return $"Decreases evasion by {value * 100.0f}% for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -592,7 +597,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases precision by {value} points for {duration} turns.";
+            return $"Decreases precision by {value * 100.0f} points for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -628,7 +633,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases evasion by {value}% for {duration} turns.";
+            return $"Increases evasion by {value * 100.0f}% for {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -690,7 +695,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Increases armor by {value}% for {duration} turns.";
+            return $"Increases armor by {value * 100.0f}% for {duration} turns.";
         }
 
         public static void RegisterForFactory()

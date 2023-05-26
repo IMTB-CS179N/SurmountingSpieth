@@ -20,9 +20,11 @@ namespace Project.Input
 
         public float Height => this.m_screenHeight;
 
+        public float OrthographicSize => this.m_camera.orthographicSize;
+
         public event Action OnScreenResolutionChanged;
 
-        private void Start()
+        private void Awake()
         {
             this.m_camera = Camera.main;
             this.m_screenWidth = Screen.width;
@@ -48,25 +50,35 @@ namespace Project.Input
             return this.m_camera.ScreenToWorldPoint(point);
         }
 
-        public Vector2 MapPointBasedOnResolution(Vector2 point, Vector2 resolution)
-        {
-            var ratio = this.m_screenHeight / resolution.y;
-
-            return 2.0f * this.m_camera.orthographicSize * new Vector2(point.x * (this.m_screenWidth / resolution.x) / ratio, point.y);
-        }
-
         public Vector2 WorldPositionToUnitScreenPoint(Vector2 point)
         {
             var ratio = this.m_screenHeight / this.m_screenWidth;
 
-            var size = this.m_camera.orthographicSize * 2.0f;
+            var size = this.m_camera.orthographicSize;
 
             return new Vector2(point.x * ratio / size, point.y / size);
         }
 
         public Vector2 UnitScreenPointToWorldPosition(Vector2 point)
         {
-            return this.MapPointBasedOnResolution(point, Vector2.one);
+            return this.m_camera.orthographicSize * new Vector2(point.x * this.m_screenWidth / this.m_screenHeight, point.y);
+        }
+
+        public static Vector2 WorldPositionToUnitScreenPoint(Vector2 point, Vector2 resolution, float orthographicSize)
+        {
+            var ratio = resolution.y / resolution.x;
+
+            return new Vector2(point.x * ratio / orthographicSize, point.y / orthographicSize);
+        }
+
+        public static Vector2 UnitScreenPointToWorldPosition(Vector2 point, Vector2 resolution, float orthographicSize)
+        {
+            return orthographicSize * new Vector2(point.x * resolution.x / resolution.y, point.y);
+        }
+
+        public static Vector2 UnitScreenPointToScreenSpace(Vector2 point, Vector2 resolution)
+        {
+            return new Vector2(resolution.x * (0.5f * (point.x + 1.0f)), resolution.y * (0.5f * (point.y + 1.0f)));
         }
     }
 }

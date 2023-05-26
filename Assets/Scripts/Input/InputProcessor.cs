@@ -80,6 +80,18 @@ namespace Project.Input
             return EventSystem.current.IsPointerOverGameObject();
         }
 
+        public bool IsPointerOverCollider(out Collider2D collider)
+        {
+            collider = null;
+
+            if (!this.IsPointerOverUIObject())
+            {
+                collider = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero).collider;
+            }
+
+            return collider != null;
+        }
+
         public Vector2 MouseWorldPosition()
         {
             return this.m_mouseWorldPos;
@@ -100,14 +112,12 @@ namespace Project.Input
             if (!this.IsPointerOverUIObject())
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
-
 #if DEBUG
                 if (raycast)
                 {
                     Debug.Log($"Raycasted {raycast.collider.name}");
                 }
 #endif
-
                 return raycast.collider;
             }
 
@@ -119,14 +129,12 @@ namespace Project.Input
             if (!this.IsPointerOverUIObject() && this.m_mouseLeftDown)
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
-
 #if DEBUG
                 if (raycast)
                 {
                     Debug.Log($"Raycasted {raycast.collider.name}");
                 }
 #endif
-
                 return raycast.collider;
             }
 
@@ -138,14 +146,12 @@ namespace Project.Input
             if (!this.IsPointerOverUIObject() && this.m_mouseRightDown)
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
-
 #if DEBUG
                 if (raycast)
                 {
                     Debug.Log($"Raycasted {raycast.collider.name}");
                 }
 #endif
-
                 return raycast.collider;
             }
 
@@ -157,14 +163,12 @@ namespace Project.Input
             if (!this.IsPointerOverUIObject() && this.m_wasLeftPressed)
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
-
 #if DEBUG
                 if (raycast)
                 {
                     Debug.Log($"Raycasted {raycast.collider.name}");
                 }
 #endif
-
                 return raycast.collider;
             }
 
@@ -176,18 +180,58 @@ namespace Project.Input
             if (!this.IsPointerOverUIObject() && this.m_wasRightPressed)
             {
                 var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
-
 #if DEBUG
                 if (raycast)
                 {
                     Debug.Log($"Raycasted {raycast.collider.name}");
                 }
 #endif
-
                 return raycast.collider;
             }
 
             return null;
+        }
+
+        public bool RaycastLeftClickIfHappened(out Collider2D collider)
+        {
+            collider = null;
+
+            if (!this.IsPointerOverUIObject() && this.m_wasLeftPressed)
+            {
+                var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
+#if DEBUG
+                if (raycast)
+                {
+                    Debug.Log($"Raycasted {raycast.collider.name}");
+                }
+#endif
+                collider = raycast.collider;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool RaycastRightClickIfHappened(out Collider2D collider)
+        {
+            collider = null;
+
+            if (!this.IsPointerOverUIObject() && this.m_wasRightPressed)
+            {
+                var raycast = Physics2D.Raycast(this.m_mouseWorldPos, Vector2.zero);
+#if DEBUG
+                if (raycast)
+                {
+                    Debug.Log($"Raycasted {raycast.collider.name}");
+                }
+#endif
+                collider = raycast.collider;
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

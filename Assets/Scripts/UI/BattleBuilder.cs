@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 
 namespace Project.UI
@@ -16,6 +17,13 @@ namespace Project.UI
             Regular,
             Ability,
             Potion,
+        }
+
+        private enum AnimationType
+        {
+            None,
+            Hide,
+            Show,
         }
 
         private struct TooltipData
@@ -674,6 +682,15 @@ namespace Project.UI
                         if (this.Text is not null)
                         {
                             this.Text.pickingMode = PickingMode.Position;
+
+                            if (usage == AbilityUsage.OnCooldown)
+                            {
+                                this.Text.text = this.m_ability.RemainingCooldown.ToString();
+                            }
+                            else
+                            {
+                                this.Text.text = String.Empty;
+                            }
                         }
                     }
                     else
@@ -686,6 +703,8 @@ namespace Project.UI
                         if (this.Text is not null)
                         {
                             this.Text.pickingMode = PickingMode.Ignore;
+
+                            this.Text.text = String.Empty;
                         }
                     }
                 }
@@ -1000,6 +1019,130 @@ namespace Project.UI
 
                 this.UpdateText();
             }
+
+            public void SuperReset()
+            {
+                this.m_pressed = false;
+
+                if (this.Icon is not null)
+                {
+                    this.Icon.style.backgroundColor = ms_buttonLockedColor;
+                    this.Icon.pickingMode = PickingMode.Ignore;
+                }
+
+                if (this.Text is not null)
+                {
+                    this.Text.text = "LOCKED";
+                    this.Text.pickingMode = PickingMode.Ignore;
+                }
+            }
+        }
+
+        private class HealthIndicator
+        {
+
+        }
+
+        private class AnimatedText
+        {
+            private static int ms_uniqueId;
+
+            private readonly Vector2 m_start;
+            private readonly Vector2 m_end;
+            private readonly float m_invDuration;
+            private readonly float m_duration;
+            private float m_deltaTotal;
+
+            public readonly Label Text;
+
+            public AnimatedText(string text, float duration, float delay, int size, int width, Color color, Vector2 start, Vector2 end, BattleBuilder builder)
+            {
+                this.m_start = new Vector2((start.x + 1.0f) * 50f - 2.0f, (start.y + 1.0f) * 50f);
+                this.m_end = new Vector2((end.x + 1.0f) * 50f - 2.0f, (end.y + 1.0f) * 50f);
+                this.m_duration = duration;
+                this.m_invDuration = 1.0f / duration;
+                this.m_deltaTotal = -delay;
+
+                this.Text = new Label(text)
+                {
+                    name = "animated-label-" + ms_uniqueId++.ToString(),
+                    pickingMode = PickingMode.Ignore,
+                };
+
+                var style = this.Text.style;
+
+                style.position = Position.Absolute;
+                style.visibility = Visibility.Hidden;
+
+                style.left = new StyleLength(new Length(this.m_start.x, LengthUnit.Percent));
+                style.bottom = new StyleLength(new Length(this.m_start.y, LengthUnit.Percent));
+
+                style.marginLeft = 0;
+                style.marginRight = 0;
+                style.marginTop = 0;
+                style.marginBottom = 0;
+
+                style.paddingLeft = 0;
+                style.paddingRight = 0;
+                style.paddingTop = 0;
+                style.paddingBottom = 0;
+
+                style.unityFontDefinition = new StyleFontDefinition(builder.MainFont);
+                style.fontSize = size;
+                style.color = color;
+                style.unityTextAlign = TextAnchor.MiddleCenter;
+                style.unityTextOutlineColor = Color.black;
+                style.unityTextOutlineWidth = width;
+                style.unityFontStyleAndWeight = FontStyle.Bold;
+
+                builder.m_battleOverlay.Add(this.Text);
+            }
+
+            public bool Update()
+            {
+                var style = this.Text.style;
+
+                if (this.m_deltaTotal < 0.0f)
+                {
+                    this.m_deltaTotal += Time.deltaTime;
+
+                    style.visibility = Visibility.Hidden;
+
+                    return true;
+                }
+
+                if (this.m_deltaTotal < this.m_duration)
+                {
+                    style.visibility = Visibility.Visible;
+
+                    this.m_deltaTotal += Time.deltaTime;
+
+                    if (this.m_deltaTotal > this.m_duration)
+                    {
+                        this.m_deltaTotal = this.m_duration;
+                    }
+
+                    var position = this.m_start + (this.m_deltaTotal * this.m_invDuration * (this.m_end - this.m_start));
+
+                    this.Text.style.left = new StyleLength(new Length(position.x, LengthUnit.Percent));
+                    this.Text.style.bottom = new StyleLength(new Length(position.y, LengthUnit.Percent));
+
+                    if (this.m_deltaTotal * 2.0f > this.m_duration)
+                    {
+                        var color = this.Text.style.color.value;
+
+                        color.a = 2.0f * (this.m_duration - this.m_deltaTotal) * this.m_invDuration;
+
+                        this.Text.style.color = color;
+                    }
+
+                    return true;
+                }
+
+                style.visibility = Visibility.Hidden;
+
+                return false;
+            }
         }
 
         private const string kStatistic = "Statistic";
@@ -1097,9 +1240,20 @@ namespace Project.UI
         private static readonly Color ms_borderSelectColor = new Color32(0, 225, 255, 255);
         private static readonly Color ms_borderDefaultColor = Color.black;
 
+        private static readonly float ms_startMainLayoutOffset = 0.0f;   // for top relative
+        private static readonly float ms_finalMainLayoutOffset = 170.0f; // for top relative
+        private static readonly float ms_mainLayoutAnimSpeed = 300.0f;
+
+        [SerializeField]
+        private FontAsset MainFont;
+
         private ITooltipProvider m_currentProvider;
         private ISelectableItem m_currentSelected;
         private IEntity m_currentEntity;
+
+        private List<HealthIndicator> m_indicators;
+        private List<AnimatedText> m_animations;
+        private VisualElement m_battleOverlay;
 
         private List<EffectStatistic> m_effectList;
         private VisualElement m_effectContainer;
@@ -1143,6 +1297,8 @@ namespace Project.UI
         private VisualElement m_backButton;
         private bool m_backPressed;
 
+        private AnimationType m_animation;
+
         public IEntity CurrentEntity
         {
             get
@@ -1160,6 +1316,8 @@ namespace Project.UI
             }
         }
 
+        public bool HasAnyAnimationsPlaying => this.m_animations?.Count > 0;
+
         public event Action OnExitRequest;
 
         public event Action OnUseAttackRequest;
@@ -1174,6 +1332,8 @@ namespace Project.UI
         {
             this.OnUIEnabled += this.OnEnableEvent;
             this.OnUIDisabled += this.OnDisableEvent;
+            this.OnUIUpdate += this.AnimateLayout;
+            this.OnUIUpdate += this.AnimateAllText;
 
             this.OnUseAttackRequest += LockAll;
             this.OnUseAbilityRequest += LockAllIndexed;
@@ -1234,9 +1394,15 @@ namespace Project.UI
 
         private void OnDisableEvent()
         {
+            this.m_animation = AnimationType.None;
+
             this.m_currentEntity = null;
             this.m_currentSelected = null;
             this.m_currentProvider = null;
+
+            this.m_animations = null;
+            this.m_indicators = null;
+            this.m_battleOverlay = null;
 
             this.m_backButton = null;
             this.m_backPressed = false;
@@ -1383,6 +1549,14 @@ namespace Project.UI
             this.m_potionLayout = root.Q<VisualElement>(kPotionLayout);
             this.m_tooltipLayout = root.Q<VisualElement>(kTooltipLayout);
             this.m_interactLayout = root.Q<VisualElement>(kInteractLayout);
+
+            this.m_battleOverlay = root.Q<VisualElement>(kBattleOverlay);
+
+            if (this.m_battleOverlay is not null)
+            {
+                this.m_animations = new List<AnimatedText>();
+                this.m_indicators = new List<HealthIndicator>();
+            }
         }
 
         private void SetupStatistics()
@@ -1440,7 +1614,12 @@ namespace Project.UI
                 this.SelectItem(null);
                 this.DisplayTooltip(null, false);
 
-                this.m_actionButton = null;
+                if (this.m_actionButton is not null)
+                {
+                    this.m_actionButton.SuperReset();
+
+                    this.m_actionButton = null;
+                }
 
                 if (this.m_tooltipLayout is not null)
                 {
@@ -1449,16 +1628,13 @@ namespace Project.UI
 
                 if (this.m_mainLayout is not null)
                 {
-                    this.m_mainLayout.style.display = DisplayStyle.None;
+                    this.m_animation = AnimationType.Hide;
+
+                    this.AnimateLayout();
                 }
             }
             else
             {
-                if (this.m_mainLayout is not null)
-                {
-                    this.m_mainLayout.style.display = DisplayStyle.Flex;
-                }
-
                 if (entity.IsPlayer)
                 {
                     if (this.m_potionLayout is not null)
@@ -1468,7 +1644,7 @@ namespace Project.UI
 
                     if (this.m_interactLayout is not null)
                     {
-                        this.m_potionLayout.style.display = DisplayStyle.Flex;
+                        this.m_interactLayout.style.display = DisplayStyle.Flex;
                     }
 
                     this.m_attackItem = new AttackItem(this);
@@ -1494,7 +1670,7 @@ namespace Project.UI
 
                     if (this.m_interactLayout is not null)
                     {
-                        this.m_potionLayout.style.display = DisplayStyle.None;
+                        this.m_interactLayout.style.display = DisplayStyle.None;
                     }
                 }
 
@@ -1502,6 +1678,13 @@ namespace Project.UI
                 this.DisplayTooltip(null, false);
 
                 this.UpdateInterface();
+
+                if (this.m_mainLayout is not null)
+                {
+                    this.m_animation = AnimationType.Show;
+
+                    this.AnimateLayout();
+                }
             }
         }
 
@@ -1522,6 +1705,11 @@ namespace Project.UI
             // otherwise, provider not null means element that we just entered/left hover-wise
             // display = true means entered an element to tooltip display, display = false otherwise
             // if we want to stop displaying item that already was overwritten, don't do anything
+
+            if (this.m_animation != AnimationType.None)
+            {
+                return; // no tooltip is allowed when we are hiding/showing layout
+            }
 
             if (provider is null)
             {
@@ -1649,6 +1837,73 @@ namespace Project.UI
                 }
             }
         }
+        
+        private void AnimateLayout()
+        {
+            if (this.m_animation != AnimationType.None && this.m_mainLayout is not null)
+            {
+                this.m_mainLayout.pickingMode = PickingMode.Ignore;
+
+                var style = this.m_mainLayout.style;
+
+                if (this.m_animation == AnimationType.Hide)
+                {
+                    float next = style.top.value.value + ms_mainLayoutAnimSpeed * Time.deltaTime;
+
+                    if (next >= ms_finalMainLayoutOffset)
+                    {
+                        style.top = ms_finalMainLayoutOffset;
+
+                        style.display = DisplayStyle.None;
+
+                        this.m_animation = AnimationType.None;
+                    }
+                    else
+                    {
+                        style.top = next;
+                    }
+                }
+                
+                if (this.m_animation == AnimationType.Show)
+                {
+                    style.display = DisplayStyle.Flex;
+
+                    float next = style.top.value.value - ms_mainLayoutAnimSpeed * Time.deltaTime;
+
+                    if (next <= ms_startMainLayoutOffset)
+                    {
+                        style.top = ms_startMainLayoutOffset;
+
+                        this.m_mainLayout.pickingMode = PickingMode.Position;
+
+                        this.m_animation = AnimationType.None;
+                    }
+                    else
+                    {
+                        style.top = next;
+                    }
+                }
+            }
+        }
+
+        private void AnimateAllText()
+        {
+            var animations = this.m_animations;
+            var batOverlay = this.m_battleOverlay;
+
+            if (animations is not null && batOverlay is not null)
+            {
+                for (int i = animations.Count - 1; i >= 0; --i)
+                {
+                    if (!animations[i].Update())
+                    {
+                        batOverlay.RemoveAt(i);
+
+                        animations.RemoveAt(i);
+                    }
+                }
+            }
+        }
 
         public void UpdateInterface()
         {
@@ -1723,6 +1978,13 @@ namespace Project.UI
             this.m_potionSlot1?.SetLocked(false);
             this.m_potionSlot2?.SetLocked(false);
             this.m_potionSlot3?.SetLocked(false);
+
+            this.SelectItem(null);
+        }
+
+        public void AddAnimatedText(string text, float duration, float delay, int size, int width, Color color, Vector2 start, Vector2 end)
+        {
+            this.m_animations?.Add(new AnimatedText(text, duration, delay, size, width, color, start, end, this));
         }
 
         private static float RemapToRange(float value, float inMin, float inMax, float outMin, float outMax)

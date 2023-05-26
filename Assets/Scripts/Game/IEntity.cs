@@ -15,6 +15,8 @@ namespace Project.Game
 
     public interface IEntity
     {
+        Sprite Sprite { get; }
+
         bool IsPlayer { get; }
 
         bool IsAlive { get; }
