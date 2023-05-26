@@ -1,5 +1,6 @@
 using Project.Game;
 using Project.Input;
+using Project.Overworld;
 
 using System;
 
@@ -16,7 +17,10 @@ namespace Project
         private bool m_showAllTrade;
         private bool m_enableMusic;
 
-        public static Main Instance => Main.ms_instance == null ? (Main.ms_instance = Object.FindFirstObjectByType<Main>()) : Main.ms_instance;
+        public static Main Instance =>
+            Main.ms_instance == null
+                ? (Main.ms_instance = Object.FindFirstObjectByType<Main>())
+                : Main.ms_instance;
 
         public bool ShowAllTradeElements
         {
@@ -36,10 +40,7 @@ namespace Project
             TrinketFactory.Initialize();
         }
 
-        private void Update()
-        {
-
-        }
+        private void Update() { }
 
         private void FixedUpdate()
         {
@@ -61,7 +62,7 @@ namespace Project
             if (enable != this.m_enableMusic)
             {
                 this.m_enableMusic = enable;
-
+                this.GetComponent<AudioSource>().enabled = enable;
                 // #TODO enable / disable
             }
         }

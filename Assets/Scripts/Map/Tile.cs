@@ -321,12 +321,12 @@ namespace Project
     {
         public List<Enemy> enemies = new List<Enemy>();
 
-        public BattleInfo(int yValue, List<Enemy> enemies)
+        public BattleInfo(int yValue)
             : base(yValue)
         {
             this.enemies = enemies;
             // TileSprite = ResourceManager.LoadSprite("Sprites/Characters/Dragonborn cleric");
-            SpritePath = "Sprites/Characters/Dragonborn cleric";
+            SpritePath = "Sprites/Battle/Ez";
             tileType = TileType.BattleEasy;
         }
 

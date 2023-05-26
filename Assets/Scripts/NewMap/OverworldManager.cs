@@ -47,7 +47,7 @@ namespace Project.Overworld
 
             List<CellInfo> newCells = new List<CellInfo>();
             newCells.Add(new ShopInfo(0, 1));
-            newCells.Add(new ShopInfo(1, 1));
+            newCells.Add(new BattleInfo(1));
             newCells.Add(new ShopInfo(2, 1));
             newCells.Add(new ShopInfo(3, 1));
             newCells.Add(new ShopInfo(4, 1));
@@ -94,7 +94,7 @@ namespace Project.Overworld
                 newCells.Add(new ShopInfo(0, 1));
                 newCells.Add(new ShopInfo(1, 1));
                 newCells.Add(new ShopInfo(2, 1));
-                newCells.Add(new ShopInfo(3, 1));
+                newCells.Add(new BattleInfo(3));
                 newCells.Add(new ShopInfo(4, 1));
                 destination = false;
                 // Debug.Log("dlksjfslkj");
