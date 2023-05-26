@@ -1,4 +1,5 @@
 ﻿using Project.Game;
+using Project.Input;
 
 using System;
 using System.Collections.Generic;
@@ -1047,10 +1048,13 @@ namespace Project.UI
         {
             private static int ms_uniqueId;
 
-            private readonly Vector2 m_start;
-            private readonly Vector2 m_end;
+            private readonly Vector2 m_trueStart;
+            private readonly Vector2 m_trueEnd;
             private readonly float m_invDuration;
             private readonly float m_duration;
+
+            private Vector2 m_start;
+            private Vector2 m_end;
             private float m_deltaTotal;
 
             public readonly Label Text;
@@ -1096,10 +1100,30 @@ namespace Project.UI
                 style.unityFontStyleAndWeight = FontStyle.Bold;
 
                 builder.m_battleOverlay.Add(this.Text);
+
+                this.m_trueStart = ScreenManager.UnitScreenPointToScreenSpace(start, builder.UI.panelSettings.referenceResolution);
+                this.m_trueEnd = ScreenManager.UnitScreenPointToScreenSpace(end, builder.UI.panelSettings.referenceResolution);
+
+                var bounds = this.Text.layout;
+
+                int breaker = 0;
             }
+
+            private bool m_complete;
 
             public bool Update()
             {
+                //if (!this.m_complete)
+                //{
+                //    var width = this.Text.resolvedStyle.width;
+                //    var heigh = this.Text.resolvedStyle.height;
+                //
+                //    var trueStart = this.m_trueStart;
+                //    var trueEnd = this.m_trueEnd;
+                //
+                //    this.m_complete = true;
+                //}
+
                 var style = this.Text.style;
 
                 if (this.m_deltaTotal < 0.0f)

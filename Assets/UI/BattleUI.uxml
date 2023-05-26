@@ -3,8 +3,8 @@
     <ui:VisualElement name="battle-overlay" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
     <ui:VisualElement name="ui-overlay" picking-mode="Ignore" style="flex-grow: 1; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px;">
         <ui:VisualElement name="button-layout" picking-mode="Ignore" style="flex-direction: row; flex-shrink: 0;">
-            <ui:VisualElement name="back-button" class="upper-button-style" />
-            <ui:VisualElement name="sound-button" class="upper-button-style" style="background-color: rgb(209, 156, 76);" />
+            <ui:VisualElement name="back-button" class="upper-button-style" style="background-image: resource(&apos;UI/Shared/BackButton&apos;); -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: rgba(0, 0, 0, 255);" />
+            <ui:VisualElement name="sound-button" class="upper-button-style" style="background-color: rgb(209, 156, 76); background-image: resource(&apos;UI/Shared/SoundButton&apos;); -unity-background-scale-mode: scale-to-fit;" />
         </ui:VisualElement>
         <ui:VisualElement name="game-layout" picking-mode="Ignore" style="flex-grow: 1; flex-direction: column-reverse; justify-content: flex-start; align-items: center;">
             <ui:VisualElement name="main-layout" picking-mode="Ignore" style="width: 400px; height: 150px; background-color: rgb(189, 146, 82); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-image: resource(&apos;UI/Shared/Vignette&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 0.39); top: 170px; display: none;">

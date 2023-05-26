@@ -210,6 +210,8 @@ namespace Project.UI
 
                 if (this.m_currentAction == ActionType.Battle)
                 {
+                    MapManager.Instance.Unload();
+
                     BattleManager.Instance.StartBattle();
                 }
             });

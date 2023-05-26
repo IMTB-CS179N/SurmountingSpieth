@@ -47,7 +47,22 @@ namespace Project.Battle
 
         public void Load()
         {
-            this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+            if (this.m_overworld == null)
+            {
+                this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+
+                this.m_overworld.name = "Overworld";
+            }
+
+            this.m_overworld.SetActive(true);
+        }
+
+        public void Unload()
+        {
+            if (this.m_overworld != null)
+            {
+                this.m_overworld.SetActive(false);
+            }
         }
 
         public void UpdateAction(InGameBuilder.ActionType action)

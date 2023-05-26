@@ -4,24 +4,24 @@
         <ui:VisualElement name="left-button-layout" picking-mode="Ignore" style="flex-direction: column; width: auto; flex-shrink: 0; align-items: flex-start; justify-content: space-between;">
             <ui:VisualElement name="left-supercontainer" style="flex-direction: row; align-items: flex-start;">
                 <ui:VisualElement name="sound-layout" class="button-style button-layout-style">
-                    <ui:VisualElement name="sound-button" class="button-image-style" />
+                    <ui:VisualElement name="sound-button" class="button-image-style" style="background-image: resource(&apos;UI/Shared/SoundButton&apos;);" />
                 </ui:VisualElement>
                 <ui:VisualElement name="save-layout" class="button-style button-layout-style">
-                    <ui:VisualElement name="save-button" class="button-image-style" />
+                    <ui:VisualElement name="save-button" class="button-image-style" style="background-image: resource(&apos;UI/InGame/SaveButton&apos;);" />
                 </ui:VisualElement>
                 <ui:VisualElement name="debugshop-layout" class="button-layout-style">
-                    <ui:VisualElement name="debugshop-button" class="button-image-style" />
+                    <ui:VisualElement name="debugshop-button" class="button-image-style" style="background-image: resource(&apos;UI/InGame/DebugButton&apos;);" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="back-button" style="flex-shrink: 0; width: 48px; height: 48px; background-image: resource(&apos;UI/Shared/NullItem&apos;);" />
+            <ui:VisualElement name="back-button" style="flex-shrink: 0; width: 48px; height: 48px; background-image: resource(&apos;UI/Shared/BackButton&apos;); -unity-background-image-tint-color: rgba(0, 0, 0, 255);" />
         </ui:VisualElement>
         <ui:VisualElement name="right-button-layout" picking-mode="Ignore" style="flex-direction: column; align-items: flex-end; flex-shrink: 0; justify-content: space-between;">
             <ui:VisualElement name="right-supercontainer" picking-mode="Ignore" style="flex-direction: row-reverse; align-items: center; justify-content: flex-end;">
                 <ui:VisualElement name="inventory-layout" class="button-style button-layout-style">
-                    <ui:VisualElement name="inventory-button" class="button-image-style" />
+                    <ui:VisualElement name="inventory-button" class="button-image-style" style="background-image: resource(&apos;UI/InGame/InventoryButton&apos;);" />
                 </ui:VisualElement>
                 <ui:VisualElement name="money-container" style="flex-direction: row; flex-shrink: 0; align-items: center; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-top-left-radius: 15px; border-bottom-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; background-color: rgb(178, 120, 61);">
-                    <ui:VisualElement name="money-image" style="flex-shrink: 0; width: 32px; height: 32px; background-image: url(&apos;project://database/Packages/com.unity.2d.animation/Editor/Assets/SkinningModule/dotYellow.png?fileID=2800000&amp;guid=173a5eb1d13d68d4ea39f3e5d2c6e2c0&amp;type=3#dotYellow&apos;); margin-left: 3px; margin-right: 3px; margin-top: 3px; margin-bottom: 3px;" />
+                    <ui:VisualElement name="money-image" style="flex-shrink: 0; width: 32px; height: 32px; background-image: resource(&apos;UI/InGame/CoinStackIcon&apos;); margin-left: 3px; margin-right: 3px; margin-top: 3px; margin-bottom: 3px;" />
                     <ui:Label text="$1000" display-tooltip-when-elided="true" name="money-label" style="-unity-font-definition: resource(&apos;Fonts/Thaleah_PixelFont/Materials/ThaleahFat_TTF SDF&apos;); font-size: 24px;" />
                 </ui:VisualElement>
             </ui:VisualElement>

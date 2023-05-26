@@ -52,7 +52,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="back-button" style="flex-shrink: 0; position: absolute; width: 32px; height: 32px; top: 10px; background-image: resource(&apos;UI/Shared/CloseButton&apos;); -unity-background-image-tint-color: rgb(0, 0, 0);" />
+            <ui:VisualElement name="back-button" style="flex-shrink: 0; position: absolute; width: 32px; height: 32px; top: 10px; background-image: resource(&apos;UI/Shared/BackButton&apos;); -unity-background-image-tint-color: rgb(0, 0, 0);" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

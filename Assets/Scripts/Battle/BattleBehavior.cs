@@ -1,8 +1,6 @@
 ﻿using Project.Game;
 using Project.Input;
 
-using Unity.VisualScripting;
-
 using UnityEngine;
 
 namespace Project.Battle
@@ -17,13 +15,20 @@ namespace Project.Battle
             Attacking,
         }
 
+        private const float kOrthoDefault = 0.2f;
+
         private SpriteRenderer m_renderer;
         private BoxCollider2D m_collider;
-
+        private float m_animationSpeed;
+        private float m_maximumScale;
+        private float m_minimumScale;
+        private float m_defaultScale;
+        private Vector2 m_unitPosition;
+        private Vector2 m_topMostPoint;
         private AnimationType m_animation;
-
         private IEntity m_entity;
         private bool m_upsizing;
+        private int m_index;
 
         public IEntity Entity
         {
@@ -44,19 +49,43 @@ namespace Project.Battle
             }
         }
 
-        public int Index;
+        public int Index
+        {
+            get => this.m_index;
+            set => this.m_index = value;
+        }
 
-        public float AnimationSpeed = 0.13f; // 0.2 for player
+        public float AnimationSpeed
+        {
+            get => this.m_animationSpeed / (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+            set => this.m_animationSpeed = value * (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+        }
 
-        public float MaximumScale = 1.00f; // 1.25 for player
+        public float MaximumScale
+        {
+            get => this.m_maximumScale / (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+            set => this.m_maximumScale = value * (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+        }
 
-        public float MinimumScale = 0.90f; // 1.10 for player
+        public float MinimumScale
+        {
+            get => this.m_minimumScale / (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+            set => this.m_minimumScale = value * (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+        }
 
-        public float DefaultScale = 1.00f; // same as max scale typically
+        public float DefaultScale
+        {
+            get => this.m_defaultScale / (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+            set => this.m_defaultScale = value * (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+        }
 
-        public Vector2 UnitPosition; // unit screen scale position
+        public Vector2 UnitPosition
+        {
+            get => this.m_unitPosition;
+            set => this.m_unitPosition = value;
+        }
 
-        public Vector2 TopMostPoint; // for text animations
+        public Vector2 TopMostPoint => this.m_topMostPoint;
 
         public bool NoneIsIdleAnimation;
 
@@ -85,13 +114,6 @@ namespace Project.Battle
             }
         }
 
-        private void ResetScaling()
-        {
-            this.transform.localScale = new Vector3(this.DefaultScale, this.DefaultScale, 1.0f);
-
-            this.m_upsizing = false;
-        }
-
         private void AnimateIdle()
         {
             var transform = this.transform;
@@ -104,22 +126,22 @@ namespace Project.Battle
 
             if (this.m_upsizing)
             {
-                newScale = oldScale.y + this.AnimationSpeed * Time.deltaTime;
+                newScale = oldScale.y + this.m_animationSpeed * Time.deltaTime;
 
-                if (newScale >= this.MaximumScale)
+                if (newScale >= this.m_maximumScale)
                 {
-                    newScale = this.MaximumScale;
+                    newScale = this.m_maximumScale;
 
                     this.m_upsizing = false;
                 }
             }
             else
             {
-                newScale = oldScale.y - this.AnimationSpeed * Time.deltaTime;
+                newScale = oldScale.y - this.m_animationSpeed * Time.deltaTime;
 
-                if (newScale <= this.MinimumScale)
+                if (newScale <= this.m_minimumScale)
                 {
-                    newScale = this.MinimumScale;
+                    newScale = this.m_minimumScale;
 
                     this.m_upsizing = true;
                 }
@@ -142,7 +164,7 @@ namespace Project.Battle
 
         }
 
-        public void Initialize(string name, Vector2 position, float scale)
+        public void Initialize(string name)
         {
             this.gameObject.name = name;
 
@@ -152,19 +174,7 @@ namespace Project.Battle
             this.m_renderer.sortingOrder = 5;
             this.m_renderer.sprite = this.Entity?.Sprite;
 
-            this.DefaultScale = scale;
-            this.UnitPosition = position;
-
-            var worldPosition = ScreenManager.Instance.UnitScreenPointToWorldPosition(position);
-            var localScale = new Vector3(scale, scale, 1.0f);
-            var boundsSize = this.m_renderer.bounds.size;
-
-            this.transform.position = worldPosition;
-            this.transform.localScale = localScale;
-
-            this.m_collider.size = new Vector2(boundsSize.x, boundsSize.y);
-
-            this.TopMostPoint = ScreenManager.Instance.WorldPositionToUnitScreenPoint(worldPosition + new Vector2(0.0f, scale));
+            this.RecalculateTransform();
 
             // #TODO effect children
         }
@@ -173,7 +183,22 @@ namespace Project.Battle
         {
             this.m_animation = type;
 
-            this.ResetScaling();
+            this.RecalculateTransform();
+        }
+
+        public void RecalculateTransform()
+        {
+            var worldPosition = ScreenManager.Instance.UnitScreenPointToWorldPosition(this.m_unitPosition);
+            var localScale = new Vector3(this.m_defaultScale, this.m_defaultScale, 1.0f);
+            var boundsSize = this.m_renderer.bounds.size;
+
+            this.transform.position = worldPosition;
+            this.transform.localScale = localScale;
+            this.m_collider.size = new Vector2(boundsSize.x, boundsSize.y) / (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+
+            this.m_topMostPoint = ScreenManager.Instance.WorldPositionToUnitScreenPoint(worldPosition + new Vector2(0.0f, this.m_defaultScale));
+
+            this.m_upsizing = false;
         }
     }
 }

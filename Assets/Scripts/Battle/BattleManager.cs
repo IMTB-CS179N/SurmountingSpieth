@@ -132,13 +132,14 @@ namespace Project.Battle
             var behavior = GameObject.Instantiate(this.EntityPrefab).GetComponent<BattleBehavior>();
 
             behavior.Entity = this.m_playerEntity;
-
-            behavior.Initialize("Player Object", ms_playerPosition, 1.25f); // player sprites are slightly bigger
-
+            behavior.UnitPosition = ms_playerPosition;
+            behavior.DefaultScale = 1.25f;
             behavior.MaximumScale = 1.25f;
             behavior.MinimumScale = 1.10f;
             behavior.AnimationSpeed = 0.2f;
             behavior.Index = 0;
+
+            behavior.Initialize("Player Object"); // player sprites are slightly bigger
 
             this.m_playerBehavior = behavior;
 
@@ -167,12 +168,14 @@ namespace Project.Battle
                 var behavior = GameObject.Instantiate(this.EntityPrefab).GetComponent<BattleBehavior>();
 
                 behavior.Entity = this.m_enemyEntities[i];
-
-                behavior.Initialize("Enemy Object " + i.ToString(), enemyPositions[i], 1.0f);
-
+                behavior.UnitPosition = enemyPositions[i];
+                behavior.DefaultScale = 1.0f;
                 behavior.MaximumScale = 1.0f;
                 behavior.MinimumScale = 0.9f;
+                behavior.AnimationSpeed = 0.12f;
                 behavior.Index = i;
+
+                behavior.Initialize("Enemy Object " + i.ToString());
 
                 this.m_enemyBehaviors[i] = behavior;
                 this.m_enemyEntities[i].InitBattle();
