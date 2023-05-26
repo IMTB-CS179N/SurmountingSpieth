@@ -19,11 +19,14 @@ namespace Project.Overworld
         GameObject[,] GridTiles = new GameObject[5, 13];
         public GameObject BaseTile;
         public Transform TilesParent;
-        float moveSpeed = 32f;
+
+        // float moveSpeed = 32f;
+        float moveSpeed = 48f;
         public float movePointX;
         public float movePointY;
         public Transform player;
         int currentX = 0;
+        bool destination = false;
 
         List<ColumnInfo> columns = new List<ColumnInfo>();
         ColumnInfo blank = new ColumnInfo();
@@ -45,6 +48,9 @@ namespace Project.Overworld
             newCells.Add(new ShopInfo(0, 1));
             newCells.Add(new ShopInfo(1, 1));
             newCells.Add(new ShopInfo(2, 1));
+            newCells.Add(new ShopInfo(3, 1));
+            newCells.Add(new ShopInfo(4, 1));
+            GenerateLevel(newCells);
             GenerateLevel(newCells);
 
             // Instantiate GameObjects to act as tiles
@@ -81,6 +87,13 @@ namespace Project.Overworld
             {
                 SetMovePoint(moveQueue.Dequeue());
             }
+            else if (!Moving() && moveQueue.Count == 0 && destination)
+            {
+                destination = false;
+                // Debug.Log("dlksjfslkj");
+                int playerY = (int)(player.position.y) / UNIT_SIZE + 2;
+                Debug.Log("Arrived at position " + GridTiles[playerY, 6].transform.position);
+            }
         }
 
         public void SetMovePoint(Vector3 newPos)
@@ -105,6 +118,8 @@ namespace Project.Overworld
 
         public void SetDestination(Vector3 newPos)
         {
+            // UpdateAction(ActionType None) while moving
+
             int tilesX = -(int)TilesParent.position.x / UNIT_SIZE;
             int playerY = (int)player.position.y / UNIT_SIZE;
             int newX = (int)newPos.x / UNIT_SIZE;
@@ -139,6 +154,7 @@ namespace Project.Overworld
             {
                 moveQueue.Enqueue(new Vector3((tilesX + i) * UNIT_SIZE, j * UNIT_SIZE, 0f));
             }
+            destination = true;
         }
 
         void ShiftGameObjects(float delta)

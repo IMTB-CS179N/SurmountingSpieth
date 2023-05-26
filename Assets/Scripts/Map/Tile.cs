@@ -23,7 +23,9 @@ namespace Project
             ForkLeft,
             Crossroads,
             Shop,
-            Battle
+            BattleEasy,
+            BattleMedium,
+            BattleHard
         }
 
         public int yValue { get; set; }
@@ -34,7 +36,7 @@ namespace Project
 
         public bool IsClickable()
         {
-            return (tileType == TileType.Shop || tileType == TileType.Battle);
+            return (tileType == TileType.Shop || tileType == TileType.BattleEasy);
         }
 
         public CellInfo(int yValue)
@@ -77,10 +79,10 @@ namespace Project
             trinkets = new List<Trinket>();
             potions = new List<Potion>();
             armors = new List<Armor>();
-            GenerateWeapons(tier);
-            GenerateTrinkets(tier);
+            // GenerateWeapons(tier);
+            // GenerateTrinkets(tier);
             //GeneratePotions(tier);
-            GenerateArmors(tier);
+            // GenerateArmors(tier);
             SpritePath = "Map/Trade_Post";
             tileType = TileType.Shop;
         }
@@ -325,7 +327,7 @@ namespace Project
             this.enemies = enemies;
             // TileSprite = ResourceManager.LoadSprite("Sprites/Characters/Dragonborn cleric");
             SpritePath = "Sprites/Characters/Dragonborn cleric";
-            tileType = TileType.Battle;
+            tileType = TileType.BattleEasy;
         }
 
         public List<Enemy> GetEnemies()
