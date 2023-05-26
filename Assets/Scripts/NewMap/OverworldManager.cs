@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Project.Input;
+using Project.Battle;
 
 namespace Project.Overworld
 {
@@ -51,7 +52,7 @@ namespace Project.Overworld
             newCells.Add(new ShopInfo(3, 1));
             newCells.Add(new ShopInfo(4, 1));
             GenerateLevel(newCells);
-            GenerateLevel(newCells);
+            // GenerateLevel(newCells);
 
             // Instantiate GameObjects to act as tiles
             for (int i = 0; i < 5; i++)
@@ -89,10 +90,34 @@ namespace Project.Overworld
             }
             else if (!Moving() && moveQueue.Count == 0 && destination)
             {
+                List<CellInfo> newCells = new List<CellInfo>();
+                newCells.Add(new ShopInfo(0, 1));
+                newCells.Add(new ShopInfo(1, 1));
+                newCells.Add(new ShopInfo(2, 1));
+                newCells.Add(new ShopInfo(3, 1));
+                newCells.Add(new ShopInfo(4, 1));
                 destination = false;
                 // Debug.Log("dlksjfslkj");
                 int playerY = (int)(player.position.y) / UNIT_SIZE + 2;
                 Debug.Log("Arrived at position " + GridTiles[playerY, 6].transform.position);
+                GenerateLevel(newCells);
+                SetSprites();
+                switch (this.columns[this.currentX].GetCell(playerY).tileType)
+                {
+                    case CellInfo.TileType.Shop:
+                        MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Enter);
+                        break;
+
+                    case CellInfo.TileType.BattleEasy:
+                    case CellInfo.TileType.BattleMedium:
+                    case CellInfo.TileType.BattleHard:
+                        MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
+                        break;
+
+                    default:
+                        MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
+                        break;
+                }
             }
         }
 

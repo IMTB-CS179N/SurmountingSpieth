@@ -276,6 +276,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a824cd9ebf41fab469505b066673b103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InGameUI: {fileID: 1804606731}
+  OverworldPrefab: {fileID: 410404250774659408, guid: 11cc8fccab17346caa1fc3466cbdd5b7, type: 3}
 --- !u!114 &296547418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -433,7 +435,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 75
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
