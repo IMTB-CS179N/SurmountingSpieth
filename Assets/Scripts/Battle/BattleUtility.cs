@@ -17,6 +17,7 @@ namespace Project.Battle
             public bool Missed;
             public bool Killed;
             public bool Dispel;
+            public bool Stunned;
         }
 
         public bool Cleansed;
@@ -175,6 +176,11 @@ namespace Project.Battle
                                     enemy.RemoveEffectsOfSide(EffectSide.Positive);
 
                                     outcome.EnemyInfos[i].Dispel = true;
+                                }
+
+                                if (enemy.TurnStats.BlockCurrentMove)
+                                {
+                                    outcome.EnemyInfos[i].Stunned = true;
                                 }
                             }
                         }

@@ -3,7 +3,7 @@
     <ui:VisualElement name="battle-overlay" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
     <ui:VisualElement name="ui-overlay" picking-mode="Ignore" style="flex-grow: 1; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px;">
         <ui:VisualElement name="button-layout" picking-mode="Ignore" style="flex-direction: row; flex-shrink: 0;">
-            <ui:VisualElement name="back-button" class="upper-button-style" style="background-image: resource(&apos;UI/Shared/BackButton&apos;); -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: rgba(0, 0, 0, 255);" />
+            <ui:VisualElement name="back-button" class="upper-button-style" style="background-image: resource(&apos;UI/Shared/BackButton&apos;); -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: rgb(0, 0, 0);" />
             <ui:VisualElement name="sound-button" class="upper-button-style" style="background-color: rgb(209, 156, 76); background-image: resource(&apos;UI/Shared/SoundButton&apos;); -unity-background-scale-mode: scale-to-fit;" />
         </ui:VisualElement>
         <ui:VisualElement name="game-layout" picking-mode="Ignore" style="flex-grow: 1; flex-direction: column-reverse; justify-content: flex-start; align-items: center;">
@@ -24,7 +24,7 @@
                     <ui:VisualElement name="interact-layout" style="height: 100%; width: 30%; border-left-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); display: flex;">
                         <ui:VisualElement name="abilities-layout" style="flex-shrink: 1; padding-left: 4px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px; flex-grow: 1; display: flex;">
                             <ui:VisualElement name="abilities-upper" style="width: 100%; height: 50%; flex-shrink: 0; flex-direction: row; justify-content: space-around; align-items: center;">
-                                <ui:VisualElement name="regular-attack-icon" picking-mode="Ignore" class="interact-icon-style" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; background-image: none; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-color: rgb(103, 63, 39);" />
+                                <ui:VisualElement name="regular-attack-icon" picking-mode="Ignore" class="interact-icon-style" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; background-image: resource(&apos;Sprites/Abilities/BasicAttack&apos;); border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-color: rgb(103, 63, 39);" />
                                 <ui:VisualElement name="ability-slot1-icon" picking-mode="Ignore" class="interact-icon-style" style="background-color: rgb(103, 63, 39);">
                                     <ui:Label display-tooltip-when-elided="false" enable-rich-text="false" name="ability-slot1-text" picking-mode="Ignore" class="interact-text-style" />
                                 </ui:VisualElement>

@@ -80,5 +80,10 @@ namespace Project.Input
         {
             return new Vector2(resolution.x * (0.5f * (point.x + 1.0f)), resolution.y * (0.5f * (point.y + 1.0f)));
         }
+
+        public static Vector2 ScreenSpaceToUnitScreenPoint(Vector2 point, Vector2 resolution)
+        {
+            return new Vector2((2.0f * point.x / resolution.x) - 1.0f, (2.0f * point.y / resolution.y) - 1.0f);
+        }
     }
 }

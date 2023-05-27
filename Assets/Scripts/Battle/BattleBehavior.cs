@@ -188,13 +188,17 @@ namespace Project.Battle
 
         public void RecalculateTransform()
         {
+            var localScale = this.transform.localScale;
+
+            localScale.x = Mathf.Clamp(localScale.x, this.m_minimumScale, this.m_maximumScale);
+            localScale.y = Mathf.Clamp(localScale.y, this.m_minimumScale, this.m_maximumScale);
+
             var worldPosition = ScreenManager.Instance.UnitScreenPointToWorldPosition(this.m_unitPosition);
-            var localScale = new Vector3(this.m_defaultScale, this.m_defaultScale, 1.0f);
             var boundsSize = this.m_renderer.bounds.size;
 
             this.transform.position = worldPosition;
             this.transform.localScale = localScale;
-            this.m_collider.size = new Vector2(boundsSize.x, boundsSize.y) / (ScreenManager.Instance.OrthographicSize * kOrthoDefault);
+            this.m_collider.size = new Vector2(boundsSize.x / localScale.x, boundsSize.y / localScale.y);
 
             this.m_topMostPoint = ScreenManager.Instance.WorldPositionToUnitScreenPoint(worldPosition + new Vector2(0.0f, this.m_defaultScale));
 

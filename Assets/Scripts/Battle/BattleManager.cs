@@ -190,6 +190,7 @@ namespace Project.Battle
 
             // here we perform animations where entities move from outside of screen to their corresponding positions
 
+            this.BattleUI.AddHealthIndicator();
 
 
             this.m_playerBehavior.PlayAnimation(BattleBehavior.AnimationType.Idle);
@@ -221,7 +222,19 @@ namespace Project.Battle
 
             yield return null;
 
-            // #TODO prepare for the current move
+            int healthDifference = this.m_playerEntity.EntityStats.CurHealth;
+            int manaDifference = this.m_playerEntity.EntityStats.CurMana;
+
+            this.m_playerEntity.Cooldown();
+
+            this.BattleUI.UpdateInterface();
+
+            // #TODO UPDATE HEALTH BARS HERE
+
+            healthDifference -= this.m_playerEntity.EntityStats.CurHealth;
+            manaDifference -= this.m_playerEntity.EntityStats.CurMana;
+
+            this.TryAddAllyTextInformation(this.m_playerBehavior, false, -healthDifference, -manaDifference);
 
             this.BattleUI.UnlockActions();
 
@@ -230,7 +243,7 @@ namespace Project.Battle
                 this.m_enemyEntities[i].InitTurn();
             }
 
-            // #TODO more ???
+            yield return null;
 
             while (true)
             {
@@ -281,7 +294,7 @@ namespace Project.Battle
                     {
                         var outcome = BattleUtility.Attack(this.m_playerEntity, this.m_enemyEntities, attackedIndex, this.m_abilityIndex);
 
-                        this.TryAddAllyTextInformation(this.m_playerBehavior, outcome.Cleansed, outcome.HealReceived);
+                        this.TryAddAllyTextInformation(this.m_playerBehavior, outcome.Cleansed, outcome.HealReceived, 0);
 
                         for (int i = 0; i < outcome.EnemyInfos.Length; ++i)
                         {
@@ -289,7 +302,7 @@ namespace Project.Battle
 
                             if (info.Engaged)
                             {
-                                this.TryAddEnemyTextInformation(this.m_enemyBehaviors[i], info.Dispel, info.Missed, info.DamageDealt);
+                                this.TryAddEnemyTextInformation(this.m_enemyBehaviors[i], info.Dispel, info.Stunned, info.Missed, info.DamageDealt);
                             }
 
                             if (info.Killed)
@@ -298,13 +311,13 @@ namespace Project.Battle
                             }
                         }
 
-                        // #TODO UPDATE HEALTH BARS HERE
-
                         this.BattleUI.ConfirmActionFinished();
 
                         this.BattleUI.UpdateInterface();
 
                         this.BattleUI.LockActions();
+
+                        // #TODO UPDATE HEALTH BARS HERE
 
                         break;
                     }
@@ -334,8 +347,6 @@ namespace Project.Battle
                 yield return null;
             }
 
-            yield return new WaitForSeconds(1.0f);
-
             bool isSomeoneAlive = false;
 
             for (int i = 0; i < this.m_enemyEntities.Length; ++i)
@@ -361,10 +372,6 @@ namespace Project.Battle
 
                 yield break;
             }
-
-            this.m_playerEntity.Cooldown(); // #TODO any health ++ display as a result of effect affections
-
-            this.BattleUI.UpdateInterface();
 
             // #TODO some other stuff
 
@@ -400,9 +407,11 @@ namespace Project.Battle
 
             this.m_playerEntity.ApplyDamage(5);
 
-            this.BattleUI.UpdateInterface(); 
+            this.BattleUI.UpdateInterface();
 
-            this.TryAddEnemyTextInformation(this.m_playerBehavior, false, false, 5);
+            // #TODO UPDATE HEALTH BARS HERE
+
+            this.TryAddEnemyTextInformation(this.m_playerBehavior, false, false, false, 5);
 
             yield return new WaitForSeconds(1.0f);
 
@@ -424,6 +433,8 @@ namespace Project.Battle
                 this.BattleUI.OnCancelInteractRequest += OnCancelInteractRequest;
 
                 this.BattleUI.OnExitRequest += OnExitRequest;
+
+                ScreenManager.Instance.OnScreenResolutionChanged += OnScreenResolutionChanged;
             }
             else
             {
@@ -436,6 +447,8 @@ namespace Project.Battle
                 this.BattleUI.OnCancelInteractRequest -= OnCancelInteractRequest;
 
                 this.BattleUI.OnExitRequest -= OnExitRequest;
+
+                ScreenManager.Instance.OnScreenResolutionChanged -= OnScreenResolutionChanged;
             }
 
             void OnUseAttackRequest()
@@ -476,7 +489,10 @@ namespace Project.Battle
                     }
 
                     this.BattleUI.ConfirmActionFinished();
+
                     this.BattleUI.UpdateInterface();
+
+                    // #TODO UPDATE HEALTH BARS HERE
                 }
             }
 
@@ -493,43 +509,76 @@ namespace Project.Battle
 
                 this.BattleUI.CurrentEntity = null;
             }
+
+            void OnScreenResolutionChanged()
+            {
+                if (this.m_playerBehavior != null)
+                {
+                    this.m_playerBehavior.RecalculateTransform();
+                }
+
+                if (this.m_enemyBehaviors is not null)
+                {
+                    for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
+                    {
+                        if (this.m_enemyBehaviors[i] != null)
+                        {
+                            this.m_enemyBehaviors[i].RecalculateTransform();
+                        }
+                    }
+                }
+            }
         }
 
-        private void TryAddAllyTextInformation(BattleBehavior behavior, bool cleansed, int healAmount)
+        private void TryAddAllyTextInformation(BattleBehavior behavior, bool cleansed, int healAmount, int manaAmount)
         {
             float delay = 0.0f;
 
             if (cleansed)
             {
-                this.BattleUI.AddAnimatedText("CLEANSED", 2.0f, delay, 30, 1, new Color32(0, 255, 255, 255), behavior.UnitPosition, behavior.TopMostPoint);
+                this.BattleUI.AddAnimatedText("CLEANSED", 1.4f, delay, 30, 1, new Color32(0, 255, 255, 255), behavior.UnitPosition, behavior.TopMostPoint);
 
                 delay += 1.0f;
             }
 
             if (healAmount > 0)
             {
-                this.BattleUI.AddAnimatedText("+" + healAmount.ToString(), 2.0f, delay, 60, 2, new Color32(0, 200, 0, 255), behavior.UnitPosition, behavior.TopMostPoint);
+                this.BattleUI.AddAnimatedText("+" + healAmount.ToString(), 1.4f, delay, 60, 2, new Color32(0, 200, 0, 255), behavior.UnitPosition, behavior.TopMostPoint);
+
+                delay += 1.0f;
+            }
+
+            if (manaAmount > 0)
+            {
+                this.BattleUI.AddAnimatedText("+" + manaAmount.ToString(), 1.4f, delay, 60, 2, new Color(0, 128, 255, 255), behavior.UnitPosition, behavior.TopMostPoint);
             }
         }
 
-        private void TryAddEnemyTextInformation(BattleBehavior behavior, bool dispel, bool missed, int damageDealt)
+        private void TryAddEnemyTextInformation(BattleBehavior behavior, bool dispel, bool stunned, bool missed, int damageDealt)
         {
             float delay = 0.0f;
 
             if (dispel)
             {
-                this.BattleUI.AddAnimatedText("DISPELLED", 2.0f, delay, 30, 1, new Color32(255, 0, 255, 255), behavior.UnitPosition, behavior.TopMostPoint);
+                this.BattleUI.AddAnimatedText("DISPELLED", 1.4f, delay, 30, 1, new Color32(255, 0, 255, 255), behavior.UnitPosition, behavior.TopMostPoint);
+
+                delay += 1.0f;
+            }
+
+            if (stunned)
+            {
+                this.BattleUI.AddAnimatedText("STUNNED", 1.4f, delay, 30, 1, new Color(215, 215, 215, 255), behavior.UnitPosition, behavior.TopMostPoint);
 
                 delay += 1.0f;
             }
 
             if (missed)
             {
-                this.BattleUI.AddAnimatedText("MISSED", 2.0f, delay, 30, 1, new Color(215, 215, 215, 255), behavior.UnitPosition, behavior.TopMostPoint);
+                this.BattleUI.AddAnimatedText("MISSED", 1.4f, delay, 30, 1, new Color(215, 215, 215, 255), behavior.UnitPosition, behavior.TopMostPoint);
             }
             else
             {
-                this.BattleUI.AddAnimatedText("-" + damageDealt.ToString(), 2.0f, delay, 60, 2, new Color(200, 0, 0, 255), behavior.UnitPosition, behavior.TopMostPoint);
+                this.BattleUI.AddAnimatedText("-" + damageDealt.ToString(), 1.4f, delay, 60, 2, new Color(200, 0, 0, 255), behavior.UnitPosition, behavior.TopMostPoint);
             }
         }
     }
