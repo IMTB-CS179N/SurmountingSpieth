@@ -4,6 +4,9 @@ using UnityEngine;
 using Project.Game;
 using System.Linq;
 
+
+
+
 namespace Project
 {
     public class CellInfo
@@ -319,9 +322,25 @@ namespace Project
 
     public class BattleInfo : CellInfo
     {
-        public List<Enemy> enemies = new List<Enemy>();
+        //0-3 would be pre midpoint boss
+        //4-7 would be post midpoint boss
+        //8 is 180W, 9 is Craig
 
+<<<<<<< Updated upstream
         public BattleInfo(int yValue)
+=======
+
+
+        public BattleInfo (int yValue, List<EncounterData> CampaignEncountersCSV)
+            : base(yValue)
+            {
+                
+
+            }
+
+        /*
+        public BattleInfo(int yValue, List<Enemy> enemies)
+>>>>>>> Stashed changes
             : base(yValue)
         {
             this.enemies = enemies;
@@ -334,6 +353,10 @@ namespace Project
         {
             return enemies;
         }
+        */
+
+        
+
     }
 
     public class ColumnInfo
@@ -398,3 +421,6 @@ namespace Project
         }
     }
 }
+
+
+

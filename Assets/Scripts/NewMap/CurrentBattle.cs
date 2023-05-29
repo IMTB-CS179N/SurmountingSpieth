@@ -13,7 +13,7 @@ namespace Project
                 ? (ms_instance = FindFirstObjectByType<CurrentBattle>())
                 : ms_instance;
         BattleInfo currentBattle;
-        List<Enemy> enemies;
+        //List<EncounterData> enemies;
 
         // Start is called before the first frame update
         void Start() { }
@@ -24,7 +24,7 @@ namespace Project
         public void SetBattle(BattleInfo newBattle)
         {
             currentBattle = newBattle;
-            enemies = currentBattle.GetEnemies();
+            //enemies = currentBattle.Enemies;
         }
     }
 }
