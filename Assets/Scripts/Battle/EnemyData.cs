@@ -2,7 +2,7 @@ using Project.Input;
 using System;
 using UnityEngine;
 
-namespace Project.Battle{
+namespace Project{
 public class EnemyData : IDisposable
 {
 
