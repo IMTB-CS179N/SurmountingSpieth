@@ -1,5 +1,4 @@
 ﻿using Project.Game;
-using Project.Input;
 
 using System;
 using System.Collections.Generic;
@@ -1121,17 +1120,38 @@ namespace Project.UI
 
         private class HealthIndicator
         {
+            private const float kLayoutWidth = 10.0f; // technically width and height should not matter since overflow
+            private const float kLayoutHeight = 10.0f; // context solves all issues, but we need it for precise calcs
+
             private static int ms_uniqueId;
+
+            private Vector2 m_currentPosition;
+
+            public readonly IEntity Entity;
 
             public readonly ProgressBar Bar;
 
-            public HealthIndicator(BattleBuilder builder)
+            public readonly VisualElement Layout;
+
+            public readonly Func<Vector2> Fetcher;
+
+            public HealthIndicator(Func<Vector2> fetcher, IEntity entity, BattleBuilder builder)
             {
                 IStyle style;
 
+                this.Entity = entity;
+                this.Fetcher = fetcher;
+                this.m_currentPosition = new Vector2(Single.NaN, Single.NaN);
+
+                this.Layout = new VisualElement()
+                {
+                    name = "health-indicator-layout-" + ms_uniqueId.ToString(),
+                    pickingMode = PickingMode.Ignore,
+                };
+
                 this.Bar = new ProgressBar()
                 {
-                    name = "health-indicator-" + ms_uniqueId++.ToString(),
+                    name = "health-indicator-bar-" + ms_uniqueId++.ToString(),
                     pickingMode = PickingMode.Ignore,
                     title = String.Empty,
                     lowValue = 0.0f,
@@ -1139,12 +1159,16 @@ namespace Project.UI
                     value = 50.0f,
                 };
 
-                style = this.Bar.style;
+                style = this.Layout.style;
 
-                style.left = new StyleLength(new Length(50.0f, LengthUnit.Percent));
-                style.bottom = new StyleLength(new Length(50.0f, LengthUnit.Percent));
+                style.position = Position.Absolute;
+                style.width = new StyleLength(new Length(kLayoutWidth, LengthUnit.Percent));
+                style.height = new StyleLength(new Length(kLayoutHeight, LengthUnit.Percent));
 
-                style.width = new StyleLength(new Length(10.0f, LengthUnit.Percent)); // hmmmmmmm
+                style.flexGrow = 0.0f;
+                style.flexShrink = 0.0f;
+                style.alignItems = Align.Center;
+                style.justifyContent = Justify.Center;
 
                 this.Bar.AddToClassList("health-indicator__container");
                 this.Bar.AddToClassList("health-indicator__background");
@@ -1152,12 +1176,36 @@ namespace Project.UI
                 this.Bar.AddToClassList("health-indicator__title");
                 this.Bar.AddToClassList("health-indicator");
 
-                builder.m_battleOverlay.Add(this.Bar);
+                this.Layout.Add(this.Bar);
+
+                builder.m_battleOverlay.Add(this.Layout);
+
+                this.Update();
             }
 
-            public void Update(float value, float low, float high)
+            public void Update()
             {
-                // #TODO
+                var position = this.Fetcher();
+
+                float x = (position.x + 1.0f) * 50.0f - (kLayoutWidth * 0.5f);
+                float y = (position.y + 1.0f) * 50.0f - (kLayoutHeight * 0.5f);
+
+                if (this.m_currentPosition.x != x || this.m_currentPosition.y != y)
+                {
+                    this.m_currentPosition = new Vector2(x, y); // perform update ONLY if changed
+
+                    this.Layout.style.left = new StyleLength(new Length(x, LengthUnit.Percent));
+                    this.Layout.style.bottom = new StyleLength(new Length(y, LengthUnit.Percent));
+                }
+
+                ref readonly var stats = ref this.Entity.EntityStats;
+
+                var value = RemapToRange(stats.CurHealth, 0.0f, stats.MaxHealth, 0.0f, 100.0f);
+
+                if (this.Bar.value != value)
+                {
+                    this.Bar.value = value; // perform update ONLY if changed
+                }
             }
         }
 
@@ -1173,6 +1221,7 @@ namespace Project.UI
             private readonly Vector2 m_end;
             private readonly float m_invDuration;
             private readonly float m_duration;
+            private readonly float m_alphaMul;
             private float m_deltaTotal;
 
             public readonly Label Text;
@@ -1185,6 +1234,7 @@ namespace Project.UI
                 this.m_duration = duration;
                 this.m_invDuration = 1.0f / duration;
                 this.m_deltaTotal = -delay;
+                this.m_alphaMul = 1.0f / (duration - (duration / kDelayBeforeAlpha));
 
                 this.Text = new Label(text)
                 {
@@ -1252,11 +1302,15 @@ namespace Project.UI
 
                     if (this.m_deltaTotal * kDelayBeforeAlpha > this.m_duration)
                     {
+                        float alpha = this.m_alphaMul * (this.m_duration - this.m_deltaTotal);
+
                         var color = this.Text.style.color.value;
 
-                        color.a = kDelayBeforeAlpha * (this.m_duration - this.m_deltaTotal) * this.m_invDuration;
+                        color.a = alpha;
 
                         this.Text.style.color = color;
+
+                        this.Text.style.unityTextOutlineColor = new Color(0.0f, 0.0f, 0.0f, alpha);
                     }
 
                     return true;
@@ -1280,6 +1334,11 @@ namespace Project.UI
         private const string kBattleOverlay = "battle-overlay";
         private const string kBackButton = "back-button";
         private const string kSoundButton = "sound-button";
+        private const string kTurnLabel = "turn-label";
+
+        private const string kGameOverOverlay = "gameover-overlay";
+        private const string kOutcomeLabel = "outcome-label";
+        private const string kRewardText = "reward-text";
 
         private const string kMainLayout = "main-layout";
         private const string kTooltipLayout = "tooltip-layout";
@@ -1414,6 +1473,8 @@ namespace Project.UI
         private VisualElement m_potionLayout;
         private VisualElement m_mainLayout;
 
+        private Label m_turnLabel;
+
         private VisualElement m_soundButton;
         private bool m_soundPressed;
         
@@ -1455,8 +1516,7 @@ namespace Project.UI
         {
             this.OnUIEnabled += this.OnEnableEvent;
             this.OnUIDisabled += this.OnDisableEvent;
-            this.OnUIUpdate += this.AnimateLayout;
-            this.OnUIUpdate += this.AnimateAllText;
+            this.OnUIUpdate += this.AnimateAll;
 
             this.OnUseAttackRequest += LockAll;
             this.OnUseAbilityRequest += LockAllIndexed;
@@ -1507,6 +1567,7 @@ namespace Project.UI
         {
             this.SetupBackButton();
             this.SetupSoundButton();
+            this.SetupTurnLabel();
             this.SetupLayouts();
             this.SetupStatistics();
             this.SetupEffectList();
@@ -1532,6 +1593,8 @@ namespace Project.UI
 
             this.m_soundButton = null;
             this.m_soundPressed = false;
+
+            this.m_turnLabel = null;
 
             this.m_mainLayout = null;
             this.m_potionLayout = null;
@@ -1664,6 +1727,11 @@ namespace Project.UI
             }
         }
 
+        private void SetupTurnLabel()
+        {
+            this.m_turnLabel = this.UI.rootVisualElement.Q<Label>(kTurnLabel);
+        }
+
         private void SetupLayouts()
         {
             var root = this.UI.rootVisualElement;
@@ -1792,7 +1860,7 @@ namespace Project.UI
                 {
                     this.m_animation = AnimationType.Hide;
 
-                    this.AnimateLayout();
+                    this.AnimateAll();
                 }
             }
             else
@@ -1845,7 +1913,7 @@ namespace Project.UI
                 {
                     this.m_animation = AnimationType.Show;
 
-                    this.AnimateLayout();
+                    this.AnimateAll();
                 }
             }
         }
@@ -2000,7 +2068,7 @@ namespace Project.UI
             }
         }
         
-        private void AnimateLayout()
+        private void AnimateAll()
         {
             if (this.m_animation != AnimationType.None && this.m_mainLayout is not null)
             {
@@ -2046,29 +2114,39 @@ namespace Project.UI
                     }
                 }
             }
-        }
 
-        private void AnimateAllText()
-        {
             var animations = this.m_animations;
-            var batOverlay = this.m_battleOverlay;
 
-            if (animations is not null && batOverlay is not null)
+            if (animations is not null)
             {
                 for (int i = animations.Count - 1; i >= 0; --i)
                 {
-                    if (!animations[i].Update())
+                    var animation = animations[i];
+
+                    if (!animation.Update())
                     {
-                        batOverlay.RemoveAt(i);
+                        animation.Text.RemoveFromHierarchy();
 
                         animations.RemoveAt(i);
                     }
+                }
+            }
+
+            var indicators = this.m_indicators;
+
+            if (indicators is not null)
+            {
+                for (int i = indicators.Count - 1; i >= 0; --i)
+                {
+                    indicators[i].Update();
                 }
             }
         }
 
         public void UpdateInterface()
         {
+            // #TODO handle tooltip update since we redo tons of stuff
+
             if (this.m_effectContainer is not null)
             {
                 this.m_effectList.Clear();
@@ -2149,9 +2227,68 @@ namespace Project.UI
             this.m_animations?.Add(new AnimatedText(text, duration, delay, size, width, color, start, end, this));
         }
 
-        public void AddHealthIndicator()
+        public void AddHealthIndicator(Func<Vector2> positionFetcher, IEntity entity)
         {
-            this.m_indicators?.Add(new HealthIndicator(this));
+            this.m_indicators?.Add(new HealthIndicator(positionFetcher, entity, this));
+        }
+
+        public void RemoveHealthIndicator(IEntity entity)
+        {
+            var indicators = this.m_indicators;
+
+            if (indicators is not null)
+            {
+                for (int i = 0; i < indicators.Count; ++i)
+                {
+                    var indicator = indicators[i];
+
+                    if (indicator.Entity == entity)
+                    {
+                        indicator.Layout.RemoveFromHierarchy();
+
+                        indicators.RemoveAt(i);
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void UpdateTurnLabel(string text, Color color)
+        {
+            if (this.m_turnLabel is not null)
+            {
+                this.m_turnLabel.text = text;
+                this.m_turnLabel.style.color = color;
+            }
+        }
+
+        public void ShowGameOverOverlay(string outcomeText, string rewardText, Color outcomeColor)
+        {
+            var overlay = this.UI.rootVisualElement.Q<VisualElement>(kGameOverOverlay);
+
+            if (overlay is not null)
+            {
+                overlay.style.display = DisplayStyle.Flex;
+
+                var outcomeLabel = overlay.Q<Label>(kOutcomeLabel);
+
+                if (outcomeLabel is not null)
+                {
+                    outcomeLabel.text = outcomeText;
+
+                    outcomeLabel.style.color = outcomeColor;
+                }
+
+                var rewardLabel = overlay.Q<Label>(kRewardText);
+
+                if (rewardLabel is not null)
+                {
+                    rewardLabel.text = rewardText;
+
+                    rewardLabel.style.color = Color.white;
+                }
+            }
         }
 
         private static float RemapToRange(float value, float inMin, float inMax, float outMin, float outMax)

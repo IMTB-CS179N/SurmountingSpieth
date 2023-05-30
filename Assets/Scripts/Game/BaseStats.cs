@@ -6,20 +6,6 @@ using UnityEngine;
 
 namespace Project.Game
 {
-    public struct EntityStats
-    {
-        public int MaxHealth;
-        public int MaxMana;
-        public int CurHealth;
-        public int CurMana;
-        public int Armor;
-        public int Damage;
-        public float Evasion;
-        public float Precision;
-        public float CritChance;
-        public float CritMultiplier;
-    }
-
     public class BaseStats : IDisposable
     {
         private Sprite m_sprite;

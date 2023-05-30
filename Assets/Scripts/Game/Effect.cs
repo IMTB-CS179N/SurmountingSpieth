@@ -11,7 +11,6 @@ namespace Project.Game
         IsImmediate,
         ModifyStats,
         AffectStats,
-        SuperEffect,
     }
 
     public enum EffectSide
@@ -27,6 +26,7 @@ namespace Project.Game
         private readonly EffectSide m_side;
         private readonly Sprite m_sprite;
         private readonly string m_description;
+        private readonly string m_status;
         private readonly string m_name;
         private readonly float m_value;
         private int m_remainingDuration;
@@ -43,13 +43,15 @@ namespace Project.Game
 
         public string Name => this.m_name;
 
+        public string Status => this.m_status;
+
         public string Description => this.m_description;
 
         public Sprite Sprite => this.m_sprite;
 
-        public Effect(EffectType type, EffectSide side, float value, int duration, string name, string description, string spritePath)
+        public Effect(EffectType type, EffectSide side, float value, int duration, string name, string status, string description, string spritePath)
         {
-            if ((type == EffectType.IsImmediate || type == EffectType.SuperEffect) && duration != 0)
+            if (type == EffectType.IsImmediate && duration != 0)
             {
                 throw new Exception("Immediate and Super effects cannot have non-zero duration");
             }
@@ -59,43 +61,40 @@ namespace Project.Game
             this.m_value = value;
             this.m_remainingDuration = duration;
             this.m_name = name ?? String.Empty;
+            this.m_status = status ?? String.Empty;
             this.m_description = description ?? String.Empty;
             this.m_sprite = ResourceManager.LoadSprite(spritePath);
         }
 
-        protected virtual void AffectStatsInternal(ref EntityStats stats)
+        protected virtual void AffectStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
         }
 
-        protected virtual void ModifyStatsInternal(ref EntityStats stats)
+        protected virtual void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
         }
 
-        protected virtual void ApplyAllNowInternal(ref EntityStats stats)
+        protected virtual void ApplyAllNowInternal(ref EntityStats entity, ref TurnStats turn)
         {
         }
 
-        protected virtual void SuperEffectInternal(ref TurnStats stats)
-        {
-        }
-
-        public void ModifyStats(ref EntityStats stats)
+        public void ModifyStats(ref EntityStats entity, ref TurnStats turn)
         {
             if (this.m_type == EffectType.ModifyStats)
             {
-                this.ModifyStatsInternal(ref stats);
+                this.ModifyStatsInternal(ref entity, ref turn);
             }
         }
 
-        public void ApplyImmediate(ref EntityStats stats)
+        public void ApplyImmediate(ref EntityStats entity, ref TurnStats turn)
         {
             if (this.m_type == EffectType.IsImmediate)
             {
-                this.ApplyAllNowInternal(ref stats);
+                this.ApplyAllNowInternal(ref entity, ref turn);
             }
         }
 
-        public void Cooldown(ref EntityStats stats)
+        public void Cooldown(ref EntityStats entity, ref TurnStats turn)
         {
             if (this.IsLasting)
             {
@@ -103,16 +102,8 @@ namespace Project.Game
 
                 if (this.m_type == EffectType.AffectStats)
                 {
-                    this.AffectStatsInternal(ref stats);
+                    this.AffectStatsInternal(ref entity, ref turn);
                 }
-            }
-        }
-
-        public void SuperAffect(ref TurnStats stats)
-        {
-            if (this.m_type == EffectType.SuperEffect)
-            {
-                this.SuperEffectInternal(ref stats);
             }
         }
 
@@ -128,17 +119,20 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/PoisonEffect";
 
-        public PoisonEffect(float value, int duration, in EntityStats initial) : base(EffectType.AffectStats, EffectSide.Negative, value * initial.Damage, duration, EffectName, GetDescription(value * initial.Damage, duration), SpritePath)
+        public PoisonEffect(float value, int duration, in EntityStats initial) : base(EffectType.AffectStats, EffectSide.Negative, value * initial.Damage, duration, EffectName, String.Empty, GetDescription(value * initial.Damage, duration), SpritePath)
         {
         }
 
-        protected override void AffectStatsInternal(ref EntityStats stats)
+        protected override void AffectStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.CurHealth -= (int)this.Value;
-
-            if (stats.CurHealth < 0)
+            if (entity.CurHealth > 0)
             {
-                stats.CurHealth = 0;
+                entity.CurHealth -= (int)this.Value;
+
+                if (entity.CurHealth < 1)
+                {
+                    entity.CurHealth = 1;
+                }
             }
         }
 
@@ -164,17 +158,17 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/BurnEffect";
 
-        public BurnEffect(float value, int duration, in EntityStats initial) : base(EffectType.AffectStats, EffectSide.Negative, value * initial.Damage, duration, EffectName, GetDescription(value * initial.Damage, duration), SpritePath)
+        public BurnEffect(float value, int duration, in EntityStats initial) : base(EffectType.AffectStats, EffectSide.Negative, value * initial.Damage, duration, EffectName, String.Empty, GetDescription(value * initial.Damage, duration), SpritePath)
         {
         }
 
-        protected override void AffectStatsInternal(ref EntityStats stats)
+        protected override void AffectStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.CurHealth -= (int)this.Value;
+            entity.CurHealth -= (int)this.Value;
 
-            if (stats.CurHealth < 0)
+            if (entity.CurHealth < 0)
             {
-                stats.CurHealth = 0;
+                entity.CurHealth = 0;
             }
         }
 
@@ -200,17 +194,17 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/ShredEffect";
 
-        public ShredEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Negative, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public ShredEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Negative, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Armor -= (int)(stats.Armor * this.Value);
+            entity.Armor -= (int)(entity.Armor * this.Value);
 
-            if (stats.Armor < 0)
+            if (entity.Armor < 0)
             {
-                stats.Armor = 0;
+                entity.Armor = 0;
             }
         }
 
@@ -236,13 +230,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/EmpowerEffect";
 
-        public EmpowerEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public EmpowerEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Damage += (int)this.Value;
+            entity.Damage += (int)this.Value;
         }
 
         private static string GetDescription(float value, int duration)
@@ -267,13 +261,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/AmplifyEffect";
 
-        public AmplifyEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public AmplifyEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Damage += (int)(stats.Damage * this.Value);
+            entity.Damage += (int)(entity.Damage * this.Value);
         }
 
         private static string GetDescription(float value, int duration)
@@ -298,23 +292,23 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/HealingEffect";
 
-        public HealingEffect(float value) : base(EffectType.IsImmediate, EffectSide.Neutral, value, 0, EffectName, GetDescription(value), SpritePath)
+        public HealingEffect(float value) : base(EffectType.IsImmediate, EffectSide.Neutral, value, 0, EffectName, String.Empty, GetDescription(value), SpritePath)
         {
         }
 
-        protected override void ApplyAllNowInternal(ref EntityStats stats)
+        protected override void ApplyAllNowInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.CurHealth += (int)this.Value;
+            entity.CurHealth += (int)(entity.MaxHealth * this.Value);
 
-            if (stats.CurHealth > stats.MaxHealth)
+            if (entity.CurHealth > entity.MaxHealth)
             {
-                stats.CurHealth = stats.MaxHealth;
+                entity.CurHealth = entity.MaxHealth;
             }
         }
 
         private static string GetDescription(float value)
         {
-            return $"Restores {value} health points immediately.";
+            return $"Restores {value * 100.0f}% health points immediately.";
         }
 
         public static void RegisterForFactory()
@@ -334,23 +328,23 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/SurgeEffect";
 
-        public SurgeEffect(float value) : base(EffectType.IsImmediate, EffectSide.Neutral, value, 0, EffectName, GetDescription(value), SpritePath)
+        public SurgeEffect(float value) : base(EffectType.IsImmediate, EffectSide.Neutral, value, 0, EffectName, String.Empty, GetDescription(value), SpritePath)
         {
         }
 
-        protected override void ApplyAllNowInternal(ref EntityStats stats)
+        protected override void ApplyAllNowInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.CurMana += (int)this.Value;
+            entity.CurMana += (int)(entity.MaxMana * this.Value);
 
-            if (stats.CurMana > stats.MaxMana)
+            if (entity.CurMana > entity.MaxMana)
             {
-                stats.CurMana = stats.MaxMana;
+                entity.CurMana = entity.MaxMana;
             }
         }
 
         private static string GetDescription(float value)
         {
-            return $"Restores {value} mana points immediately.";
+            return $"Restores {value * 100.0f}% mana points immediately.";
         }
 
         public static void RegisterForFactory()
@@ -370,23 +364,23 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/RegenerationEffect";
 
-        public RegenerationEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public RegenerationEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void AffectStatsInternal(ref EntityStats stats)
+        protected override void AffectStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.CurHealth += (int)this.Value;
+            entity.CurHealth += (int)(entity.MaxHealth * this.Value);
 
-            if (stats.CurHealth > stats.MaxHealth)
+            if (entity.CurHealth > entity.MaxHealth)
             {
-                stats.CurHealth = stats.MaxHealth;
+                entity.CurHealth = entity.MaxHealth;
             }
         }
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Regenerates health for {value} points per turn over {duration} turns.";
+            return $"Regenerates {value * 100.0f}% health points per turn over {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -406,23 +400,23 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/RenewalEffect";
 
-        public RenewalEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public RenewalEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void AffectStatsInternal(ref EntityStats stats)
+        protected override void AffectStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.CurMana += (int)this.Value;
+            entity.CurMana += (int)(entity.MaxMana * this.Value);
 
-            if (stats.CurMana > stats.MaxMana)
+            if (entity.CurMana > entity.MaxMana)
             {
-                stats.CurMana = stats.MaxMana;
+                entity.CurMana = entity.MaxMana;
             }
         }
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Regenerates mana for {value} points per turn over {duration} turns.";
+            return $"Regenerates {value * 100.0f}% mana points per turn over {duration} turns.";
         }
 
         public static void RegisterForFactory()
@@ -442,17 +436,17 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/WeakenEffect";
 
-        public WeakenEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public WeakenEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Damage -= (int)(this.Value * stats.Damage);
+            entity.Damage -= (int)(this.Value * entity.Damage);
 
-            if (stats.Damage < 0)
+            if (entity.Damage < 0)
             {
-                stats.Damage = 0;
+                entity.Damage = 0;
             }
         }
 
@@ -478,17 +472,17 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/LethalityEffect";
 
-        public LethalityEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public LethalityEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.CritChance += this.Value;
+            entity.CritChance += this.Value;
 
-            if (stats.CritChance > 1.0f)
+            if (entity.CritChance > 1.0f)
             {
-                stats.CritChance = 1.0f;
+                entity.CritChance = 1.0f;
             }
         }
 
@@ -514,13 +508,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/ShatterEffect";
 
-        public ShatterEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public ShatterEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.CritMultiplier += this.Value;
+            entity.CritMultiplier += this.Value;
         }
 
         private static string GetDescription(float value, int duration)
@@ -545,17 +539,17 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/SlowEffect";
 
-        public SlowEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public SlowEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Evasion -= this.Value;
+            entity.Evasion -= this.Value;
 
-            if (stats.Evasion < 0.0f)
+            if (entity.Evasion < 0.0f)
             {
-                stats.Evasion = 0.0f;
+                entity.Evasion = 0.0f;
             }
         }
 
@@ -581,17 +575,17 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/DizzynessEffect";
 
-        public DizzynessEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public DizzynessEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Precision -= this.Value;
+            entity.Precision -= this.Value;
 
-            if (stats.Precision < 0.0f)
+            if (entity.Precision < 0.0f)
             {
-                stats.Precision = 0.0f;
+                entity.Precision = 0.0f;
             }
         }
 
@@ -617,17 +611,17 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/FlowEffect";
 
-        public FlowEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public FlowEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Evasion += this.Value;
+            entity.Evasion += this.Value;
 
-            if (stats.Evasion > 1.0f)
+            if (entity.Evasion > 1.0f)
             {
-                stats.Evasion = 1.0f;
+                entity.Evasion = 1.0f;
             }
         }
 
@@ -653,13 +647,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/SharpnessEffect";
 
-        public SharpnessEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public SharpnessEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Precision += this.Value;
+            entity.Precision += this.Value;
         }
 
         private static string GetDescription(float value, int duration)
@@ -684,13 +678,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/BarricadeEffect";
 
-        public BarricadeEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, GetDescription(value, duration), SpritePath)
+        public BarricadeEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Positive, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
-        protected override void ModifyStatsInternal(ref EntityStats stats)
+        protected override void ModifyStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.Armor += (int)(stats.Armor * this.Value);
+            entity.Armor += (int)(entity.Armor * this.Value);
         }
 
         private static string GetDescription(float value, int duration)
@@ -715,13 +709,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/CleanseEffect";
 
-        public CleanseEffect() : base(EffectType.SuperEffect, EffectSide.Neutral, 0.0f, 0, EffectName, GetDescription(), SpritePath)
+        public CleanseEffect() : base(EffectType.IsImmediate, EffectSide.Neutral, 0.0f, 0, EffectName, "CLEANSED", GetDescription(), SpritePath)
         {
         }
 
-        protected override void SuperEffectInternal(ref TurnStats stats)
+        protected override void ApplyAllNowInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.RemoveNegativeEffects = true;
+            turn.RemoveNegativeEffects = true;
         }
 
         private static string GetDescription()
@@ -746,13 +740,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/DispelEffect";
 
-        public DispelEffect() : base(EffectType.SuperEffect, EffectSide.Neutral, 0.0f, 0, EffectName, GetDescription(), SpritePath)
+        public DispelEffect() : base(EffectType.IsImmediate, EffectSide.Neutral, 0.0f, 0, EffectName, "DISPELLED", GetDescription(), SpritePath)
         {
         }
 
-        protected override void SuperEffectInternal(ref TurnStats stats)
+        protected override void ApplyAllNowInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.RemovePositiveEffects = true;
+            turn.RemovePositiveEffects = true;
         }
 
         private static string GetDescription()
@@ -777,13 +771,13 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/StunEffect";
 
-        public StunEffect() : base(EffectType.SuperEffect, EffectSide.Neutral, 0.0f, 0, EffectName, GetDescription(), SpritePath)
+        public StunEffect() : base(EffectType.AffectStats, EffectSide.Neutral, 0.0f, 1, EffectName, "STUNNED", GetDescription(), SpritePath)
         {
         }
 
-        protected override void SuperEffectInternal(ref TurnStats stats)
+        protected override void AffectStatsInternal(ref EntityStats entity, ref TurnStats turn)
         {
-            stats.BlockCurrentMove = true;
+            turn.BlockCurrentMove = true;
         }
 
         private static string GetDescription()

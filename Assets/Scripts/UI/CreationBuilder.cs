@@ -533,9 +533,7 @@ namespace Project.UI
 
                 Player.Initialize(race, @class);
 
-                MapManager.Instance.Load();
-
-                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+                MapManager.Instance.LoadInGame();
             }
         }
 

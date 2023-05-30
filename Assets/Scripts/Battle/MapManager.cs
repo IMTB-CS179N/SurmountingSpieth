@@ -1,11 +1,5 @@
 ﻿using Project.UI;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using UnityEngine;
 
 namespace Project.Battle
@@ -24,7 +18,7 @@ namespace Project.Battle
         [SerializeField]
         private GameObject OverworldPrefab;
 
-        private void Start()
+        private void Awake()
         {
             if (this.InGameUI == null)
             {
@@ -37,32 +31,39 @@ namespace Project.Battle
             }
         }
 
-        private void Update()
+        public void LoadInGame()
         {
-        }
-
-        private void FixedUpdate()
-        {
-        }
-
-        public void Load()
-        {
-            if (this.m_overworld == null)
+            UIManager.Instance.TransitionWithDelay(() =>
             {
-                this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+                if (this.m_overworld == null)
+                {
+                    this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
 
-                this.m_overworld.name = "Overworld";
-            }
+                    this.m_overworld.name = "Overworld";
+                }
 
-            this.m_overworld.SetActive(true);
+                this.m_overworld.SetActive(true);
+
+                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+            }, null, 2.0f);
         }
 
-        public void Unload()
+        public void ReturnToMain()
         {
-            if (this.m_overworld != null)
+            UIManager.Instance.TransitionWithDelay(() =>
             {
-                this.m_overworld.SetActive(false);
-            }
+                if (this.m_overworld != null)
+                {
+                    this.m_overworld.SetActive(false);
+                }
+
+                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
+            }, null, 2.0f);
+        }
+
+        public void StartBattle()
+        {
+
         }
 
         public void UpdateAction(InGameBuilder.ActionType action)

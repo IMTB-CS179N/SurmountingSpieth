@@ -91,10 +91,10 @@ namespace Project.Game
     {
         private readonly static string[] ms_cowNames = new string[]
         {
-            "1_Gray_Raster_Cow",
-            "1_Red_Raster_Cow",
-            "1_Blue_Raster_Cow",
-            "1_Green_Raster_Cow",
+            "GrayRasterCow",
+            "RedRasterCow",
+            "BlueRasterCow",
+            "GreenRasterCow",
         };
 
         private readonly List<Effect> m_effects;
@@ -108,6 +108,8 @@ namespace Project.Game
         public bool IsPlayer => false;
 
         public bool IsAlive => this.m_stats.CurHealth > 0;
+
+        public bool IsMelee => true;
 
         public ref readonly EntityStats EntityStats => ref this.m_stats;
 
@@ -167,7 +169,7 @@ namespace Project.Game
 
             for (int i = 0; i < this.m_effects.Count; ++i)
             {
-                this.m_effects[i].ModifyStats(ref this.m_stats);
+                this.m_effects[i].ModifyStats(ref this.m_stats, ref this.m_turn);
             }
 
             this.m_stats.CurMana = 0;
@@ -190,6 +192,80 @@ namespace Project.Game
         public void InitTurn()
         {
             this.m_turn = default;
+        }
+
+        public void Cooldown(out int totalHeal, out int totalMana, out int totalDmgs)
+        {
+            int count = this.m_effects.Count;
+
+            for (int i = 0; i < this.m_abilities.Length; ++i)
+            {
+                this.m_abilities[i].Cooldown();
+            }
+
+            totalHeal = 0;
+            totalMana = 0;
+            totalDmgs = 0;
+
+            // positive, then neutral, then negative
+
+            for (int i = this.m_effects.Count - 1; i >= 0; --i)
+            {
+                var effect = this.m_effects[i];
+
+                if (effect.Side == EffectSide.Positive)
+                {
+                    int curHealth = this.m_stats.CurHealth;
+
+                    effect.Cooldown(ref this.m_stats, ref this.m_turn);
+
+                    totalHeal += this.m_stats.CurHealth - curHealth;
+
+                    if (!effect.IsLasting)
+                    {
+                        this.m_effects.RemoveAt(i);
+                    }
+                }
+            }
+
+            for (int i = this.m_effects.Count - 1; i >= 0; --i)
+            {
+                var effect = this.m_effects[i];
+
+                if (effect.Side == EffectSide.Neutral)
+                {
+                    effect.Cooldown(ref this.m_stats, ref this.m_turn);
+
+                    if (!effect.IsLasting)
+                    {
+                        this.m_effects.RemoveAt(i);
+                    }
+                }
+            }
+
+            for (int i = this.m_effects.Count - 1; i >= 0; --i)
+            {
+                var effect = this.m_effects[i];
+
+                if (effect.Side == EffectSide.Negative)
+                {
+                    int curHealth = this.m_stats.CurHealth;
+
+                    effect.Cooldown(ref this.m_stats, ref this.m_turn);
+
+                    totalDmgs += curHealth - this.m_stats.CurHealth;
+
+                    if (!effect.IsLasting)
+                    {
+                        this.m_effects.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (count > this.m_effects.Count)
+            {
+                this.RecalculateStats();
+            }
         }
 
 
@@ -251,13 +327,7 @@ namespace Project.Game
 
                 if (effect.Type == EffectType.IsImmediate)
                 {
-                    effect.ApplyImmediate(ref this.m_stats);
-
-                    this.m_effects.RemoveAt(i);
-                }
-                else if (effect.Type == EffectType.SuperEffect)
-                {
-                    effect.SuperAffect(ref this.m_turn);
+                    effect.ApplyImmediate(ref this.m_stats, ref this.m_turn);
 
                     this.m_effects.RemoveAt(i);
                 }

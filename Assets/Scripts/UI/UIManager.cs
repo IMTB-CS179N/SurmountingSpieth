@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Runtime.CompilerServices;
+
+using UnityEngine;
 
 using Object = UnityEngine.Object;
 
@@ -41,6 +44,9 @@ namespace Project.UI
 
         [SerializeField]
         private UIBuilder TradeUI;
+
+        [SerializeField]
+        private UIBuilder TransitionUI;
 
         private void Awake()
         {
@@ -100,6 +106,15 @@ namespace Project.UI
             {
                 Debug.LogWarning("Trade UI is not attached to the UI manager!");
             }
+
+            if (this.TransitionUI != null)
+            {
+                this.TransitionUI.UI.enabled = false;
+            }
+            else
+            {
+                Debug.LogWarning("Transition UI is not attached to the UI manager!");
+            }
         }
 
         private void Update()
@@ -128,6 +143,21 @@ namespace Project.UI
         public void PerformScreenChange(ScreenType type)
         {
             this.m_nextType = type;
+        }
+
+        public void BeginTransitioning(Action callback)
+        {
+            Unsafe.As<TransitionBuilder>(this.TransitionUI).BeginTransition(callback);
+        }
+
+        public void EndTransitioning(Action callback)
+        {
+            Unsafe.As<TransitionBuilder>(this.TransitionUI).EndTransition(callback);
+        }
+
+        public void TransitionWithDelay(Action onBeginTransitionFinished, Action onEndTransitionFinished, float delay)
+        {
+            Unsafe.As<TransitionBuilder>(this.TransitionUI).TransitionWithDelay(onBeginTransitionFinished, onEndTransitionFinished, delay);
         }
 
         public UIBuilder GetUI(ScreenType type)

@@ -15,6 +15,14 @@ namespace Project
 
         public static readonly string DefaultSpritePath = "Sprites/Shared/DEFAULT_SPRITE";
 
+        public static readonly string EnemyCursorPath = "Cursors/EnemyCursor";
+
+        public static readonly string PlayerCursorPath = "Cursors/PlayerCursor";
+
+        public static readonly string TargetCursorPath = "Cursors/TargetCursor";
+
+        public static readonly string DefaultCursorPath = "Cursors/DefaultCursor";
+
         public static readonly string ArmorDataPath = "Data/Armor.csv";
 
         public static readonly string WeaponDataPath = "Data/Weapons.csv";
@@ -48,12 +56,25 @@ namespace Project
         private static RaceInfo[] ms_races;
         private static BaseStats[] ms_stats;
 
+        private static Texture2D ms_defaultCursor;
+        private static Texture2D ms_targetCursor;
+        private static Texture2D ms_playerCursor;
+        private static Texture2D ms_enemyCursor;
+
         private static Texture2D ms_defaultTexture;
         private static Sprite ms_defaultSprite;
 
         public static Texture2D DefaultTexture => ms_defaultTexture == null ? (ms_defaultTexture = Resources.Load<Texture2D>(DefaultTexturePath)) : ms_defaultTexture;
 
         public static Sprite DefaultSprite => ms_defaultSprite == null ? (ms_defaultSprite = Resources.Load<Sprite>(DefaultSpritePath)) : ms_defaultSprite;
+
+        public static Texture2D EnemyCursor => ms_enemyCursor == null ? (ms_enemyCursor = Resources.Load<Texture2D>(EnemyCursorPath)) : ms_enemyCursor;
+
+        public static Texture2D PlayerCursor => ms_playerCursor == null ? (ms_playerCursor = Resources.Load<Texture2D>(PlayerCursorPath)) : ms_playerCursor;
+
+        public static Texture2D TargetCursor => ms_targetCursor == null ? (ms_targetCursor = Resources.Load<Texture2D>(TargetCursorPath)) : ms_targetCursor;
+
+        public static Texture2D DefaultCursor => ms_defaultCursor == null ? (ms_defaultCursor = Resources.Load<Texture2D>(DefaultCursorPath)) : ms_defaultCursor;
 
         public static IReadOnlyList<BaseStats> Stats => ms_stats ??= AssetParser.ParseFromCSV<BaseStats>(CharacterDataPath, true);
 

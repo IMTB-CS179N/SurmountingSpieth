@@ -56,6 +56,8 @@ namespace Project.Game
 
         public bool IsAlive => this.m_stats.CurHealth > 0;
 
+        public bool IsMelee => true;
+
         public ref readonly EntityStats EntityStats => ref this.m_stats;
 
         public ref readonly TurnStats TurnStats => ref this.m_turn;
@@ -212,7 +214,7 @@ namespace Project.Game
 
             for (int i = 0; i < this.m_effects.Count; ++i)
             {
-                this.m_effects[i].ModifyStats(ref this.m_stats);
+                this.m_effects[i].ModifyStats(ref this.m_stats, ref this.m_turn);
             }
 
             this.m_stats.CurHealth = Mathf.Clamp(this.m_stats.CurHealth, 0, this.m_stats.MaxHealth);
@@ -293,7 +295,7 @@ namespace Project.Game
             this.m_turn = default;
         }
 
-        public void Cooldown()
+        public void Cooldown(out int totalHeal, out int totalMana, out int totalDmgs)
         {
             int count = this.m_effects.Count;
 
@@ -302,15 +304,64 @@ namespace Project.Game
                 this.m_abilities[i].Cooldown();
             }
 
+            totalHeal = 0;
+            totalMana = 0;
+            totalDmgs = 0;
+
+            // positive, then neutral, then negative
+
             for (int i = this.m_effects.Count - 1; i >= 0; --i)
             {
                 var effect = this.m_effects[i];
 
-                effect.Cooldown(ref this.m_stats);
-
-                if (!effect.IsLasting)
+                if (effect.Side == EffectSide.Positive)
                 {
-                    this.m_effects.RemoveAt(i);
+                    int curHealth = this.m_stats.CurHealth;
+                    int curMana = this.m_stats.CurMana;
+
+                    effect.Cooldown(ref this.m_stats, ref this.m_turn);
+
+                    totalHeal += this.m_stats.CurHealth - curHealth;
+                    totalMana += this.m_stats.CurMana - curMana;
+
+                    if (!effect.IsLasting)
+                    {
+                        this.m_effects.RemoveAt(i);
+                    }
+                }
+            }
+
+            for (int i = this.m_effects.Count - 1; i >= 0; --i)
+            {
+                var effect = this.m_effects[i];
+
+                if (effect.Side == EffectSide.Neutral)
+                {
+                    effect.Cooldown(ref this.m_stats, ref this.m_turn);
+
+                    if (!effect.IsLasting)
+                    {
+                        this.m_effects.RemoveAt(i);
+                    }
+                }
+            }
+
+            for (int i = this.m_effects.Count - 1; i >= 0; --i)
+            {
+                var effect = this.m_effects[i];
+
+                if (effect.Side == EffectSide.Negative)
+                {
+                    int curHealth = this.m_stats.CurHealth;
+
+                    effect.Cooldown(ref this.m_stats, ref this.m_turn);
+
+                    totalDmgs += curHealth - this.m_stats.CurHealth;
+
+                    if (!effect.IsLasting)
+                    {
+                        this.m_effects.RemoveAt(i);
+                    }
                 }
             }
 
@@ -332,14 +383,14 @@ namespace Project.Game
 
                 if (effect.Type == EffectType.IsImmediate)
                 {
-                    effect.ApplyImmediate(ref this.m_stats);
+                    effect.ApplyImmediate(ref this.m_stats, ref this.m_turn);
                 }
-                else // #TODO is cleanse potion, handle super
+                else
                 {
                     this.m_effects.Add(effect);
-
-                    this.RecalculateStats();
                 }
+
+                this.RecalculateStats();
             }
         }
 
@@ -422,13 +473,7 @@ namespace Project.Game
 
                 if (effect.Type == EffectType.IsImmediate)
                 {
-                    effect.ApplyImmediate(ref this.m_stats);
-
-                    this.m_effects.RemoveAt(i);
-                }
-                else if (effect.Type == EffectType.SuperEffect)
-                {
-                    effect.SuperAffect(ref this.m_turn);
+                    effect.ApplyImmediate(ref this.m_stats, ref this.m_turn);
 
                     this.m_effects.RemoveAt(i);
                 }

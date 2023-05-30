@@ -170,17 +170,6 @@
     background-color: rgb(209, 156, 76);
 }
 
-.health-indicator {
-    height: 10px;
-    flex-shrink: 0;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    position: absolute;
-    width: 10%;
-}
-
 .health-indicator__container .unity-progress-bar__container {
     max-height: none;
     min-height: auto;
@@ -217,11 +206,12 @@
     padding-bottom: 0;
 }
 
-.entity-bar {
+.health-indicator {
     width: 80px;
     height: 10px;
     margin-left: 0;
     margin-right: 0;
     margin-top: 0;
     margin-bottom: 0;
+    flex-shrink: 0;
 }

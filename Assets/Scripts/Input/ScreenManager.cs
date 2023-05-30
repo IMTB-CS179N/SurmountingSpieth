@@ -10,6 +10,10 @@ namespace Project.Input
     {
         private static ScreenManager ms_instance;
 
+        private Texture2D m_cursorTexture;
+        private CursorMode m_cursorMode;
+        private Vector2 m_cursorOrigin;
+
         private float m_screenHeight;
         private float m_screenWidth;
         private Camera m_camera;
@@ -21,6 +25,8 @@ namespace Project.Input
         public float Height => this.m_screenHeight;
 
         public float OrthographicSize => this.m_camera.orthographicSize;
+
+        public Texture2D CursorTexture => this.m_cursorTexture;
 
         public event Action OnScreenResolutionChanged;
 
@@ -42,6 +48,20 @@ namespace Project.Input
                 this.m_screenHeight = height;
 
                 this.OnScreenResolutionChanged?.Invoke();
+            }
+        }
+
+        public void SetCursorTexture(Texture2D cursorTexture, Vector2 origin, CursorMode mode = CursorMode.Auto)
+        {
+            if (this.m_cursorTexture != cursorTexture || this.m_cursorOrigin != origin || this.m_cursorMode != mode)
+            {
+                this.m_cursorTexture = cursorTexture;
+
+                this.m_cursorOrigin = origin;
+
+                this.m_cursorMode = mode;
+
+                Cursor.SetCursor(cursorTexture, origin, mode);
             }
         }
 
