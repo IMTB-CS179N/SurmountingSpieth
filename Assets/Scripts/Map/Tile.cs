@@ -326,9 +326,12 @@ namespace Project
         //4-7 would be post midpoint boss
         //8 is 180W, 9 is Craig
 
+<<<<<<< Updated upstream
+        public BattleInfo(int yValue)
+=======
 
 
-        public BattleInfo (int yValue)
+        public BattleInfo (int yValue, List<EncounterData> CampaignEncountersCSV)
             : base(yValue)
             {
                 
@@ -337,6 +340,7 @@ namespace Project
 
         /*
         public BattleInfo(int yValue, List<Enemy> enemies)
+>>>>>>> Stashed changes
             : base(yValue)
         {
             this.enemies = enemies;
