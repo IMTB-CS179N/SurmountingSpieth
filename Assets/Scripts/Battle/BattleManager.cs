@@ -9,6 +9,8 @@ using System.Collections;
 
 using UnityEngine;
 
+using Object = UnityEngine.Object;
+
 namespace Project.Battle
 {
     public class BattleManager : MonoBehaviour
@@ -20,6 +22,13 @@ namespace Project.Battle
             PlayerMove,
             EnemyMove,
             FinishBattle,
+        }
+
+        public enum BattleOutcome
+        {
+            Exit,
+            Victory,
+            Defeat,
         }
 
         private static readonly Vector2[][] ms_enemyPositions = new Vector2[][]
@@ -56,6 +65,7 @@ namespace Project.Battle
         private static BattleManager ms_instance;
 
         private GameObject m_background;
+        private Action m_onBattleEnded;
 
         private BattleBehavior[] m_enemyBehaviors;
         private BattleBehavior m_playerBehavior;
@@ -63,6 +73,7 @@ namespace Project.Battle
         private Enemy[] m_enemyEntities;
         private Player m_playerEntity;
 
+        private BattleOutcome m_outcome;
         private BattleState m_state;
         private int m_abilityIndex;
 
@@ -77,7 +88,9 @@ namespace Project.Battle
 
         public static BattleManager Instance => ms_instance == null ? (ms_instance = FindFirstObjectByType<BattleManager>()) : ms_instance;
 
-        public void StartBattle()
+        public BattleOutcome Outcome => this.m_state == BattleState.FinishBattle ? this.m_outcome : throw new Exception("Cannot decide battle outcome when it is not finished");
+
+        public void StartBattle(Player player, Enemy[] enemies, Action onBattleStarted, Action onBattleEnded)
         {
             if (this.m_state != BattleState.None)
             {
@@ -89,34 +102,71 @@ namespace Project.Battle
                 throw new Exception("Cannot start battle because Battle UI is null!");
             }
 
+            if (player is null)
+            {
+                throw new ArgumentNullException(nameof(player));
+            }
+
+            if (enemies is null)
+            {
+                throw new ArgumentNullException(nameof(enemies));
+            }
+
+            this.m_state = BattleState.StartBattle;
+            this.m_outcome = BattleOutcome.Exit;
+
             this.m_forceExit = false;
+            this.m_onBattleEnded = onBattleEnded;
+            this.m_playerEntity = player;
+            this.m_enemyEntities = enemies;
+            this.m_abilityIndex = -2;
 
             this.SetupCallbacks(true);
 
-            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Battle);
-
-            this.InitializePlayer();
-            this.InitializeEnemies();
-
             this.BattleUI.LockActions();
 
-            this.m_currentRoutine = this.StartCoroutine(this.PerformBattleStart());
+            this.m_currentRoutine = this.StartCoroutine(this.PerformBattleStart(onBattleStarted));
         }
 
         public void FinishBattle()
         {
+            this.BattleUI.LockActions();
+            this.BattleUI.CurrentEntity = null;
+
             if (this.m_currentRoutine != null)
             {
                 this.StopCoroutine(this.m_currentRoutine);
             }
 
-            // #TODO CLEAN UP ALL OF IT
+            this.MaybeChangeCursorTexture(true);
+            this.SetupCallbacks(false);
+
+            Object.Destroy(this.m_background);
+            Object.Destroy(this.m_playerBehavior.gameObject);
+
+            if (this.m_enemyBehaviors is not null)
+            {
+                for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
+                {
+                    Object.Destroy(this.m_enemyBehaviors[i].gameObject);
+                }
+            }
+
+            this.m_background = null;
+            this.m_playerEntity = null;
+            this.m_enemyEntities = null;
+            this.m_playerBehavior = null;
+            this.m_enemyBehaviors = null;
+            this.m_forceExit = false;
+            this.m_abilityIndex = -2;
+            this.m_onBattleEnded = null;
+            this.m_currentRoutine = null;
+            this.m_state = BattleState.None;
+            this.m_outcome = BattleOutcome.Exit;
         }
 
         private void InitializePlayer()
         {
-            this.m_playerEntity = Player.Instance;
-
             var behavior = GameObject.Instantiate(this.EntityPrefab).GetComponent<BattleBehavior>();
 
             behavior.UnitOrigin = ms_playerPosition;
@@ -136,20 +186,9 @@ namespace Project.Battle
 
         private void InitializeEnemies()
         {
-#if DEFAULT_ENEMIES
-            this.m_enemyEntities = new Enemy[UnityEngine.Random.Range(1, 5)];
-
-            for (int i = 0; i < this.m_enemyEntities.Length; ++i)
-            {
-                this.m_enemyEntities[i] = Enemy.CreateDefaultEnemy();
-            }
-            
-            this.m_enemyBehaviors = new BattleBehavior[this.m_enemyEntities.Length];
-#else
-            this.m_enemyEntities = Array.Empty<Enemy>(); // #TODO from world map
-            this.m_enemyBehaviors = Array.Empty<BattleBehavior>(); // #TODO from world map
-#endif
             var enemyPositions = ms_enemyPositions[this.m_enemyEntities.Length];
+
+            this.m_enemyBehaviors = new BattleBehavior[this.m_enemyEntities.Length];
 
             for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
             {
@@ -170,53 +209,87 @@ namespace Project.Battle
             }
         }
 
-        private IEnumerator PerformBattleStart()
+        private void InitializeBackground()
+        {
+            // #TODO
+        }
+
+        private IEnumerator PerformBattleStart(Action callback)
         {
             this.m_state = BattleState.StartBattle;
 
             yield return null;
 
-            // here we perform animations where entities move from outside of screen to their corresponding positions
+            this.InitializeBackground();
+
+            yield return null;
+
+            this.InitializePlayer();
+
+            yield return null;
+
+            this.InitializeEnemies();
+
+            yield return null;
 
             this.BattleUI.AddHealthIndicator(this.m_playerBehavior.GetPositionForHealthIndicator, this.m_playerEntity);
 
-            this.m_playerBehavior.PlayAnimation(BattleBehavior.AnimationType.Idle);
+            yield return null;
 
             for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
             {
                 this.BattleUI.AddHealthIndicator(this.m_enemyBehaviors[i].GetPositionForHealthIndicator, this.m_enemyEntities[i]);
+            }
 
+            this.m_playerBehavior.PlayAnimation(BattleBehavior.AnimationType.Idle);
+
+            yield return null;
+
+            for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
+            {
                 this.m_enemyBehaviors[i].PlayAnimation(BattleBehavior.AnimationType.Idle);
             }
 
+            yield return null;
+
             this.m_currentRoutine = this.StartCoroutine(this.PerformPlayerMove());
+
+            callback?.Invoke();
         }
 
-        private IEnumerator PerformBattleFinal(bool forced)
+        private IEnumerator PerformBattleFinal(BattleOutcome outcome)
         {
             this.m_state = BattleState.FinishBattle;
+
+            this.m_outcome = outcome;
+
+            this.BattleUI.LockActions();
 
             yield return null;
 
             this.MaybeChangeCursorTexture(true);
 
-            this.SetupCallbacks(false);
+            this.BattleUI.CurrentEntity = null;
 
-            if (!forced)
+            yield return null;
+
+            if (outcome != BattleOutcome.Exit)
             {
-                if (this.m_playerEntity.IsAlive)
+                if (outcome == BattleOutcome.Victory)
                 {
-                    this.BattleUI.ShowGameOverOverlay("VICTORY", "REWARD: $100", new Color32(255, 220, 0, 255));
+                    this.BattleUI.ShowGameOverOverlay("VICTORY", "REWARD: $100", new Color32(255, 220, 0, 255)); // #TODO actual reward for winning
                 }
                 else
                 {
-                    this.BattleUI.ShowGameOverOverlay("DEFEAT", "REWARD: $5", new Color32(180, 0, 0, 255));
+                    this.BattleUI.ShowGameOverOverlay("DEFEAT", "REWARD: $5", new Color32(180, 0, 0, 255)); // #TODO actual reward for losing
                 }
+
+                yield return new WaitForSeconds(5.0f);
             }
 
-            // #TODO more
+            Debug.Log($"Finished the battle; outcome = {outcome}");
 
-            Debug.Log($"Finished the battle; forced stop was = {forced}");
+            this.m_onBattleEnded?.Invoke();
         }
 
         private IEnumerator PerformPlayerMove()
@@ -227,7 +300,7 @@ namespace Project.Battle
             // check if force exit was requested
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -253,7 +326,7 @@ namespace Project.Battle
             // check if force exit was requested
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -315,7 +388,7 @@ namespace Project.Battle
                 // in the meantime, if force exit was requested, exit
                 if (this.m_forceExit)
                 {
-                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                     yield break;
                 }
@@ -339,7 +412,7 @@ namespace Project.Battle
             // if player is no longer alive and death animation finished playing, exit non-forcefully
             if (!this.m_playerEntity.IsAlive)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(false));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Defeat));
 
                 yield break;
             }
@@ -362,7 +435,7 @@ namespace Project.Battle
                 // in the meantime, if force exit was requested, exit
                 if (this.m_forceExit)
                 {
-                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                     yield break;
                 }
@@ -440,7 +513,7 @@ namespace Project.Battle
             // if forced exit was requested, quit now
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -457,7 +530,7 @@ namespace Project.Battle
                     // in the meantime, if forced exit was requested, quit now
                     if (this.m_forceExit)
                     {
-                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                         yield break;
                     }
@@ -485,7 +558,7 @@ namespace Project.Battle
             // if forced exit is requested, quit
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -566,7 +639,7 @@ namespace Project.Battle
                 // in the meantime, if forced exit was requested, quit the battle
                 if (this.m_forceExit)
                 {
-                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                     yield break;
                 }
@@ -593,7 +666,7 @@ namespace Project.Battle
             // check as always if forced exit was requested (this is required every frame, yes)
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -610,7 +683,7 @@ namespace Project.Battle
                     // if force exit was requested, quit
                     if (this.m_forceExit)
                     {
-                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                         yield break;
                     }
@@ -638,7 +711,7 @@ namespace Project.Battle
             // check if force exit was requested
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -667,7 +740,7 @@ namespace Project.Battle
             // if no enemies are alive, we can exit the battle now non-forcefully
             if (!isSomeoneAlive)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(false));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Victory));
 
                 yield break;
             }
@@ -678,7 +751,7 @@ namespace Project.Battle
             // we check last time if forced exit was requested
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -704,7 +777,7 @@ namespace Project.Battle
             // check if force exit was requested
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -727,7 +800,7 @@ namespace Project.Battle
             // check if force exit was requested
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }
@@ -795,7 +868,7 @@ namespace Project.Battle
                 // if forced exit was requested, quit the battle
                 if (this.m_forceExit)
                 {
-                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                     yield break;
                 }
@@ -834,7 +907,7 @@ namespace Project.Battle
             // if no enemies are alive, we can exit the battle now non-forcefully
             if (!isSomeoneAlive)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(false));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Victory));
 
                 yield break;
             }
@@ -845,13 +918,40 @@ namespace Project.Battle
             // technically this should never be the case, but ensure
             if (!this.m_playerEntity.IsAlive)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(false));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Defeat));
 
                 yield break;
             }
 
             // initialize player turn for this move
             this.m_playerEntity.InitTurn();
+
+            // we should wait before first enemy moves as well
+            float delay = 0.0f;
+
+            // loop until enough time passes so that first enemy can attack
+            while (delay < kWaitTimeBeforeEnemyMoves)
+            {
+                // if we want to forcefully exit, do it
+                if (this.m_forceExit)
+                {
+                    this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
+
+                    yield break;
+                }
+
+                // otherwise update cursor texture
+                this.MaybeChangeCursorTexture(false);
+
+                // as well as currently displayed entity
+                this.MaybeChangeEntityDisplayed();
+
+                // increment time passed
+                delay += Time.deltaTime;
+
+                // and wait for next frame
+                yield return null;
+            }
 
             // now, we iterate over all ALIVE and NOT stunned enemies and perform attack, as long as player is still alive that is
             for (int i = 0; i < this.m_enemyEntities.Length; ++i)
@@ -866,7 +966,7 @@ namespace Project.Battle
                     // ensure that no forced exit was requested in the meantime
                     if (this.m_forceExit)
                     {
-                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                         yield break;
                     }
@@ -895,7 +995,7 @@ namespace Project.Battle
                             // if forced exit was requested, quit the battle
                             if (this.m_forceExit)
                             {
-                                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                                 yield break;
                             }
@@ -923,7 +1023,7 @@ namespace Project.Battle
                     // if forced exit was requested, exit the battle
                     if (this.m_forceExit)
                     {
-                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                         yield break;
                     }
@@ -994,7 +1094,7 @@ namespace Project.Battle
                         // in the meantime, if forced exit was requested, quit
                         if (this.m_forceExit)
                         {
-                            this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                            this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                             yield break;
                         }
@@ -1021,7 +1121,7 @@ namespace Project.Battle
                     // if forced exit was requested, quit the battle
                     if (this.m_forceExit)
                     {
-                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                         yield break;
                     }
@@ -1038,7 +1138,7 @@ namespace Project.Battle
                             // if forced exit was requested, exit accordingly
                             if (this.m_forceExit)
                             {
-                                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                                 yield break;
                             }
@@ -1066,7 +1166,7 @@ namespace Project.Battle
                     // if playe is no longer alive, we exit the battle non-forcefully (no need for other enemies to perform attacks anymore since no more targets)
                     if (!this.m_playerEntity.IsAlive)
                     {
-                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(false));
+                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Defeat));
 
                         yield break;
                     }
@@ -1074,7 +1174,7 @@ namespace Project.Battle
                     // if forced exit was requested, quit the battle
                     if (this.m_forceExit)
                     {
-                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                        this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                         yield break;
                     }
@@ -1097,7 +1197,7 @@ namespace Project.Battle
                         // if forced exit was requested, abort the battle
                         if (this.m_forceExit)
                         {
-                            this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                            this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                             yield break;
                         }
@@ -1129,7 +1229,7 @@ namespace Project.Battle
             // note: playe SHOULD be alive at this point b/c we would've game over-ed either before previous loop or during it
             if (this.m_forceExit)
             {
-                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(true));
+                this.m_currentRoutine = this.StartCoroutine(this.PerformBattleFinal(BattleOutcome.Exit));
 
                 yield break;
             }

@@ -187,6 +187,13 @@ namespace Project.Game
 
             this.m_stats.CurHealth = this.m_stats.MaxHealth;
             this.m_stats.CurMana = this.m_stats.MaxMana;
+
+            this.m_effects.Clear();
+
+            for (int i = 0; i < this.m_abilities.Length; ++i)
+            {
+                this.m_abilities[i].Reset();
+            }
         }
 
         public void InitTurn()

@@ -1,4 +1,7 @@
-﻿using Project.UI;
+﻿using Project.Game;
+using Project.UI;
+
+using System.Collections;
 
 using UnityEngine;
 
@@ -63,12 +66,98 @@ namespace Project.Battle
 
         public void StartBattle()
         {
+            this.StartCoroutine(this.StartBattleInternal());
+        }
 
+        public void FinishBattle()
+        {
+            this.StartCoroutine(this.FinishBattleInternal());
         }
 
         public void UpdateAction(InGameBuilder.ActionType action)
         {
             this.InGameUI.UpdateAction(action);
+        }
+
+        private IEnumerator StartBattleInternal()
+        {
+            bool done = false;
+
+            UIManager.Instance.BeginTransitioning(() => done = true);
+
+            while (!done)
+            {
+                yield return null;
+            }
+
+            // #TODO get enemy information based on map cell here
+
+            var enemies = new Enemy[Random.Range(3, 5)];
+
+            for (int i = 0; i < enemies.Length; ++i)
+            {
+                enemies[i] = Enemy.CreateDefaultEnemy();
+            }
+
+            yield return null;
+
+            if (this.m_overworld != null)
+            {
+                this.m_overworld.SetActive(false);
+            }
+
+            yield return null;
+
+            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Battle);
+
+            yield return null;
+
+            BattleManager.Instance.StartBattle(Player.Instance, enemies, () =>
+            {
+                this.StartCoroutine(this.EndTransitionsAfterDelay(2.0f));
+            }, this.FinishBattle);
+        }
+
+        private IEnumerator FinishBattleInternal()
+        {
+            bool done = false;
+
+            UIManager.Instance.BeginTransitioning(() => done = true);
+
+            while (!done)
+            {
+                yield return null;
+            }
+
+            var outcome = BattleManager.Instance.Outcome;
+
+            BattleManager.Instance.FinishBattle();
+
+            yield return null;
+
+            if (this.m_overworld == null)
+            {
+                this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+
+                this.m_overworld.name = "Overworld";
+            }
+
+            this.m_overworld.SetActive(true);
+
+            yield return null;
+
+            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+
+            yield return null;
+
+            yield return this.StartCoroutine(this.EndTransitionsAfterDelay(2.0f));
+        }
+
+        private IEnumerator EndTransitionsAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            UIManager.Instance.EndTransitioning(null);
         }
     }
 }
