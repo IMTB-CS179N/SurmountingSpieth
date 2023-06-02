@@ -341,6 +341,8 @@ namespace Project
         CellInfo[] cells = new CellInfo[5];
         int m_index { get; set; }
 
+        public List<int> nonBlank = new List<int>();
+
         public ColumnInfo()
         {
             for (int i = 0; i < 5; i++)
@@ -395,6 +397,8 @@ namespace Project
         public void SetCell(CellInfo newCell)
         {
             cells[newCell.yValue] = newCell;
+            nonBlank.Add(newCell.yValue);
+            nonBlank.Sort();
         }
     }
 }
