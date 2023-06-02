@@ -48,17 +48,6 @@ namespace Project
 
         private void FixedUpdate()
         {
-            var collider = InputProcessor.Instance.RaycastLeftSingular();
-
-            if (collider)
-            {
-                var clickObj = collider.transform.gameObject.GetComponent<Click>();
-
-                if (clickObj)
-                {
-                    clickObj.TriggerClick();
-                }
-            }
         }
 
         private void SetMusicStatus(bool enable)

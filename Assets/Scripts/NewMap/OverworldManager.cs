@@ -74,6 +74,18 @@ namespace Project.Overworld
         // Update is called once per frame
         void Update()
         {
+            var collider = InputProcessor.Instance.RaycastLeftSingular();
+
+            if (collider)
+            {
+                var clickObj = collider.transform.gameObject.GetComponent<Click>();
+
+                if (clickObj)
+                {
+                    clickObj.TriggerClick();
+                }
+            }
+
             player.position = Vector3.MoveTowards(
                 player.position,
                 new Vector3(0f, movePointY, 0f),
