@@ -30,7 +30,7 @@ namespace Project.Battle
 
         public Difficulty difficulty { get; set; }
 
-        public int LevelIndex = 0;
+        public int levelIndex = 0;
 
         private void Awake()
         {

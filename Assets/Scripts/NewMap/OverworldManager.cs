@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Project.Input;
 using Project.Battle;
+using Project.Game;
 
 namespace Project.Overworld
 {
@@ -496,25 +497,32 @@ namespace Project.Overworld
 
         void GenerateBattle()
         {
+            Encounter currentEncounter = ResourceManager.Campaign[MapManager.Instance.levelIndex];
+
             List<CellInfo> level = new List<CellInfo>();
             List<int> yValues = new List<int>();
-            int numBattles = 3;
             HashSet<int> heights = new HashSet<int>();
             int random = Random.Range(0, 5);
-            List<CellInfo.TileType> battleTypes = new List<CellInfo.TileType>
+            List<CellInfo.TileType> battleTypes = new List<CellInfo.TileType>();
+            if (currentEncounter.EasyEnemyList.Length > 0)
             {
-                CellInfo.TileType.BattleHard,
-                CellInfo.TileType.BattleMedium,
-                CellInfo.TileType.BattleEasy
-            };
-            for (int i = 0; i < numBattles; i++)
+                battleTypes.Add(CellInfo.TileType.BattleEasy);
+            }
+            if (currentEncounter.NormalEnemyList.Length > 0)
+            {
+                battleTypes.Add(CellInfo.TileType.BattleMedium);
+            }
+            if (currentEncounter.HardEnemyList.Length > 0)
+            {
+                battleTypes.Add(CellInfo.TileType.BattleHard);
+            }
+            for (int i = 0; i < battleTypes.Count; i++)
             {
                 while (heights.Contains(random))
                 {
                     random = Random.Range(0, 5);
                 }
                 heights.Add(random);
-                // yValues.Add(random);
                 level.Add(new BattleInfo(random, battleTypes[i]));
             }
 
@@ -522,6 +530,7 @@ namespace Project.Overworld
             level.Sort((x, y) => x.yValue.CompareTo(y.yValue));
 
             GenerateLevel(level);
+            MapManager.Instance.levelIndex++;
         }
 
         void SetSprites()
