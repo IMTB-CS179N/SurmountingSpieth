@@ -36,11 +36,15 @@ namespace Project
 
         private void Start()
         {
+            ScreenManager.Instance.SetCursorTexture(ResourceManager.DefaultCursor, Vector2.zero, CursorMode.Auto);
+
             EffectFactory.Initialize();
             TrinketFactory.Initialize();
         }
 
-        private void Update() { }
+        private void Update()
+        {
+        }
 
         private void FixedUpdate()
         {

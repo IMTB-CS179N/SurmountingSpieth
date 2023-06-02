@@ -41,6 +41,8 @@ namespace Project
 
         public static readonly string EnemyAbilityPath = "Data/EnemyAbilities.csv";
 
+        public static readonly string CampaignPath = "Data/Campaign.csv";
+
         public static readonly string DisallowPath = "UI/Shared/DisallowIcon";
 
         public static readonly string SelectedItemPath = "UI/Shared/SelectedItemBackground";
@@ -56,6 +58,7 @@ namespace Project
         private static WeaponData[] ms_weapons;
         private static ArmorData[] ms_armors;
 
+        private static Encounter[] ms_campaign;
         private static AbilityData[] ms_abilities;
         private static ClassInfo[] ms_classes;
         private static RaceInfo[] ms_races;
@@ -97,6 +100,8 @@ namespace Project
         public static IReadOnlyList<EnemyData> EnemyDatas => ms_enemyDatas ??= AssetParser.ParseFromCSV<EnemyData>(EnemyDataPath, true);
 
         public static IReadOnlyList<AbilityData> EnemyAbilityDatas => ms_enemyAbilities ??= AssetParser.ParseFromCSV<AbilityData>(EnemyAbilityPath, true);
+
+        public static IReadOnlyList<Encounter> Campaign => ms_campaign ??= AssetParser.ParseFromCSV<Encounter>(CampaignPath, true);
 
         public static Texture2D LoadTexture2D(string path)
         {

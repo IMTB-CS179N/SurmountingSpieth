@@ -124,6 +124,27 @@ namespace Project.Game
             this.RecalculateStats();
         }
 
+        public Enemy(EnemyData data, AbilityData ability, int health, int damage)
+        {
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            if (ability is null)
+            {
+                throw new ArgumentNullException(nameof(ability));
+            }
+
+            this.m_data = data;
+            this.m_baseHealth = Mathf.Max(0, health);
+            this.m_baseDamage = Mathf.Max(0, damage);
+            this.m_abilities = new Ability[1] { new Ability(this, ability) };
+            this.m_effects = new List<Effect>();
+
+            this.RecalculateStats();
+        }
+
         private void RecalculateStats()
         {
             this.m_stats.MaxMana = 0;
@@ -335,7 +356,63 @@ namespace Project.Game
 
         public static Enemy CreateDefaultEnemy()
         {
-            return null; // #TODO
+            return new Enemy(new EnemyData()
+            {
+                Name = "Cow",
+                Armor = 5 * Random.Range(4, 9),
+                Precision = 30.0f,
+                Evasion = 0.10f,
+                CritChance = 0.05f,
+                CritMultiplier = 1.5f,
+                Ability = "Milkdrop",
+                Sprite = ResourceManager.LoadSprite("Sprites/Monsters/" + ms_cowNames[Random.Range(0, ms_cowNames.Length)]),
+            }, new AbilityData()
+            {
+                Class = "Enemy",
+                Name = "Milkdrop",
+                EnemyEffects = new string[]
+                {
+                    "Weaken",
+                    "Poison",
+                },
+                AllyEffects = new string[]
+                {
+                    "Healing",
+                    "Amplify",
+                    "Sharpness",
+                },
+                EnemyModifiers = new float[]
+                {
+                    0.20f,
+                    0.30f,
+                },
+                AllyModifiers = new float[]
+                {
+                    15.0f,
+                    0.20f,
+                    30.0f,
+                },
+                EnemyDurations = new int[]
+                {
+                    2,
+                    3,
+                },
+                AllyDurations = new int[]
+                {
+                    0,
+                    3,
+                    3,
+                },
+                DamageMultiplier = 1.2f,
+                ManaCost = 0,
+                IsAOE = false,
+                CooldownTime = 5,
+                Sprite = ResourceManager.DefaultSprite,
+                Description = "Spits poisonous milk. The milk applies reduces enemy's damage by 20% for 2 turns and applies " +
+                "Poison effect that deals 30% of base damage over 3 turns. The milk also applies positive effects to the entity itself, " +
+                "healing it by 15% of its maximum health, increasing its damage by 20% for 3 turns and increasing its precision by 30 " +
+                "points for 3 turns.",
+            }, 10 * Random.Range(10, 30), Random.Range(8, 16));
         }
     }
 }
