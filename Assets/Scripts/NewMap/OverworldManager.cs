@@ -47,12 +47,13 @@ namespace Project.Overworld
 
             List<CellInfo> newCells = new List<CellInfo>();
             newCells.Add(new ShopInfo(0, 1));
-            newCells.Add(new BattleInfo(1));
+            newCells.Add(new BattleInfo(1, CellInfo.TileType.BattleEasy));
             newCells.Add(new ShopInfo(2, 1));
             newCells.Add(new ShopInfo(3, 1));
             newCells.Add(new ShopInfo(4, 1));
-            GenerateLevel(newCells);
             // GenerateLevel(newCells);
+            GenerateBattle();
+            // GenerateShop();
 
             // Instantiate GameObjects to act as tiles
             for (int i = 0; i < 5; i++)
@@ -102,20 +103,14 @@ namespace Project.Overworld
             }
             else if (!Moving() && moveQueue.Count == 0 && destination)
             {
-                List<CellInfo> newCells = new List<CellInfo>();
-                newCells.Add(new ShopInfo(0, 1));
-                newCells.Add(new ShopInfo(1, 1));
-                newCells.Add(new ShopInfo(2, 1));
-                newCells.Add(new BattleInfo(3));
-                newCells.Add(new ShopInfo(4, 1));
                 destination = false;
-                // Debug.Log("dlksjfslkj");
                 int playerY = (int)(player.position.y) / UNIT_SIZE + 2;
                 Debug.Log("Arrived at position " + GridTiles[playerY, 6].transform.position);
                 int rand = Random.Range(0, 2);
                 if (rand == 0)
                 {
-                    GenerateLevel(newCells);
+                    // GenerateLevel(newCells);
+                    GenerateBattle();
                 }
                 else
                 {
@@ -129,8 +124,15 @@ namespace Project.Overworld
                         break;
 
                     case CellInfo.TileType.BattleEasy:
+                        MapManager.Instance.difficulty = MapManager.Difficulty.Easy;
+                        MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
+                        break;
                     case CellInfo.TileType.BattleMedium:
+                        MapManager.Instance.difficulty = MapManager.Difficulty.Medium;
+                        MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
+                        break;
                     case CellInfo.TileType.BattleHard:
+                        MapManager.Instance.difficulty = MapManager.Difficulty.Hard;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
                         break;
 
@@ -489,6 +491,36 @@ namespace Project.Overworld
             int height = Random.Range(0, 5);
             ShopInfo shop = new ShopInfo(height, 0);
             level.Add(shop);
+            GenerateLevel(level);
+        }
+
+        void GenerateBattle()
+        {
+            List<CellInfo> level = new List<CellInfo>();
+            List<int> yValues = new List<int>();
+            int numBattles = 3;
+            HashSet<int> heights = new HashSet<int>();
+            int random = Random.Range(0, 5);
+            List<CellInfo.TileType> battleTypes = new List<CellInfo.TileType>
+            {
+                CellInfo.TileType.BattleHard,
+                CellInfo.TileType.BattleMedium,
+                CellInfo.TileType.BattleEasy
+            };
+            for (int i = 0; i < numBattles; i++)
+            {
+                while (heights.Contains(random))
+                {
+                    random = Random.Range(0, 5);
+                }
+                heights.Add(random);
+                // yValues.Add(random);
+                level.Add(new BattleInfo(random, battleTypes[i]));
+            }
+
+            yValues.Sort();
+            level.Sort((x, y) => x.yValue.CompareTo(y.yValue));
+
             GenerateLevel(level);
         }
 

@@ -21,6 +21,17 @@ namespace Project.Battle
         [SerializeField]
         private GameObject OverworldPrefab;
 
+        public enum Difficulty
+        {
+            Easy,
+            Medium,
+            Hard            
+        }
+
+        public Difficulty difficulty { get; set; }
+
+        public int LevelIndex = 0;
+
         private void Awake()
         {
             if (this.InGameUI == null)

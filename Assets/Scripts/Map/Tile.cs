@@ -36,7 +36,12 @@ namespace Project
 
         public bool IsClickable()
         {
-            return (tileType == TileType.Shop || tileType == TileType.BattleEasy);
+            return (
+                tileType == TileType.Shop
+                || tileType == TileType.BattleEasy
+                || tileType == TileType.BattleMedium
+                || tileType == TileType.BattleHard
+            );
         }
 
         public CellInfo(int yValue)
@@ -321,13 +326,13 @@ namespace Project
     {
         public List<Enemy> enemies = new List<Enemy>();
 
-        public BattleInfo(int yValue)
+        public BattleInfo(int yValue, TileType difficulty)
             : base(yValue)
         {
-            this.enemies = enemies;
-            // TileSprite = ResourceManager.LoadSprite("Sprites/Characters/Dragonborn cleric");
-            SpritePath = "Sprites/Battle/Ez";
-            tileType = TileType.BattleEasy;
+            var SpriteName = difficulty.ToString("G");
+            SpritePath = "Sprites/Battle/" + SpriteName;
+            Debug.Log(SpritePath);
+            tileType = difficulty;
         }
 
         public List<Enemy> GetEnemies()
