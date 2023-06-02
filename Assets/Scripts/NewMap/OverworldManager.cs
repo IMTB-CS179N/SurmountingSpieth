@@ -12,7 +12,7 @@ namespace Project.Overworld
         private static OverworldManager ms_instance;
         public static OverworldManager Instance =>
             ms_instance == null
-                ? (ms_instance = FindFirstObjectByType<OverworldManager>())
+                ? (ms_instance = MapManager.Instance.CreateOverworld())
                 : ms_instance;
         public static OverworldInfo[] stages;
         int UNIT_SIZE = 16;
@@ -30,12 +30,41 @@ namespace Project.Overworld
         int currentX = 0;
         bool destination = false;
 
+        private UI.InGameBuilder.ActionType m_action;
+
         List<ColumnInfo> columns = new List<ColumnInfo>();
         ColumnInfo blank = new ColumnInfo();
         Queue<Vector3> moveQueue = new Queue<Vector3>();
 
+        void Awake()
+        {
+            MapManager.Instance.InGameUI.OnUIEnabled += this.InGameUICallback;
+        }
+
+        void OnDestroy()
+        {
+            if (MapManager.Instance != null && MapManager.Instance.InGameUI != null)
+            {
+                MapManager.Instance.InGameUI.OnUIEnabled -= this.InGameUICallback;
+            }
+        }
+
         void Start()
         {
+            // Instantiate GameObjects to act as tiles
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 13; j++)
+                {
+                    GridTiles[i, j] = Instantiate<GameObject>(
+                        BaseTile,
+                        new Vector3((j - 6) * UNIT_SIZE, (i - 2) * UNIT_SIZE, 0),
+                        transform.rotation,
+                        TilesParent
+                    );
+                    GridTiles[i, j].AddComponent<Click>();
+                }
+            }
             // Add blanks to the left side of character starting point
             for (int i = 0; i < 6; i++)
             {
@@ -56,20 +85,6 @@ namespace Project.Overworld
             GenerateBattle();
             // GenerateShop();
 
-            // Instantiate GameObjects to act as tiles
-            for (int i = 0; i < 5; i++)
-            {
-                for (int j = 0; j < 13; j++)
-                {
-                    GridTiles[i, j] = Instantiate<GameObject>(
-                        BaseTile,
-                        new Vector3((j - 6) * UNIT_SIZE, (i - 2) * UNIT_SIZE, 0),
-                        transform.rotation,
-                        TilesParent
-                    );
-                    GridTiles[i, j].AddComponent<Click>();
-                }
-            }
             SetSprites();
         }
 
@@ -107,37 +122,43 @@ namespace Project.Overworld
                 destination = false;
                 int playerY = (int)(player.position.y) / UNIT_SIZE + 2;
                 Debug.Log("Arrived at position " + GridTiles[playerY, 6].transform.position);
-                int rand = Random.Range(0, 2);
-                if (rand == 0)
-                {
-                    // GenerateLevel(newCells);
-                    GenerateBattle();
-                }
-                else
-                {
-                    GenerateShop();
-                }
+                // int rand = Random.Range(0, 2);
+                // if (rand == 0)
+                // {
+                //     // GenerateLevel(newCells);
+                //     GenerateBattle();
+                // }
+                // else
+                // {
+                //     GenerateShop();
+                // }
                 SetSprites();
                 switch (this.columns[this.currentX].GetCell(playerY).tileType)
                 {
                     case CellInfo.TileType.Shop:
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Enter);
+                        m_action = UI.InGameBuilder.ActionType.Enter;
+                        GenerateBattle();
                         break;
 
                     case CellInfo.TileType.BattleEasy:
                         MapManager.Instance.difficulty = MapManager.Difficulty.Easy;
+                        m_action = UI.InGameBuilder.ActionType.Battle;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
                         break;
                     case CellInfo.TileType.BattleMedium:
                         MapManager.Instance.difficulty = MapManager.Difficulty.Medium;
+                        m_action = UI.InGameBuilder.ActionType.Battle;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
                         break;
                     case CellInfo.TileType.BattleHard:
                         MapManager.Instance.difficulty = MapManager.Difficulty.Hard;
+                        m_action = UI.InGameBuilder.ActionType.Battle;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
                         break;
 
                     default:
+                        m_action = UI.InGameBuilder.ActionType.None;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
                         break;
                 }
@@ -479,6 +500,7 @@ namespace Project.Overworld
             -* bottom and same -> fork_up
             -* bottom and below -> bottom_left
             */
+            SetSprites();
         }
 
         bool Moving()
@@ -486,8 +508,9 @@ namespace Project.Overworld
             return player.position.y != movePointY || TilesParent.position.x != -movePointX;
         }
 
-        void GenerateShop()
+        public void GenerateShop()
         {
+            Debug.Log("Inside GenerateShop");
             List<CellInfo> level = new List<CellInfo>();
             int height = Random.Range(0, 5);
             ShopInfo shop = new ShopInfo(height, 0);
@@ -561,6 +584,11 @@ namespace Project.Overworld
                     }
                 }
             }
+        }
+
+        public void InGameUICallback()
+        {
+            MapManager.Instance.UpdateAction(this.m_action);
         }
     }
 }

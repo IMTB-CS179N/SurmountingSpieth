@@ -1,5 +1,6 @@
 ﻿using Project.Game;
 using Project.UI;
+using Project.Overworld;
 
 using System.Collections;
 
@@ -11,12 +12,13 @@ namespace Project.Battle
     {
         private static MapManager ms_instance;
 
-        private GameObject m_overworld;
+        // private GameObject m_overworld;
 
-        public static MapManager Instance => ms_instance == null ? (ms_instance = FindFirstObjectByType<MapManager>()) : ms_instance;
+        public static MapManager Instance =>
+            ms_instance == null ? (ms_instance = FindFirstObjectByType<MapManager>()) : ms_instance;
 
         [SerializeField]
-        private InGameBuilder InGameUI;
+        public InGameBuilder InGameUI;
 
         [SerializeField]
         private GameObject OverworldPrefab;
@@ -25,7 +27,7 @@ namespace Project.Battle
         {
             Easy,
             Medium,
-            Hard            
+            Hard
         }
 
         public Difficulty difficulty { get; set; }
@@ -45,18 +47,18 @@ namespace Project.Battle
             }
         }
 
+        public OverworldManager CreateOverworld() {
+            return GameObject.Instantiate(this.OverworldPrefab).GetComponent<OverworldManager>();
+        }
+
         public void LoadInGame()
         {
-            UIManager.Instance.TransitionWithDelay(() =>
-            {
-                if (this.m_overworld == null)
+            UIManager.Instance.TransitionWithDelay(
+                () =>
                 {
-                    this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+                    var overworld = OverworldManager.Instance;
 
-                    this.m_overworld.name = "Overworld";
-                }
-
-                this.m_overworld.SetActive(true);
+                    overworld.gameObject.SetActive(true);
 
                 UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
             }, null, 2.0f);
@@ -64,15 +66,16 @@ namespace Project.Battle
 
         public void ReturnToMain()
         {
-            UIManager.Instance.TransitionWithDelay(() =>
-            {
-                if (this.m_overworld != null)
+            UIManager.Instance.TransitionWithDelay(
+                () =>
                 {
-                    this.m_overworld.SetActive(false);
-                }
+                    OverworldManager.Instance.gameObject.SetActive(false);
 
-                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
-            }, null, 2.0f);
+                    UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
+                },
+                null,
+                2.0f
+            );
         }
 
         public void StartBattle()
@@ -112,10 +115,7 @@ namespace Project.Battle
 
             yield return null;
 
-            if (this.m_overworld != null)
-            {
-                this.m_overworld.SetActive(false);
-            }
+            OverworldManager.Instance.gameObject.SetActive(false);
 
             yield return null;
 
@@ -146,20 +146,32 @@ namespace Project.Battle
 
             yield return null;
 
-            if (this.m_overworld == null)
-            {
-                this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+            var overworld = OverworldManager.Instance;
 
-                this.m_overworld.name = "Overworld";
-            }
-
-            this.m_overworld.SetActive(true);
+            overworld.gameObject.SetActive(true);
 
             yield return null;
 
             UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
 
             yield return null;
+
+            switch (outcome)
+            {
+                case BattleManager.BattleOutcome.Exit:
+                    MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
+                    break;
+
+                case BattleManager.BattleOutcome.Victory:
+                    MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
+                    Debug.Log("calling");
+                    OverworldManager.Instance.GenerateShop();
+                    // m_overworld.GetComponent<OverworldManager>().GenerateShop();
+                    break;
+
+                default:
+                    break;
+            }
 
             yield return this.StartCoroutine(this.EndTransitionsAfterDelay(2.0f));
         }

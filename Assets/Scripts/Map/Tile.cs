@@ -331,7 +331,6 @@ namespace Project
         {
             var SpriteName = difficulty.ToString("G");
             SpritePath = "Sprites/Battle/" + SpriteName;
-            Debug.Log(SpritePath);
             tileType = difficulty;
         }
 
