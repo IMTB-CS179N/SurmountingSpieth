@@ -71,28 +71,30 @@ namespace Project
 
     public class ShopInfo : CellInfo
     {
-        public List<Trinket> trinkets { get; set; }
-        public List<Potion> potions { get; set; }
-        public List<Weapon> weapons { get; set; }
-        public List<Armor> armors { get; set; }
+        public readonly HashSet<TrinketData> Trinkets;
+        public readonly HashSet<PotionData> Potions;
+        public readonly HashSet<WeaponData> Weapons;
+        public readonly HashSet<ArmorData> Armors;
 
         public ShopInfo(int yValue, int tier)
             : base(yValue)
         {
             // tier 3 (lowest) 70% tier 3 items 20% tier 2 items 10% tier 1 i
-            weapons = new List<Weapon>();
-            trinkets = new List<Trinket>();
-            potions = new List<Potion>();
-            armors = new List<Armor>();
-            // GenerateWeapons(tier);
-            // GenerateTrinkets(tier);
-            //GeneratePotions(tier);
-            // GenerateArmors(tier);
+            weapons = new();
+            trinkets = new();
+            potions = new();
+            armors = new();
+
+            GenerateWeapons(tier);
+            GenerateTrinkets(tier);
+            GeneratePotions(tier);
+            GenerateArmors(tier);
+
             SpritePath = "Map/Trade_Post";
             tileType = TileType.Shop;
         }
 
-        public List<Weapon> GenerateWeapons(int tier)
+        public HashSet<WeaponData> GenerateWeapons(int tier)
         {
             int numTier1Items = 0;
             int numTier2Items = 0;
@@ -117,10 +119,34 @@ namespace Project
                 numTier2Items = 2;
                 numTier3Items = 3;
             }
+
             int numWeapons = Random.Range(4, 7);
 
-            for (int i = 0; i <= numWeapons; i++)
+            var allWeapons = ResourceManager.Weapons;
+
+            for (
+                int i = 0;
+                i < numWeapons; /* empty */
+
+            )
             {
+                var weapon = allWeapons[Random.Range(0, allWeapons.Count)];
+
+                ref int count = ref weapon.Tier switch
+                {
+                    1 => numTier1Items,
+                    2 => numTier2Items,
+                    3 => numTier3Items,
+                    _ => throw new System.Exception($"Invalid tier {weapon.Tier}"),
+                };
+
+                if (count > 0 && this.Weapons.Add(weapon))
+                {
+                    --count;
+                }
+
+                continue;
+
                 if (i < numTier1Items)
                 {
                     // Select a random tier 1 weapon from the available options
@@ -128,7 +154,7 @@ namespace Project
                         .Where(weaponData => weaponData.Tier == 1)
                         .ToList();
                     var randomWeapon = tier1Weapons[Random.Range(0, tier1Weapons.Count)];
-                    weapons.Add(new Weapon(randomWeapon));
+                    weapons.Add(randomWeapon);
                 }
                 else if (i < (numTier1Items + numTier2Items))
                 {
@@ -137,7 +163,7 @@ namespace Project
                         .Where(weaponData => weaponData.Tier == 2)
                         .ToList();
                     var randomWeapon = tier2Weapons[Random.Range(0, tier2Weapons.Count)];
-                    weapons.Add(new Weapon(randomWeapon));
+                    weapons.Add(randomWeapon);
                 }
                 else if (i < (numTier1Items + numTier2Items + numTier3Items))
                 {
@@ -146,10 +172,9 @@ namespace Project
                         .Where(weaponData => weaponData.Tier == 3)
                         .ToList();
                     var randomWeapon = tier3Weapons[Random.Range(0, tier3Weapons.Count)];
-                    weapons.Add(new Weapon(randomWeapon));
+                    weapons.Add(randomWeapon);
                 }
             }
-            return weapons;
         }
 
         public List<Trinket> GenerateTrinkets(int tier)

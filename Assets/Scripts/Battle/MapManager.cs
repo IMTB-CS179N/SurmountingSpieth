@@ -23,16 +23,17 @@ namespace Project.Battle
         [SerializeField]
         private GameObject OverworldPrefab;
 
-        public enum Difficulty
+        public enum DifficultyLevel
         {
+            None,
             Easy,
             Medium,
             Hard
         }
 
-        public Difficulty difficulty { get; set; }
+        public DifficultyLevel Difficulty;
 
-        public int levelIndex = 0;
+        public int LevelIndex = -1;
 
         private void Awake()
         {
@@ -104,13 +105,28 @@ namespace Project.Battle
                 yield return null;
             }
 
-            // #TODO get enemy information based on map cell here
+            Debug.Assert(this.LevelIndex >= 0 && this.LevelIndex < ResourceManager.Campaign.Count);
+            Debug.Assert(this.Difficulty != DifficultyLevel.None);
 
-            var enemies = new Enemy[Random.Range(3, 5)];
+            var encounter = ResourceManager.Campaign[this.LevelIndex];
+
+            (string[] names, int[] health, int[] damage) enemyData = this.Difficulty switch
+            {
+                DifficultyLevel.Easy => (encounter.EasyEnemyList, encounter.EasyEnemyHealth, encounter.EasyEnemyDamage),
+                DifficultyLevel.Medium => (encounter.NormalEnemyList, encounter.NormalEnemyHealth, encounter.NormalEnemyDamage),
+                DifficultyLevel.Hard => (encounter.HardEnemyList, encounter.HardEnemyHealth, encounter.HardEnemyDamage),
+                _ => default, // never should be here b/c of assert and yes
+            };
+
+            Debug.Assert(enemyData.names.Length != 0);
+            Debug.Assert(enemyData.names.Length == enemyData.health.Length);
+            Debug.Assert(enemyData.names.Length == enemyData.damage.Length);
+
+            var enemies = new Enemy[enemyData.names.Length];
 
             for (int i = 0; i < enemies.Length; ++i)
             {
-                enemies[i] = Enemy.CreateDefaultEnemy();
+                enemies[i] = new Enemy(enemyData.names[i], enemyData.health[i], enemyData.damage[i]);
             }
 
             yield return null;
@@ -164,9 +180,8 @@ namespace Project.Battle
 
                 case BattleManager.BattleOutcome.Victory:
                     MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
-                    Debug.Log("calling");
+                    Difficulty = DifficultyLevel.None;
                     OverworldManager.Instance.GenerateShop();
-                    // m_overworld.GetComponent<OverworldManager>().GenerateShop();
                     break;
 
                 default:

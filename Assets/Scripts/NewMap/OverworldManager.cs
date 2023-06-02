@@ -122,42 +122,34 @@ namespace Project.Overworld
                 destination = false;
                 int playerY = (int)(player.position.y) / UNIT_SIZE + 2;
                 Debug.Log("Arrived at position " + GridTiles[playerY, 6].transform.position);
-                // int rand = Random.Range(0, 2);
-                // if (rand == 0)
-                // {
-                //     // GenerateLevel(newCells);
-                //     GenerateBattle();
-                // }
-                // else
-                // {
-                //     GenerateShop();
-                // }
                 SetSprites();
                 switch (this.columns[this.currentX].GetCell(playerY).tileType)
                 {
                     case CellInfo.TileType.Shop:
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.None;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Enter);
                         m_action = UI.InGameBuilder.ActionType.Enter;
                         GenerateBattle();
                         break;
 
                     case CellInfo.TileType.BattleEasy:
-                        MapManager.Instance.difficulty = MapManager.Difficulty.Easy;
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.Easy;
                         m_action = UI.InGameBuilder.ActionType.Battle;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
                         break;
                     case CellInfo.TileType.BattleMedium:
-                        MapManager.Instance.difficulty = MapManager.Difficulty.Medium;
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.Medium;
                         m_action = UI.InGameBuilder.ActionType.Battle;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
                         break;
                     case CellInfo.TileType.BattleHard:
-                        MapManager.Instance.difficulty = MapManager.Difficulty.Hard;
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.Hard;
                         m_action = UI.InGameBuilder.ActionType.Battle;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
                         break;
 
                     default:
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.None;
                         m_action = UI.InGameBuilder.ActionType.None;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
                         break;
@@ -254,10 +246,6 @@ namespace Project.Overworld
                 1
                 0
             */
-            if (!Moving() && currentX == (columns.Count - 1))
-            {
-                Debug.Log("test");
-            }
             ColumnInfo playerSideTurns = new ColumnInfo();
             ColumnInfo tileColumn = new ColumnInfo();
             int playerHeight = (int)(player.position.y + (UNIT_SIZE * 2)) / UNIT_SIZE;
@@ -510,7 +498,6 @@ namespace Project.Overworld
 
         public void GenerateShop()
         {
-            Debug.Log("Inside GenerateShop");
             List<CellInfo> level = new List<CellInfo>();
             int height = Random.Range(0, 5);
             ShopInfo shop = new ShopInfo(height, 0);
@@ -520,7 +507,8 @@ namespace Project.Overworld
 
         void GenerateBattle()
         {
-            Encounter currentEncounter = ResourceManager.Campaign[MapManager.Instance.levelIndex];
+            MapManager.Instance.LevelIndex++;
+            Encounter currentEncounter = ResourceManager.Campaign[MapManager.Instance.LevelIndex];
 
             List<CellInfo> level = new List<CellInfo>();
             List<int> yValues = new List<int>();
@@ -553,7 +541,6 @@ namespace Project.Overworld
             level.Sort((x, y) => x.yValue.CompareTo(y.yValue));
 
             GenerateLevel(level);
-            MapManager.Instance.levelIndex++;
         }
 
         void SetSprites()
