@@ -46,7 +46,7 @@ namespace Project.Items
             set => this.m_sprite = value == null ? ResourceManager.DefaultSprite : value;
         }
 
-        [Order(6)]
+        [Order(7)]
         public string Description
         {
             get => this.m_desc;

@@ -10,6 +10,10 @@ namespace Project.Input
     {
         private static ScreenManager ms_instance;
 
+        private Texture2D m_cursorTexture;
+        private CursorMode m_cursorMode;
+        private Vector2 m_cursorOrigin;
+
         private float m_screenHeight;
         private float m_screenWidth;
         private Camera m_camera;
@@ -21,6 +25,8 @@ namespace Project.Input
         public float Height => this.m_screenHeight;
 
         public float OrthographicSize => this.m_camera.orthographicSize;
+
+        public Texture2D CursorTexture => this.m_cursorTexture;
 
         public event Action OnScreenResolutionChanged;
 
@@ -42,6 +48,20 @@ namespace Project.Input
                 this.m_screenHeight = height;
 
                 this.OnScreenResolutionChanged?.Invoke();
+            }
+        }
+
+        public void SetCursorTexture(Texture2D cursorTexture, Vector2 origin, CursorMode mode = CursorMode.Auto)
+        {
+            if (this.m_cursorTexture != cursorTexture || this.m_cursorOrigin != origin || this.m_cursorMode != mode)
+            {
+                this.m_cursorTexture = cursorTexture;
+
+                this.m_cursorOrigin = origin;
+
+                this.m_cursorMode = mode;
+
+                Cursor.SetCursor(cursorTexture, origin, mode);
             }
         }
 
@@ -79,6 +99,11 @@ namespace Project.Input
         public static Vector2 UnitScreenPointToScreenSpace(Vector2 point, Vector2 resolution)
         {
             return new Vector2(resolution.x * (0.5f * (point.x + 1.0f)), resolution.y * (0.5f * (point.y + 1.0f)));
+        }
+
+        public static Vector2 ScreenSpaceToUnitScreenPoint(Vector2 point, Vector2 resolution)
+        {
+            return new Vector2((2.0f * point.x / resolution.x) - 1.0f, (2.0f * point.y / resolution.y) - 1.0f);
         }
     }
 }

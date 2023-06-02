@@ -1,5 +1,4 @@
 ﻿using Project.Game;
-using Project.Input;
 
 using System;
 using System.Collections.Generic;
@@ -406,7 +405,67 @@ namespace Project.UI
             }
         }
 
-        private class AttackItem : ITooltipProvider, ISelectableItem
+        private class EnemyAbility : ITooltipProvider
+        {
+            private TooltipData m_data;
+
+            public readonly VisualElement Icon;
+
+            public readonly BattleBuilder Builder;
+
+            public ref readonly TooltipData Data => ref this.m_data;
+
+            public EnemyAbility(VisualElement element, BattleBuilder builder)
+            {
+                this.Icon = element;
+
+                this.Builder = builder;
+
+                element.pickingMode = PickingMode.Ignore;
+
+                element.style.visibility = Visibility.Hidden;
+
+                element.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+
+                this.SetupCallbacks();
+            }
+
+            private void SetupCallbacks()
+            {
+                this.Icon.RegisterCallback<PointerLeaveEvent>(e =>
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
+                    {
+                        this.Builder.DisplayTooltip(this, false);
+                    }
+                });
+
+                this.Icon.RegisterCallback<PointerEnterEvent>(e =>
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
+                    {
+                        this.Builder.DisplayTooltip(this, true);
+                    }
+                });
+            }
+
+            public void UpdateInfo(Ability ability)
+            {
+                this.Icon.style.backgroundImage = new StyleBackground(ability.Sprite);
+
+                this.m_data = new TooltipData()
+                {
+                    Icon = ability.Sprite,
+                    Name = ability.Name,
+                    Type = kAbility,
+                    Time = ability.IsOnCooldown ? $"Cooldown: {ability.CooldownTime}" : "Can Use",
+                    Cost = String.Empty,
+                    Desc = ability.Description,
+                };
+            }
+        }
+
+        private class AttackItem : ITooltipProvider, ISelectableItem, IDisposable
         {
             private readonly TooltipData m_data;
             private bool m_pressed;
@@ -438,52 +497,74 @@ namespace Project.UI
                     Desc = kAttackDesc,
                 };
 
-                this.SetupCallbacks();
+                this.SetupCallbacks(true);
             }
 
-            private void SetupCallbacks()
+            ~AttackItem()
+            {
+                this.SetupCallbacks(false);
+            }
+
+            private void SetupCallbacks(bool attach)
             {
                 if (this.Icon is not null)
                 {
-                    this.Icon.pickingMode = PickingMode.Position;
-
-                    this.Icon.RegisterCallback<PointerLeaveEvent>(e =>
+                    if (attach)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position)
-                        {
-                            this.m_pressed = false;
+                        this.Icon.pickingMode = PickingMode.Position;
 
-                            this.Builder.DisplayTooltip(this, false);
-                        }
-                    });
-
-                    this.Icon.RegisterCallback<PointerEnterEvent>(e =>
+                        this.Icon.RegisterCallback<PointerLeaveEvent>(OnPointerLeaveEvent);
+                        this.Icon.RegisterCallback<PointerEnterEvent>(OnPointerEnterEvent);
+                        this.Icon.RegisterCallback<PointerDownEvent>(OnPointerDownEvent);
+                        this.Icon.RegisterCallback<PointerUpEvent>(OnPointerUpEvent);
+                    }
+                    else
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position)
-                        {
-                            this.m_pressed = false;
+                        this.Icon.pickingMode = PickingMode.Ignore;
 
-                            this.Builder.DisplayTooltip(this, true);
-                        }
-                    });
+                        this.Icon.UnregisterCallback<PointerLeaveEvent>(OnPointerLeaveEvent);
+                        this.Icon.UnregisterCallback<PointerEnterEvent>(OnPointerEnterEvent);
+                        this.Icon.UnregisterCallback<PointerDownEvent>(OnPointerDownEvent);
+                        this.Icon.UnregisterCallback<PointerUpEvent>(OnPointerUpEvent);
+                    }
+                }
 
-                    this.Icon.RegisterCallback<PointerDownEvent>(e =>
+                void OnPointerLeaveEvent(PointerLeaveEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0)
-                        {
-                            this.m_pressed = true;
-                        }
-                    });
+                        this.m_pressed = false;
 
-                    this.Icon.RegisterCallback<PointerUpEvent>(e =>
+                        this.Builder.DisplayTooltip(this, false);
+                    }
+                }
+
+                void OnPointerEnterEvent(PointerEnterEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0 && this.m_pressed)
-                        {
-                            this.m_pressed = false;
+                        this.m_pressed = false;
 
-                            this.Builder.SelectItem(this);
-                        }
-                    });
+                        this.Builder.DisplayTooltip(this, true);
+                    }
+                }
+
+                void OnPointerDownEvent(PointerDownEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0)
+                    {
+                        this.m_pressed = true;
+                    }
+                }
+
+                void OnPointerUpEvent(PointerUpEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0 && this.m_pressed)
+                    {
+                        this.m_pressed = false;
+
+                        this.Builder.SelectItem(this);
+                    }
                 }
             }
 
@@ -512,9 +593,15 @@ namespace Project.UI
                 this.m_locked = locked;
                 this.m_pressed = false;
             }
+
+            public void Dispose()
+            {
+                this.SetupCallbacks(false);
+                GC.SuppressFinalize(this);
+            }
         }
 
-        private class AbilityItem : ITooltipProvider, ISelectableItem
+        private class AbilityItem : ITooltipProvider, ISelectableItem, IDisposable
         {
             private readonly TooltipData m_data;
             private readonly Ability m_ability;
@@ -572,52 +659,72 @@ namespace Project.UI
 
                 this.m_ability = ability;
 
-                this.SetupCallbacks();
+                this.SetupCallbacks(true);
 
                 this.UpdateStatus();
             }
 
-            private void SetupCallbacks()
+            ~AbilityItem()
+            {
+                this.SetupCallbacks(false);
+            }
+
+            private void SetupCallbacks(bool attach)
             {
                 if (this.Icon is not null)
                 {
-                    this.Icon.RegisterCallback<PointerLeaveEvent>(e =>
+                    if (attach)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position)
-                        {
-                            this.m_pressed = false;
-
-                            this.Builder.DisplayTooltip(this, false);
-                        }
-                    });
-
-                    this.Icon.RegisterCallback<PointerEnterEvent>(e =>
+                        this.Icon.RegisterCallback<PointerLeaveEvent>(OnPointerLeaveEvent);
+                        this.Icon.RegisterCallback<PointerEnterEvent>(OnPointerEnterEvent);
+                        this.Icon.RegisterCallback<PointerDownEvent>(OnPointerDownEvent);
+                        this.Icon.RegisterCallback<PointerUpEvent>(OnPointerUpEvent);
+                    }
+                    else
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position)
-                        {
-                            this.m_pressed = false;
+                        this.Icon.UnregisterCallback<PointerLeaveEvent>(OnPointerLeaveEvent);
+                        this.Icon.UnregisterCallback<PointerEnterEvent>(OnPointerEnterEvent);
+                        this.Icon.UnregisterCallback<PointerDownEvent>(OnPointerDownEvent);
+                        this.Icon.UnregisterCallback<PointerUpEvent>(OnPointerUpEvent);
+                    }
+                }
 
-                            this.Builder.DisplayTooltip(this, true);
-                        }
-                    });
-
-                    this.Icon.RegisterCallback<PointerDownEvent>(e =>
+                void OnPointerLeaveEvent(PointerLeaveEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0 && this.m_selecatable)
-                        {
-                            this.m_pressed = true;
-                        }
-                    });
+                        this.m_pressed = false;
 
-                    this.Icon.RegisterCallback<PointerUpEvent>(e =>
+                        this.Builder.DisplayTooltip(this, false);
+                    }
+                }
+
+                void OnPointerEnterEvent(PointerEnterEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0 && this.m_selecatable && this.m_pressed)
-                        {
-                            this.m_pressed = false;
+                        this.m_pressed = false;
 
-                            this.Builder.SelectItem(this);
-                        }
-                    });
+                        this.Builder.DisplayTooltip(this, true);
+                    }
+                }
+
+                void OnPointerDownEvent(PointerDownEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0 && this.m_selecatable)
+                    {
+                        this.m_pressed = true;
+                    }
+                }
+
+                void OnPointerUpEvent(PointerUpEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0 && this.m_selecatable && this.m_pressed)
+                    {
+                        this.m_pressed = false;
+
+                        this.Builder.SelectItem(this);
+                    }
                 }
             }
 
@@ -710,9 +817,15 @@ namespace Project.UI
                     }
                 }
             }
+
+            public void Dispose()
+            {
+                this.SetupCallbacks(false);
+                GC.SuppressFinalize(this);
+            }
         }
 
-        private class PotionItem : ITooltipProvider, ISelectableItem
+        private class PotionItem : ITooltipProvider, ISelectableItem, IDisposable
         {
             private readonly int m_index;
             private TooltipData m_data;
@@ -737,52 +850,72 @@ namespace Project.UI
 
                 this.m_index = index;
 
-                this.SetupCallbacks();
+                this.SetupCallbacks(true);
 
                 this.UpdatePotion(null);
             }
 
-            private void SetupCallbacks()
+            ~PotionItem()
+            {
+                this.SetupCallbacks(false);
+            }
+
+            private void SetupCallbacks(bool attach)
             {
                 if (this.Icon is not null)
                 {
-                    this.Icon.RegisterCallback<PointerLeaveEvent>(e =>
+                    if (attach)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position)
-                        {
-                            this.m_pressed = false;
-
-                            this.Builder.DisplayTooltip(this, false);
-                        }
-                    });
-
-                    this.Icon.RegisterCallback<PointerEnterEvent>(e =>
+                        this.Icon.RegisterCallback<PointerLeaveEvent>(OnPointerLeaveEvent);
+                        this.Icon.RegisterCallback<PointerEnterEvent>(OnPointerEnterEvent);
+                        this.Icon.RegisterCallback<PointerDownEvent>(OnPointerDownEvent);
+                        this.Icon.RegisterCallback<PointerUpEvent>(OnPointerUpEvent);
+                    }
+                    else
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position)
-                        {
-                            this.m_pressed = false;
+                        this.Icon.UnregisterCallback<PointerLeaveEvent>(OnPointerLeaveEvent);
+                        this.Icon.UnregisterCallback<PointerEnterEvent>(OnPointerEnterEvent);
+                        this.Icon.UnregisterCallback<PointerDownEvent>(OnPointerDownEvent);
+                        this.Icon.UnregisterCallback<PointerUpEvent>(OnPointerUpEvent);
+                    }
+                }
 
-                            this.Builder.DisplayTooltip(this, true);
-                        }
-                    });
-
-                    this.Icon.RegisterCallback<PointerDownEvent>(e =>
+                void OnPointerLeaveEvent(PointerLeaveEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0)
-                        {
-                            this.m_pressed = true;
-                        }
-                    });
+                        this.m_pressed = false;
 
-                    this.Icon.RegisterCallback<PointerUpEvent>(e =>
+                        this.Builder.DisplayTooltip(this, false);
+                    }
+                }
+
+                void OnPointerEnterEvent(PointerEnterEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
                     {
-                        if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0 && this.m_pressed)
-                        {
-                            this.m_pressed = false;
+                        this.m_pressed = false;
 
-                            this.Builder.SelectItem(this);
-                        }
-                    });
+                        this.Builder.DisplayTooltip(this, true);
+                    }
+                }
+
+                void OnPointerDownEvent(PointerDownEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0)
+                    {
+                        this.m_pressed = true;
+                    }
+                }
+
+                void OnPointerUpEvent(PointerUpEvent e)
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position && !this.m_locked && e.button == 0 && this.m_pressed)
+                    {
+                        this.m_pressed = false;
+
+                        this.Builder.SelectItem(this);
+                    }
                 }
             }
 
@@ -847,6 +980,12 @@ namespace Project.UI
                         this.Icon.pickingMode = PickingMode.Position;
                     }
                 }
+            }
+
+            public void Dispose()
+            {
+                this.SetupCallbacks(false);
+                GC.SuppressFinalize(this);
             }
         }
 
@@ -1041,31 +1180,121 @@ namespace Project.UI
 
         private class HealthIndicator
         {
+            private const float kLayoutWidth = 10.0f; // technically width and height should not matter since overflow
+            private const float kLayoutHeight = 10.0f; // context solves all issues, but we need it for precise calcs
 
+            private static int ms_uniqueId;
+
+            private Vector2 m_currentPosition;
+
+            public readonly IEntity Entity;
+
+            public readonly ProgressBar Bar;
+
+            public readonly VisualElement Layout;
+
+            public readonly Func<Vector2> Fetcher;
+
+            public HealthIndicator(Func<Vector2> fetcher, IEntity entity, BattleBuilder builder)
+            {
+                IStyle style;
+
+                this.Entity = entity;
+                this.Fetcher = fetcher;
+                this.m_currentPosition = new Vector2(Single.NaN, Single.NaN);
+
+                this.Layout = new VisualElement()
+                {
+                    name = "health-indicator-layout-" + ms_uniqueId.ToString(),
+                    pickingMode = PickingMode.Ignore,
+                };
+
+                this.Bar = new ProgressBar()
+                {
+                    name = "health-indicator-bar-" + ms_uniqueId++.ToString(),
+                    pickingMode = PickingMode.Ignore,
+                    title = String.Empty,
+                    lowValue = 0.0f,
+                    highValue = 100.0f,
+                    value = 50.0f,
+                };
+
+                style = this.Layout.style;
+
+                style.position = Position.Absolute;
+                style.width = new StyleLength(new Length(kLayoutWidth, LengthUnit.Percent));
+                style.height = new StyleLength(new Length(kLayoutHeight, LengthUnit.Percent));
+
+                style.flexGrow = 0.0f;
+                style.flexShrink = 0.0f;
+                style.alignItems = Align.Center;
+                style.justifyContent = Justify.Center;
+
+                this.Bar.AddToClassList("health-indicator__container");
+                this.Bar.AddToClassList("health-indicator__background");
+                this.Bar.AddToClassList("health-indicator__progress");
+                this.Bar.AddToClassList("health-indicator__title");
+                this.Bar.AddToClassList("health-indicator");
+
+                this.Layout.Add(this.Bar);
+
+                builder.m_battleOverlay.Add(this.Layout);
+
+                this.Update();
+            }
+
+            public void Update()
+            {
+                var position = this.Fetcher();
+
+                float x = (position.x + 1.0f) * 50.0f - (kLayoutWidth * 0.5f);
+                float y = (position.y + 1.0f) * 50.0f - (kLayoutHeight * 0.5f);
+
+                if (this.m_currentPosition.x != x || this.m_currentPosition.y != y)
+                {
+                    this.m_currentPosition = new Vector2(x, y); // perform update ONLY if changed
+
+                    this.Layout.style.left = new StyleLength(new Length(x, LengthUnit.Percent));
+                    this.Layout.style.bottom = new StyleLength(new Length(y, LengthUnit.Percent));
+                }
+
+                ref readonly var stats = ref this.Entity.EntityStats;
+
+                var value = RemapToRange(stats.CurHealth, 0.0f, stats.MaxHealth, 0.0f, 100.0f);
+
+                if (this.Bar.value != value)
+                {
+                    this.Bar.value = value; // perform update ONLY if changed
+                }
+            }
         }
 
         private class AnimatedText
         {
+            private const float kTextWidth = 25.0f; // technically width and height should not matter since overflow
+            private const float kTextHeight = 10.0f; // context solves all issues, but we need it for precise calcs
+            private const float kDelayBeforeAlpha = 1.3f;
+
             private static int ms_uniqueId;
 
-            private readonly Vector2 m_trueStart;
-            private readonly Vector2 m_trueEnd;
+            private readonly Vector2 m_start;
+            private readonly Vector2 m_end;
             private readonly float m_invDuration;
             private readonly float m_duration;
-
-            private Vector2 m_start;
-            private Vector2 m_end;
+            private readonly float m_alphaMul;
             private float m_deltaTotal;
 
             public readonly Label Text;
 
             public AnimatedText(string text, float duration, float delay, int size, int width, Color color, Vector2 start, Vector2 end, BattleBuilder builder)
             {
-                this.m_start = new Vector2((start.x + 1.0f) * 50f - 2.0f, (start.y + 1.0f) * 50f);
-                this.m_end = new Vector2((end.x + 1.0f) * 50f - 2.0f, (end.y + 1.0f) * 50f);
+                this.m_start = new Vector2((start.x + 1.0f) * 50.0f - (kTextWidth * 0.5f), (start.y + 1.0f) * 50.0f - (kTextHeight * 0.5f));
+                this.m_end = new Vector2((end.x + 1.0f) * 50.0f - (kTextWidth * 0.5f), (end.y + 1.0f) * 50.0f - (kTextHeight * 0.5f));
+
                 this.m_duration = duration;
                 this.m_invDuration = 1.0f / duration;
                 this.m_deltaTotal = -delay;
+                this.m_alphaMul = 1.0f / (duration - (duration / kDelayBeforeAlpha));
 
                 this.Text = new Label(text)
                 {
@@ -1078,8 +1307,8 @@ namespace Project.UI
                 style.position = Position.Absolute;
                 style.visibility = Visibility.Hidden;
 
-                style.left = new StyleLength(new Length(this.m_start.x, LengthUnit.Percent));
-                style.bottom = new StyleLength(new Length(this.m_start.y, LengthUnit.Percent));
+                style.width = new StyleLength(new Length(kTextWidth, LengthUnit.Percent));
+                style.height = new StyleLength(new Length(kTextHeight, LengthUnit.Percent));
 
                 style.marginLeft = 0;
                 style.marginRight = 0;
@@ -1100,30 +1329,10 @@ namespace Project.UI
                 style.unityFontStyleAndWeight = FontStyle.Bold;
 
                 builder.m_battleOverlay.Add(this.Text);
-
-                this.m_trueStart = ScreenManager.UnitScreenPointToScreenSpace(start, builder.UI.panelSettings.referenceResolution);
-                this.m_trueEnd = ScreenManager.UnitScreenPointToScreenSpace(end, builder.UI.panelSettings.referenceResolution);
-
-                var bounds = this.Text.layout;
-
-                int breaker = 0;
             }
-
-            private bool m_complete;
 
             public bool Update()
             {
-                //if (!this.m_complete)
-                //{
-                //    var width = this.Text.resolvedStyle.width;
-                //    var heigh = this.Text.resolvedStyle.height;
-                //
-                //    var trueStart = this.m_trueStart;
-                //    var trueEnd = this.m_trueEnd;
-                //
-                //    this.m_complete = true;
-                //}
-
                 var style = this.Text.style;
 
                 if (this.m_deltaTotal < 0.0f)
@@ -1151,13 +1360,17 @@ namespace Project.UI
                     this.Text.style.left = new StyleLength(new Length(position.x, LengthUnit.Percent));
                     this.Text.style.bottom = new StyleLength(new Length(position.y, LengthUnit.Percent));
 
-                    if (this.m_deltaTotal * 2.0f > this.m_duration)
+                    if (this.m_deltaTotal * kDelayBeforeAlpha > this.m_duration)
                     {
+                        float alpha = this.m_alphaMul * (this.m_duration - this.m_deltaTotal);
+
                         var color = this.Text.style.color.value;
 
-                        color.a = 2.0f * (this.m_duration - this.m_deltaTotal) * this.m_invDuration;
+                        color.a = alpha;
 
                         this.Text.style.color = color;
+
+                        this.Text.style.unityTextOutlineColor = new Color(0.0f, 0.0f, 0.0f, alpha);
                     }
 
                     return true;
@@ -1181,11 +1394,16 @@ namespace Project.UI
         private const string kBattleOverlay = "battle-overlay";
         private const string kBackButton = "back-button";
         private const string kSoundButton = "sound-button";
+        private const string kTurnLabel = "turn-label";
+
+        private const string kGameOverOverlay = "gameover-overlay";
+        private const string kOutcomeLabel = "outcome-label";
+        private const string kRewardText = "reward-text";
 
         private const string kMainLayout = "main-layout";
         private const string kTooltipLayout = "tooltip-layout";
 
-        private const string kEffectContainer = "effect-container";
+        private const string kEffectLayout = "effect-layout";
         private const string kPotionLayout = "potion-layout"; // only for player
         private const string kInteractLayout = "interact-layout"; // only for player
         private const string kManaLayout = "mana-layout"; // only for player
@@ -1204,6 +1422,8 @@ namespace Project.UI
 
         private const string kAbilitySlot3Icon = "ability-slot3-icon";
         private const string kAbilitySlot3Text = "ability-slot3-text";
+
+        private const string kEnemyAbility = "enemy-ability";
 
         private const string kActionButton = "action-button";
         private const string kActionLabel = "action-label";
@@ -1296,8 +1516,9 @@ namespace Project.UI
         private AbilityItem m_abilityItem3;
         private AbilityItem m_abilityItem2;
         private AbilityItem m_abilityItem1;
-        
+
         private ActionButton m_actionButton;
+        private EnemyAbility m_enemyAbility;
         private AttackItem m_attackItem;
 
         private TextStatistic m_critMultiplierStatistic;
@@ -1314,6 +1535,8 @@ namespace Project.UI
         private VisualElement m_tooltipLayout;
         private VisualElement m_potionLayout;
         private VisualElement m_mainLayout;
+
+        private Label m_turnLabel;
 
         private VisualElement m_soundButton;
         private bool m_soundPressed;
@@ -1356,8 +1579,7 @@ namespace Project.UI
         {
             this.OnUIEnabled += this.OnEnableEvent;
             this.OnUIDisabled += this.OnDisableEvent;
-            this.OnUIUpdate += this.AnimateLayout;
-            this.OnUIUpdate += this.AnimateAllText;
+            this.OnUIUpdate += this.AnimateAll;
 
             this.OnUseAttackRequest += LockAll;
             this.OnUseAbilityRequest += LockAllIndexed;
@@ -1408,9 +1630,11 @@ namespace Project.UI
         {
             this.SetupBackButton();
             this.SetupSoundButton();
+            this.SetupTurnLabel();
             this.SetupLayouts();
             this.SetupStatistics();
             this.SetupEffectList();
+            this.SetupEnemyAbility();
             this.SetupTooltip();
 
             this.UpdateEntity();
@@ -1433,6 +1657,8 @@ namespace Project.UI
 
             this.m_soundButton = null;
             this.m_soundPressed = false;
+
+            this.m_turnLabel = null;
 
             this.m_mainLayout = null;
             this.m_potionLayout = null;
@@ -1565,6 +1791,11 @@ namespace Project.UI
             }
         }
 
+        private void SetupTurnLabel()
+        {
+            this.m_turnLabel = this.UI.rootVisualElement.Q<Label>(kTurnLabel);
+        }
+
         private void SetupLayouts()
         {
             var root = this.UI.rootVisualElement;
@@ -1597,11 +1828,21 @@ namespace Project.UI
 
         private void SetupEffectList()
         {
-            this.m_effectContainer = this.UI.rootVisualElement.Q<VisualElement>(kEffectContainer);
+            this.m_effectContainer = this.UI.rootVisualElement.Q<VisualElement>(kEffectLayout);
 
             if (this.m_effectContainer is not null)
             {
                 this.m_effectList = new List<EffectStatistic>();
+            }
+        }
+
+        private void SetupEnemyAbility()
+        {
+            var element = this.UI.rootVisualElement.Q<VisualElement>(kEnemyAbility);
+
+            if (element is not null)
+            {
+                this.m_enemyAbility = new EnemyAbility(element, this);
             }
         }
 
@@ -1621,15 +1862,54 @@ namespace Project.UI
 
         private void UpdateEntity()
         {
-            this.m_attackItem = null;
+            if (this.m_attackItem is not null)
+            {
+                this.m_attackItem.Dispose();
 
-            this.m_abilityItem1 = null;
-            this.m_abilityItem2 = null;
-            this.m_abilityItem3 = null;
+                this.m_attackItem = null;
+            }
 
-            this.m_potionSlot1 = null;
-            this.m_potionSlot2 = null;
-            this.m_potionSlot3 = null;
+            if (this.m_abilityItem1 is not null)
+            {
+                this.m_abilityItem1.Dispose();
+
+                this.m_abilityItem1 = null;
+            }
+
+            if (this.m_abilityItem2 is not null)
+            {
+                this.m_abilityItem2.Dispose();
+
+                this.m_abilityItem2 = null;
+            }
+
+            if (this.m_abilityItem3 is not null)
+            {
+                this.m_abilityItem3.Dispose();
+
+                this.m_abilityItem3 = null;
+            }
+
+            if (this.m_potionSlot1 is not null)
+            {
+                this.m_potionSlot1.Dispose();
+
+                this.m_potionSlot1 = null;
+            }
+
+            if (this.m_potionSlot2 is not null)
+            {
+                this.m_potionSlot2.Dispose();
+
+                this.m_potionSlot2 = null;
+            }
+
+            if (this.m_potionSlot3 is not null)
+            {
+                this.m_potionSlot3.Dispose();
+
+                this.m_potionSlot3 = null;
+            }
 
             var entity = this.m_currentEntity;
 
@@ -1654,7 +1934,7 @@ namespace Project.UI
                 {
                     this.m_animation = AnimationType.Hide;
 
-                    this.AnimateLayout();
+                    this.AnimateAll();
                 }
             }
             else
@@ -1669,6 +1949,13 @@ namespace Project.UI
                     if (this.m_interactLayout is not null)
                     {
                         this.m_interactLayout.style.display = DisplayStyle.Flex;
+                    }
+
+                    if (this.m_enemyAbility is not null)
+                    {
+                        this.m_enemyAbility.Icon.style.visibility = Visibility.Hidden;
+
+                        this.m_enemyAbility.Icon.pickingMode = PickingMode.Ignore;
                     }
 
                     this.m_attackItem = new AttackItem(this);
@@ -1696,6 +1983,13 @@ namespace Project.UI
                     {
                         this.m_interactLayout.style.display = DisplayStyle.None;
                     }
+
+                    if (this.m_enemyAbility is not null)
+                    {
+                        this.m_enemyAbility.Icon.style.visibility = Visibility.Visible;
+
+                        this.m_enemyAbility.Icon.pickingMode = PickingMode.Position;
+                    }
                 }
 
                 this.SelectItem(null);
@@ -1707,7 +2001,7 @@ namespace Project.UI
                 {
                     this.m_animation = AnimationType.Show;
 
-                    this.AnimateLayout();
+                    this.AnimateAll();
                 }
             }
         }
@@ -1723,7 +2017,7 @@ namespace Project.UI
             this.m_actionButton?.UpdateStatus();
         }
 
-        private void DisplayTooltip(ITooltipProvider provider, bool display)
+        private void DisplayTooltip(ITooltipProvider provider, bool display, bool forceUpdate = false)
         {
             // use two things: provider is null when no interactive UI is shown
             // otherwise, provider not null means element that we just entered/left hover-wise
@@ -1735,11 +2029,11 @@ namespace Project.UI
                 return; // no tooltip is allowed when we are hiding/showing layout
             }
 
-            if (provider is null)
+            if (provider is null || forceUpdate)
             {
                 // doesn't matter what value 'display' is
 
-                UpdateInternal(null);
+                UpdateInternal(provider);
             }
             else
             {
@@ -1862,7 +2156,7 @@ namespace Project.UI
             }
         }
         
-        private void AnimateLayout()
+        private void AnimateAll()
         {
             if (this.m_animation != AnimationType.None && this.m_mainLayout is not null)
             {
@@ -1908,23 +2202,31 @@ namespace Project.UI
                     }
                 }
             }
-        }
 
-        private void AnimateAllText()
-        {
             var animations = this.m_animations;
-            var batOverlay = this.m_battleOverlay;
 
-            if (animations is not null && batOverlay is not null)
+            if (animations is not null)
             {
                 for (int i = animations.Count - 1; i >= 0; --i)
                 {
-                    if (!animations[i].Update())
+                    var animation = animations[i];
+
+                    if (!animation.Update())
                     {
-                        batOverlay.RemoveAt(i);
+                        animation.Text.RemoveFromHierarchy();
 
                         animations.RemoveAt(i);
                     }
+                }
+            }
+
+            var indicators = this.m_indicators;
+
+            if (indicators is not null)
+            {
+                for (int i = indicators.Count - 1; i >= 0; --i)
+                {
+                    indicators[i].Update();
                 }
             }
         }
@@ -1933,6 +2235,14 @@ namespace Project.UI
         {
             if (this.m_effectContainer is not null)
             {
+                for (int i = 0; i < this.m_effectList.Count; ++i)
+                {
+                    if (this.m_effectList[i] == this.m_currentSelected)
+                    {
+                        this.DisplayTooltip(null, false);
+                    }
+                }
+
                 this.m_effectList.Clear();
                 this.m_effectContainer.Clear();
             }
@@ -1976,6 +2286,14 @@ namespace Project.UI
                     this.m_potionSlot2.UpdatePotion(entity.EquippedPotions.Count > 1 ? entity.EquippedPotions[1] : null);
                     this.m_potionSlot3.UpdatePotion(entity.EquippedPotions.Count > 2 ? entity.EquippedPotions[2] : null);
                 }
+                else
+                {
+                    Debug.Assert(entity.Abilities.Count > 0);
+
+                    this.m_enemyAbility.UpdateInfo(entity.Abilities[0]);
+                }
+
+                this.DisplayTooltip(this.m_currentProvider, this.m_currentProvider is not null, true);
             }
         }
 
@@ -2009,6 +2327,70 @@ namespace Project.UI
         public void AddAnimatedText(string text, float duration, float delay, int size, int width, Color color, Vector2 start, Vector2 end)
         {
             this.m_animations?.Add(new AnimatedText(text, duration, delay, size, width, color, start, end, this));
+        }
+
+        public void AddHealthIndicator(Func<Vector2> positionFetcher, IEntity entity)
+        {
+            this.m_indicators?.Add(new HealthIndicator(positionFetcher, entity, this));
+        }
+
+        public void RemoveHealthIndicator(IEntity entity)
+        {
+            var indicators = this.m_indicators;
+
+            if (indicators is not null)
+            {
+                for (int i = 0; i < indicators.Count; ++i)
+                {
+                    var indicator = indicators[i];
+
+                    if (indicator.Entity == entity)
+                    {
+                        indicator.Layout.RemoveFromHierarchy();
+
+                        indicators.RemoveAt(i);
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void UpdateTurnLabel(string text, Color color)
+        {
+            if (this.m_turnLabel is not null)
+            {
+                this.m_turnLabel.text = text;
+                this.m_turnLabel.style.color = color;
+            }
+        }
+
+        public void ShowGameOverOverlay(string outcomeText, string rewardText, Color outcomeColor)
+        {
+            var overlay = this.UI.rootVisualElement.Q<VisualElement>(kGameOverOverlay);
+
+            if (overlay is not null)
+            {
+                overlay.style.display = DisplayStyle.Flex;
+
+                var outcomeLabel = overlay.Q<Label>(kOutcomeLabel);
+
+                if (outcomeLabel is not null)
+                {
+                    outcomeLabel.text = outcomeText;
+
+                    outcomeLabel.style.color = outcomeColor;
+                }
+
+                var rewardLabel = overlay.Q<Label>(kRewardText);
+
+                if (rewardLabel is not null)
+                {
+                    rewardLabel.text = rewardText;
+
+                    rewardLabel.style.color = Color.white;
+                }
+            }
         }
 
         private static float RemapToRange(float value, float inMin, float inMax, float outMin, float outMax)

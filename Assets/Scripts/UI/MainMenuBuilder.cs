@@ -105,7 +105,7 @@ namespace Project.UI
 
                         this.m_newgamePressed = false;
 
-                        UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Creation);
+                        UIManager.Instance.TransitionWithDelay(() => UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Creation), null, 2.0f);
                     }
                 });
             }

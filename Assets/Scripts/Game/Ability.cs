@@ -127,7 +127,6 @@ namespace Project.Game
     {
         private readonly AbilityData m_data;
         private readonly IEntity m_owner;
-
         private int m_remainingCooldown;
 
         public bool IsOnCooldown => this.m_remainingCooldown > 0;
@@ -246,6 +245,11 @@ namespace Project.Game
                     enemy.AddEffect(EffectFactory.CreateEffect(effects[i], modifys[i], duratio[i], in ally.EntityStats));
                 }
             }
+        }
+
+        public void Reset()
+        {
+            this.m_remainingCooldown = 0;
         }
     }
 }

@@ -1,5 +1,5 @@
-Human,"Sprites/Races/Human"
-Dwarf,"Sprites/Races/Dwarf"
-Elf,"Sprites/Races/Elf"
-Dragonborn,"Sprites/Races/Dragonborn"
-Orc,"Sprites/Races/Orc"
+Human,Damage,0.20,Sprites/Races/Human
+Dwarf,Armor,0.20,Sprites/Races/Dwarf
+Elf,Evasion,0.20,Sprites/Races/Elf
+Dragonborn,Health,0.20,Sprites/Races/Dragonborn
+Orc,CritChance,0.20,Sprites/Races/Orc

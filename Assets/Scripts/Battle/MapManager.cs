@@ -1,10 +1,7 @@
-﻿using Project.UI;
+﻿using Project.Game;
+using Project.UI;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections;
 
 using UnityEngine;
 
@@ -24,7 +21,7 @@ namespace Project.Battle
         [SerializeField]
         private GameObject OverworldPrefab;
 
-        private void Start()
+        private void Awake()
         {
             if (this.InGameUI == null)
             {
@@ -37,16 +34,107 @@ namespace Project.Battle
             }
         }
 
-        private void Update()
+        public void LoadInGame()
         {
+            UIManager.Instance.TransitionWithDelay(() =>
+            {
+                if (this.m_overworld == null)
+                {
+                    this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+
+                    this.m_overworld.name = "Overworld";
+                }
+
+                this.m_overworld.SetActive(true);
+
+                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+            }, null, 2.0f);
         }
 
-        private void FixedUpdate()
+        public void ReturnToMain()
         {
+            UIManager.Instance.TransitionWithDelay(() =>
+            {
+                if (this.m_overworld != null)
+                {
+                    this.m_overworld.SetActive(false);
+                }
+
+                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
+            }, null, 2.0f);
         }
 
-        public void Load()
+        public void StartBattle()
         {
+            this.StartCoroutine(this.StartBattleInternal());
+        }
+
+        public void FinishBattle()
+        {
+            this.StartCoroutine(this.FinishBattleInternal());
+        }
+
+        public void UpdateAction(InGameBuilder.ActionType action)
+        {
+            this.InGameUI.UpdateAction(action);
+        }
+
+        private IEnumerator StartBattleInternal()
+        {
+            bool done = false;
+
+            UIManager.Instance.BeginTransitioning(() => done = true);
+
+            while (!done)
+            {
+                yield return null;
+            }
+
+            // #TODO get enemy information based on map cell here
+
+            var enemies = new Enemy[Random.Range(3, 5)];
+
+            for (int i = 0; i < enemies.Length; ++i)
+            {
+                enemies[i] = Enemy.CreateDefaultEnemy();
+            }
+
+            yield return null;
+
+            if (this.m_overworld != null)
+            {
+                this.m_overworld.SetActive(false);
+            }
+
+            yield return null;
+
+            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Battle);
+
+            yield return null;
+
+            BattleManager.Instance.StartBattle(Player.Instance, enemies, () =>
+            {
+                this.StartCoroutine(this.EndTransitionsAfterDelay(2.0f));
+            }, this.FinishBattle);
+        }
+
+        private IEnumerator FinishBattleInternal()
+        {
+            bool done = false;
+
+            UIManager.Instance.BeginTransitioning(() => done = true);
+
+            while (!done)
+            {
+                yield return null;
+            }
+
+            var outcome = BattleManager.Instance.Outcome;
+
+            BattleManager.Instance.FinishBattle();
+
+            yield return null;
+
             if (this.m_overworld == null)
             {
                 this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
@@ -55,19 +143,21 @@ namespace Project.Battle
             }
 
             this.m_overworld.SetActive(true);
+
+            yield return null;
+
+            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+
+            yield return null;
+
+            yield return this.StartCoroutine(this.EndTransitionsAfterDelay(2.0f));
         }
 
-        public void Unload()
+        private IEnumerator EndTransitionsAfterDelay(float delay)
         {
-            if (this.m_overworld != null)
-            {
-                this.m_overworld.SetActive(false);
-            }
-        }
+            yield return new WaitForSeconds(delay);
 
-        public void UpdateAction(InGameBuilder.ActionType action)
-        {
-            this.InGameUI.UpdateAction(action);
+            UIManager.Instance.EndTransitioning(null);
         }
     }
 }

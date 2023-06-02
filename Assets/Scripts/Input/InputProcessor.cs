@@ -30,7 +30,7 @@ namespace Project.Input
             this.m_mouseLeftDown = false;
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
             this.m_wasLeftPressed = false;
             this.m_wasRightPressed = false;

@@ -210,9 +210,7 @@ namespace Project.UI
 
                 if (this.m_currentAction == ActionType.Battle)
                 {
-                    MapManager.Instance.Unload();
-
-                    BattleManager.Instance.StartBattle();
+                    MapManager.Instance.StartBattle();
                 }
             });
 
@@ -296,7 +294,7 @@ namespace Project.UI
 
                             button.style.unityBackgroundImageTintColor = ms_foreHoverColor;
 
-                            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
+                            MapManager.Instance.ReturnToMain();
                         }
                     }
                 });

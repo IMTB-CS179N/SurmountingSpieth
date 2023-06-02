@@ -1,7 +1,6 @@
 .effect-style {
     width: 16px;
     height: 16px;
-    background-image: resource('Sprites/Trinkets/ClarityTrinket');
     border-left-width: 1px;
     border-right-width: 1px;
     border-top-width: 1px;
@@ -170,12 +169,12 @@
     background-color: rgb(209, 156, 76);
 }
 
-.entity-bar__container .unity-progress-bar__container {
+.health-indicator__container .unity-progress-bar__container {
     max-height: none;
     min-height: auto;
 }
 
-.entity-bar__background .unity-progress-bar__background {
+.health-indicator__background .unity-progress-bar__background {
     border-left-width: 2px;
     border-right-width: 2px;
     border-top-width: 2px;
@@ -191,7 +190,7 @@
     background-color: rgb(50, 50, 50);
 }
 
-.entity-bar__progress .unity-progress-bar__progress {
+.health-indicator__progress .unity-progress-bar__progress {
     background-color: rgb(175, 5, 0);
     margin-left: 0;
     margin-right: 0;
@@ -199,18 +198,19 @@
     margin-bottom: 0;
 }
 
-.entity-bar__title .unity-progress-bar__title {
+.health-indicator__title .unity-progress-bar__title {
     padding-left: 0;
     padding-right: 0;
     padding-top: 0;
     padding-bottom: 0;
 }
 
-.entity-bar {
+.health-indicator {
     width: 80px;
     height: 10px;
     margin-left: 0;
     margin-right: 0;
     margin-top: 0;
     margin-bottom: 0;
+    flex-shrink: 0;
 }

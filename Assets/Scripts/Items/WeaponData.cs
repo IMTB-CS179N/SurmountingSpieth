@@ -37,7 +37,7 @@ namespace Project.Items
         public int Price { get; set; }
         
         [Order(7)]
-        public int Tier {get; set; }
+        public int Tier { get; set; }
 
         [Order(8)]
         public Sprite Sprite
