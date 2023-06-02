@@ -340,6 +340,9 @@ namespace Project.Battle
             // index of the enemy selected for attacking
             int attackedIndex;
 
+            // regenerate stuff first
+            this.m_playerEntity.Regenerate();
+
             // cooldown all player abilities and effects before player's turn starts (get total heal, mana, dmg received from effects)
             this.m_playerEntity.Cooldown(out int coolHeal, out int coolMana, out int coolDmgs);
 
@@ -821,6 +824,9 @@ namespace Project.Battle
                 // perform updates only on alive enemies (note that this is also where we decide whether enemy's move is blocked b/c of stuns)
                 if (enemy.IsAlive)
                 {
+                    // regenerate stuff first
+                    enemy.Regenerate();
+
                     // cooldown all enemy abilities and effects, as well as get information on heal, mana, and dmg received amount
                     enemy.Cooldown(out int coolHeal, out int coolMana, out int coolDmgs);
 

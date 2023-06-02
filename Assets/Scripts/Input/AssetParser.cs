@@ -149,6 +149,10 @@ namespace Project.Input
             {
                 property.SetValue(target, Double.Parse(value));
             }
+            else if (property.PropertyType.IsEnum)
+            {
+                property.SetValue(target, Enum.Parse(property.PropertyType, value));
+            }
             else if (property.PropertyType == typeof(Sprite))
             {
                 property.SetValue(target, ResourceManager.LoadSprite(value));

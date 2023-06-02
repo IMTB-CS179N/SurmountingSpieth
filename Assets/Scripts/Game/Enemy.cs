@@ -11,8 +11,9 @@ namespace Project.Game
 {
     public class EnemyData : IDisposable
     {
-        private Sprite m_sprite;
+        private string m_ability;
         private string m_name;
+        private Sprite m_sprite;
 
         [Order(0)]
         public string Name
@@ -22,54 +23,28 @@ namespace Project.Game
         }
 
         [Order(1)]
-        public int Health { get; set; }
-
-        [Order(2)]
-        public int Damage { get; set; }
-
-        [Order(3)]
         public int Armor { get; set; }
 
-        [Order(4)]
+        [Order(2)]
         public float Precision { get; set; }
 
-        [Order(5)]
+        [Order(3)]
         public float Evasion { get; set; }
 
-        [Order(6)]
+        [Order(4)]
         public float CritChance { get; set; }
 
-        [Order(7)]
+        [Order(5)]
         public float CritMultiplier { get; set; }
 
-        [Order(8)]
-        public string AbilityName { get; set; }
+        [Order(6)]
+        public string Ability
+        {
+            get => this.m_ability;
+            set => this.m_ability = value ?? String.Empty;
+        }
 
-        [Order(9)]
-        public string[] AbilityEnemyEffects { get; set; }
-
-        [Order(10)]
-        public string[] AbilityAllyEffects { get; set; }
-
-        [Order(11)]
-        public float[] AbilityEnemyModifiers { get; set; }
-
-        [Order(12)]
-        public float[] AbilityAllyModifiers { get; set; }
-
-        [Order(13)]
-        public int[] AbilityEnemyDurations { get; set; }
-
-        [Order(14)]
-        public int[] AbilityAllyDurations { get; set; }
-
-        [Order(15)]
-        public float AbilityDamageMultiplier { get; set; }
-
-        [Order(16)]
-        public int AbilityCooldown { get; set; }
-
-        [Order(17)]
+        [Order(7)]
         public Sprite Sprite
         {
             get => this.m_sprite;
@@ -79,6 +54,7 @@ namespace Project.Game
         public EnemyData()
         {
             this.m_name = String.Empty;
+            this.m_ability = String.Empty;
             this.m_sprite = ResourceManager.DefaultSprite;
         }
 
@@ -100,6 +76,8 @@ namespace Project.Game
         private readonly List<Effect> m_effects;
         private readonly Ability[] m_abilities;
         private readonly EnemyData m_data;
+        private readonly int m_baseDamage;
+        private readonly int m_baseHealth;
         private EntityStats m_stats;
         private TurnStats m_turn;
 
@@ -121,36 +99,26 @@ namespace Project.Game
 
         public IReadOnlyList<Potion> EquippedPotions => Array.Empty<Potion>();
 
-        public Enemy(EnemyData data)
+        public Enemy(string name, int health, int damage)
         {
+            var data = ResourceManager.EnemyDatas.Find(_ => _.Name == name);
+            
             if (data is null)
             {
-                throw new ArgumentNullException(nameof(data));
+                throw new Exception($"Enemy data named \"{name}\" could not be found");
+            }
+
+            var ability = ResourceManager.EnemyAbilityDatas.Find(_ => _.Name == data.Ability);
+
+            if (ability is null)
+            {
+                throw new Exception($"Enemy Ability data named \"{data.Ability}\" could not be found");
             }
 
             this.m_data = data;
-
-            this.m_abilities = new Ability[1]
-            {
-                new Ability(this, new AbilityData()
-                {
-                    Class = "Enemy",
-                    Name = data.AbilityName,
-                    EnemyEffects = data.AbilityEnemyEffects,
-                    AllyEffects = data.AbilityAllyEffects,
-                    EnemyModifiers = data.AbilityEnemyModifiers,
-                    AllyModifiers = data.AbilityAllyModifiers,
-                    EnemyDurations = data.AbilityEnemyDurations,
-                    AllyDurations = data.AbilityAllyDurations,
-                    IsAOE = false,
-                    DamageMultiplier = data.AbilityDamageMultiplier,
-                    ManaCost = 0,
-                    CooldownTime = data.AbilityCooldown,
-                    Sprite = null,
-                    Description = null,
-                }),
-            };
-
+            this.m_baseHealth = Mathf.Max(0, health);
+            this.m_baseDamage = Mathf.Max(0, damage);
+            this.m_abilities = new Ability[1] { new Ability(this, ability) };
             this.m_effects = new List<Effect>();
 
             this.RecalculateStats();
@@ -159,13 +127,13 @@ namespace Project.Game
         private void RecalculateStats()
         {
             this.m_stats.MaxMana = 0;
-            this.m_stats.MaxHealth = this.m_data.Health;
+            this.m_stats.MaxHealth = this.m_baseHealth;
             this.m_stats.Armor = this.m_data.Armor;
-            this.m_stats.Damage = this.m_data.Damage;
+            this.m_stats.Damage = this.m_baseDamage;
             this.m_stats.Evasion = this.m_data.Evasion;
             this.m_stats.Precision = this.m_data.Precision;
             this.m_stats.CritChance = this.m_data.CritChance;
-            this.m_stats.CritMultiplier = this.m_data.CritMultiplier;
+            this.m_stats.CritMultiplier = this.m_data.CritMultiplier + 1.0f;
 
             for (int i = 0; i < this.m_effects.Count; ++i)
             {
@@ -199,6 +167,10 @@ namespace Project.Game
         public void InitTurn()
         {
             this.m_turn = default;
+        }
+
+        public void Regenerate()
+        {
         }
 
         public void Cooldown(out int totalHeal, out int totalMana, out int totalDmgs)
@@ -363,54 +335,7 @@ namespace Project.Game
 
         public static Enemy CreateDefaultEnemy()
         {
-            return new Enemy(new EnemyData()
-            {
-                Name = "Cow",
-                Health = 10 * Random.Range(10, 30),
-                Damage = Random.Range(8, 16),
-                Armor = 5 * Random.Range(4, 9),
-                Precision = 30.0f,
-                Evasion = 0.10f,
-                CritChance = 0.05f,
-                CritMultiplier = 1.5f,
-                AbilityName = "Milkdrop",
-                AbilityEnemyEffects = new string[]
-                {
-                    "Weaken",
-                    "Poison",
-                },
-                AbilityAllyEffects = new string[]
-                {
-                    "Healing",
-                    "Amplify",
-                    "Sharpness",
-                },
-                AbilityEnemyModifiers = new float[]
-                {
-                    0.20f,
-                    0.30f,
-                },
-                AbilityAllyModifiers = new float[]
-                {
-                    15.0f,
-                    0.20f,
-                    30.0f,
-                },
-                AbilityEnemyDurations = new int[]
-                {
-                    2,
-                    2,
-                },
-                AbilityAllyDurations = new int[]
-                {
-                    0,
-                    3,
-                    3,
-                },
-                AbilityDamageMultiplier = 1.2f,
-                AbilityCooldown = 5,
-                Sprite = ResourceManager.LoadSprite("Sprites/Monsters/" + ms_cowNames[Random.Range(0, ms_cowNames.Length)]),
-            });
+            return null; // #TODO
         }
     }
 }

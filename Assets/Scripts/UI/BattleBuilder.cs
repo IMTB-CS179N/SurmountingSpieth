@@ -405,6 +405,66 @@ namespace Project.UI
             }
         }
 
+        private class EnemyAbility : ITooltipProvider
+        {
+            private TooltipData m_data;
+
+            public readonly VisualElement Icon;
+
+            public readonly BattleBuilder Builder;
+
+            public ref readonly TooltipData Data => ref this.m_data;
+
+            public EnemyAbility(VisualElement element, BattleBuilder builder)
+            {
+                this.Icon = element;
+
+                this.Builder = builder;
+
+                element.pickingMode = PickingMode.Ignore;
+
+                element.style.visibility = Visibility.Hidden;
+
+                element.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+
+                this.SetupCallbacks();
+            }
+
+            private void SetupCallbacks()
+            {
+                this.Icon.RegisterCallback<PointerLeaveEvent>(e =>
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
+                    {
+                        this.Builder.DisplayTooltip(this, false);
+                    }
+                });
+
+                this.Icon.RegisterCallback<PointerEnterEvent>(e =>
+                {
+                    if (this.Icon.pickingMode == PickingMode.Position)
+                    {
+                        this.Builder.DisplayTooltip(this, true);
+                    }
+                });
+            }
+
+            public void UpdateInfo(Ability ability)
+            {
+                this.Icon.style.backgroundImage = new StyleBackground(ability.Sprite);
+
+                this.m_data = new TooltipData()
+                {
+                    Icon = ability.Sprite,
+                    Name = ability.Name,
+                    Type = kAbility,
+                    Time = ability.IsOnCooldown ? $"Cooldown: {ability.CooldownTime}" : "Can Use",
+                    Cost = String.Empty,
+                    Desc = ability.Description,
+                };
+            }
+        }
+
         private class AttackItem : ITooltipProvider, ISelectableItem, IDisposable
         {
             private readonly TooltipData m_data;
@@ -1343,7 +1403,7 @@ namespace Project.UI
         private const string kMainLayout = "main-layout";
         private const string kTooltipLayout = "tooltip-layout";
 
-        private const string kEffectContainer = "effect-container";
+        private const string kEffectLayout = "effect-layout";
         private const string kPotionLayout = "potion-layout"; // only for player
         private const string kInteractLayout = "interact-layout"; // only for player
         private const string kManaLayout = "mana-layout"; // only for player
@@ -1362,6 +1422,8 @@ namespace Project.UI
 
         private const string kAbilitySlot3Icon = "ability-slot3-icon";
         private const string kAbilitySlot3Text = "ability-slot3-text";
+
+        private const string kEnemyAbility = "enemy-ability";
 
         private const string kActionButton = "action-button";
         private const string kActionLabel = "action-label";
@@ -1454,8 +1516,9 @@ namespace Project.UI
         private AbilityItem m_abilityItem3;
         private AbilityItem m_abilityItem2;
         private AbilityItem m_abilityItem1;
-        
+
         private ActionButton m_actionButton;
+        private EnemyAbility m_enemyAbility;
         private AttackItem m_attackItem;
 
         private TextStatistic m_critMultiplierStatistic;
@@ -1571,6 +1634,7 @@ namespace Project.UI
             this.SetupLayouts();
             this.SetupStatistics();
             this.SetupEffectList();
+            this.SetupEnemyAbility();
             this.SetupTooltip();
 
             this.UpdateEntity();
@@ -1764,11 +1828,21 @@ namespace Project.UI
 
         private void SetupEffectList()
         {
-            this.m_effectContainer = this.UI.rootVisualElement.Q<VisualElement>(kEffectContainer);
+            this.m_effectContainer = this.UI.rootVisualElement.Q<VisualElement>(kEffectLayout);
 
             if (this.m_effectContainer is not null)
             {
                 this.m_effectList = new List<EffectStatistic>();
+            }
+        }
+
+        private void SetupEnemyAbility()
+        {
+            var element = this.UI.rootVisualElement.Q<VisualElement>(kEnemyAbility);
+
+            if (element is not null)
+            {
+                this.m_enemyAbility = new EnemyAbility(element, this);
             }
         }
 
@@ -1877,6 +1951,13 @@ namespace Project.UI
                         this.m_interactLayout.style.display = DisplayStyle.Flex;
                     }
 
+                    if (this.m_enemyAbility is not null)
+                    {
+                        this.m_enemyAbility.Icon.style.visibility = Visibility.Hidden;
+
+                        this.m_enemyAbility.Icon.pickingMode = PickingMode.Ignore;
+                    }
+
                     this.m_attackItem = new AttackItem(this);
 
                     this.m_abilityItem1 = new AbilityItem(kAbilitySlot1Icon, kAbilitySlot1Text, 0, entity.Abilities.Count > 0 ? entity.Abilities[0] : null, this);
@@ -1901,6 +1982,13 @@ namespace Project.UI
                     if (this.m_interactLayout is not null)
                     {
                         this.m_interactLayout.style.display = DisplayStyle.None;
+                    }
+
+                    if (this.m_enemyAbility is not null)
+                    {
+                        this.m_enemyAbility.Icon.style.visibility = Visibility.Visible;
+
+                        this.m_enemyAbility.Icon.pickingMode = PickingMode.Position;
                     }
                 }
 
@@ -1929,7 +2017,7 @@ namespace Project.UI
             this.m_actionButton?.UpdateStatus();
         }
 
-        private void DisplayTooltip(ITooltipProvider provider, bool display)
+        private void DisplayTooltip(ITooltipProvider provider, bool display, bool forceUpdate = false)
         {
             // use two things: provider is null when no interactive UI is shown
             // otherwise, provider not null means element that we just entered/left hover-wise
@@ -1941,11 +2029,11 @@ namespace Project.UI
                 return; // no tooltip is allowed when we are hiding/showing layout
             }
 
-            if (provider is null)
+            if (provider is null || forceUpdate)
             {
                 // doesn't matter what value 'display' is
 
-                UpdateInternal(null);
+                UpdateInternal(provider);
             }
             else
             {
@@ -2145,10 +2233,16 @@ namespace Project.UI
 
         public void UpdateInterface()
         {
-            // #TODO handle tooltip update since we redo tons of stuff
-
             if (this.m_effectContainer is not null)
             {
+                for (int i = 0; i < this.m_effectList.Count; ++i)
+                {
+                    if (this.m_effectList[i] == this.m_currentSelected)
+                    {
+                        this.DisplayTooltip(null, false);
+                    }
+                }
+
                 this.m_effectList.Clear();
                 this.m_effectContainer.Clear();
             }
@@ -2192,6 +2286,14 @@ namespace Project.UI
                     this.m_potionSlot2.UpdatePotion(entity.EquippedPotions.Count > 1 ? entity.EquippedPotions[1] : null);
                     this.m_potionSlot3.UpdatePotion(entity.EquippedPotions.Count > 2 ? entity.EquippedPotions[2] : null);
                 }
+                else
+                {
+                    Debug.Assert(entity.Abilities.Count > 0);
+
+                    this.m_enemyAbility.UpdateInfo(entity.Abilities[0]);
+                }
+
+                this.DisplayTooltip(this.m_currentProvider, this.m_currentProvider is not null, true);
             }
         }
 

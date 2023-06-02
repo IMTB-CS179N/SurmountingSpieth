@@ -36,6 +36,8 @@ namespace Project.Game
 
         void InitTurn();
 
+        void Regenerate();
+
         void Cooldown(out int totalHeal, out int totalMana, out int totalDmgs);
 
         void ApplyDamage(int damage);

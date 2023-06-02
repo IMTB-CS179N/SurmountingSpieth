@@ -21,6 +21,12 @@ namespace Project.Game
         }
 
         [Order(1)]
+        public Statistic Stat { get; set; }
+
+        [Order(2)]
+        public float Modifier { get; set; }
+
+        [Order(3)]
         public Sprite Sprite
         {
             get

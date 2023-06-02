@@ -1,7 +1,6 @@
 .effect-style {
     width: 16px;
     height: 16px;
-    background-image: resource('Sprites/Trinkets/ClarityTrinket');
     border-left-width: 1px;
     border-right-width: 1px;
     border-top-width: 1px;

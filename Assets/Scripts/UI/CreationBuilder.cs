@@ -12,24 +12,16 @@ namespace Project.UI
 {
     public class CreationBuilder : UIBuilder
     {
-        private class IconElement : VisualElement
+        private class RaceElement : VisualElement
         {
-            public readonly string Name;
+            public readonly RaceInfo Race;
 
             public readonly VisualElement Image;
 
-            public IconElement(RaceInfo info) : this(info.Name, info.Sprite)
+            public RaceElement(RaceInfo race)
             {
-            }
-
-            public IconElement(ClassInfo info) : this(info.Name, info.Sprite)
-            {
-            }
-
-            public IconElement(string name, Sprite sprite)
-            {
-                this.Name = name;
-                this.name = $"class-{name}-back";
+                this.Race = race;
+                this.name = $"race-{race.Name}-back";
                 this.pickingMode = PickingMode.Ignore;
 
                 this.style.width = 80;
@@ -50,7 +42,7 @@ namespace Project.UI
 
                 this.Image = new VisualElement()
                 {
-                    name = $"class-{name}-image",
+                    name = $"race-{race.Name}-image",
                     pickingMode = PickingMode.Position,
                 };
 
@@ -58,7 +50,62 @@ namespace Project.UI
                 this.Image.style.flexGrow = 1.0f;
 
                 this.Image.style.unityBackgroundImageTintColor = Color.white;
-                this.Image.style.backgroundImage = new StyleBackground(sprite);
+                this.Image.style.backgroundImage = new StyleBackground(race.Sprite);
+                this.Image.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+
+                this.Add(this.Image);
+            }
+
+            public void Select()
+            {
+                this.style.unityBackgroundImageTintColor = ms_selectTint;
+            }
+
+            public void Deselect()
+            {
+                this.style.unityBackgroundImageTintColor = Color.clear;
+            }
+        }
+
+        private class ClassElement : VisualElement
+        {
+            public readonly ClassInfo Class;
+
+            public readonly VisualElement Image;
+
+            public ClassElement(ClassInfo @class)
+            {
+                this.Class = @class;
+                this.name = $"class-{@class.Name}-back";
+                this.pickingMode = PickingMode.Ignore;
+
+                this.style.width = 80;
+                this.style.height = 80;
+
+                this.style.marginTop = 4;
+                this.style.marginBottom = 4;
+                this.style.marginLeft = 4;
+                this.style.marginRight = 4;
+
+                this.style.paddingTop = 4;
+                this.style.paddingBottom = 4;
+                this.style.paddingLeft = 4;
+                this.style.paddingRight = 4;
+
+                this.style.unityBackgroundImageTintColor = Color.clear;
+                this.style.backgroundImage = new StyleBackground(ResourceManager.LoadSprite(ResourceManager.SelectedItemPath));
+
+                this.Image = new VisualElement()
+                {
+                    name = $"class-{@class.Name}-image",
+                    pickingMode = PickingMode.Position,
+                };
+
+                this.Image.style.flexShrink = 1.0f;
+                this.Image.style.flexGrow = 1.0f;
+
+                this.Image.style.unityBackgroundImageTintColor = Color.white;
+                this.Image.style.backgroundImage = new StyleBackground(@class.Sprite);
                 this.Image.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
 
                 this.Add(this.Image);
@@ -84,14 +131,16 @@ namespace Project.UI
         private const string kDamageBar = "damage-bar";
         private const string kArmorBar = "armor-bar";
         private const string kEvasionBar = "evasion-bar";
+        private const string kBonusImage = "bonus-image";
+        private const string kBonusLabel = "bonus-label";
 
         private static readonly Color ms_hoverTint = new Color32(200, 200, 200, 255);
         private static readonly Color ms_pressTint = new Color32(170, 170, 170, 255);
 
         private static readonly Color ms_selectTint = Color.black;
 
-        private readonly List<IconElement> m_classIcons = new();
-        private readonly List<IconElement> m_raceIcons = new();
+        private readonly List<ClassElement> m_classIcons = new();
+        private readonly List<RaceElement> m_raceIcons = new();
 
         private float m_minimumHealth;
         private float m_maximumHealth;
@@ -110,6 +159,30 @@ namespace Project.UI
 
         private int m_selectedClass = -1;
         private int m_selectedRace = -1;
+
+        [SerializeField]
+        private Sprite HealthSprite;
+
+        [SerializeField]
+        private Sprite ManaSprite;
+
+        [SerializeField]
+        private Sprite DamageSprite;
+
+        [SerializeField]
+        private Sprite ArmorSprite;
+
+        [SerializeField]
+        private Sprite EvasionSprite;
+
+        [SerializeField]
+        private Sprite PrecisionSprite;
+
+        [SerializeField]
+        private Sprite CritChanceSprite;
+
+        [SerializeField]
+        private Sprite CritMultSprite;
 
         protected override void BindEvents()
         {
@@ -179,7 +252,7 @@ namespace Project.UI
 
                 for (int i = 0; i < classes.Count; ++i)
                 {
-                    var icon = new IconElement(classes[i]);
+                    var icon = new ClassElement(classes[i]);
 
                     icon.RegisterCallback<MouseLeaveEvent>(e =>
                     {
@@ -218,7 +291,7 @@ namespace Project.UI
                             this.UpdateCharacterAndFinish();
                         }
 
-                        Debug.Log($"Currently selected class is \"{icon.Name}\"!");
+                        Debug.Log($"Currently selected class is \"{icon.Class.Name}\"!");
                     });
 
                     container.Add(icon);
@@ -238,7 +311,7 @@ namespace Project.UI
 
                 for (int i = 0; i < races.Count; ++i)
                 {
-                    var icon = new IconElement(races[i]);
+                    var icon = new RaceElement(races[i]);
 
                     icon.RegisterCallback<MouseLeaveEvent>(e =>
                     {
@@ -277,7 +350,7 @@ namespace Project.UI
                             this.UpdateCharacterAndFinish();
                         }
 
-                        Debug.Log($"Currently selected race is \"{icon.Name}\"!");
+                        Debug.Log($"Currently selected race is \"{icon.Race.Name}\"!");
                     });
 
                     container.Add(icon);
@@ -289,7 +362,7 @@ namespace Project.UI
 
         private void SetupStatistics()
         {
-            var stats = ResourceManager.Stats;
+            var stats = ResourceManager.Classes;
             int count = stats.Count;
 
             if (count != 0)
@@ -398,10 +471,10 @@ namespace Project.UI
                 this.m_minimumEvasion = min;
             }
 
-            this.UpdateStatistics(null);
+            this.UpdateStatistics(null, null);
         }
 
-        private void UpdateStatistics(BaseStats stats)
+        private void UpdateStatistics(RaceInfo raceInfo, ClassInfo classInfo)
         {
             var root = this.UI.rootVisualElement;
 
@@ -410,8 +483,10 @@ namespace Project.UI
             var damageBar = root.Q<ProgressBar>(kDamageBar);
             var armorBar = root.Q<ProgressBar>(kArmorBar);
             var evasionBar = root.Q<ProgressBar>(kEvasionBar);
+            var bonusImage = root.Q<VisualElement>(kBonusImage);
+            var bonusLabel = root.Q<Label>(kBonusLabel);
 
-            if (stats is null)
+            if (classInfo is null)
             {
                 if (healthBar is not null)
                 {
@@ -437,58 +512,112 @@ namespace Project.UI
                 {
                     evasionBar.value = 0.0f;
                 }
+
+                if (bonusImage is not null)
+                {
+                    bonusImage.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+
+                    bonusImage.style.visibility = Visibility.Hidden;
+                }
+
+                if (bonusLabel is not null)
+                {
+                    bonusLabel.text = String.Empty;
+
+                    bonusLabel.style.visibility = Visibility.Hidden;
+                }
             }
             else
             {
                 if (healthBar is not null)
                 {
-                    healthBar.value = RemapToRange(stats.Health, this.m_minimumHealth, this.m_maximumHealth, 0.0f, 100.0f);
+                    healthBar.value = RemapToRange(classInfo.Health, this.m_minimumHealth, this.m_maximumHealth, 0.0f, 100.0f);
                 }
 
                 if (manaBar is not null)
                 {
-                    manaBar.value = RemapToRange(stats.Mana, this.m_minimumMana, this.m_maximumMana, 0.0f, 100.0f);
+                    manaBar.value = RemapToRange(classInfo.Mana, this.m_minimumMana, this.m_maximumMana, 0.0f, 100.0f);
                 }
 
                 if (damageBar is not null)
                 {
-                    damageBar.value = RemapToRange(stats.Damage, this.m_minimumDamage, this.m_maximumDamage, 0.0f, 100.0f);
+                    damageBar.value = RemapToRange(classInfo.Damage, this.m_minimumDamage, this.m_maximumDamage, 0.0f, 100.0f);
                 }
 
                 if (armorBar is not null)
                 {
-                    armorBar.value = RemapToRange(stats.Armor, this.m_minimumArmor, this.m_maximumArmor, 0.0f, 100.0f);
+                    armorBar.value = RemapToRange(classInfo.Armor, this.m_minimumArmor, this.m_maximumArmor, 0.0f, 100.0f);
                 }
 
                 if (evasionBar is not null)
                 {
-                    evasionBar.value = RemapToRange(stats.Evasion, this.m_minimumEvasion, this.m_maximumEvasion, 0.0f, 100.0f);
+                    evasionBar.value = RemapToRange(classInfo.Evasion, this.m_minimumEvasion, this.m_maximumEvasion, 0.0f, 100.0f);
                 }
+
+                if (bonusImage is not null)
+                {
+                    bonusImage.style.backgroundImage = new StyleBackground(GetSpriteForBonus(raceInfo));
+
+                    bonusImage.style.visibility = Visibility.Visible;
+                }
+
+                if (bonusLabel is not null)
+                {
+                    bonusLabel.text = GetStringForBonus(raceInfo);
+
+                    bonusLabel.style.visibility = Visibility.Visible;
+                }
+            }
+
+            Sprite GetSpriteForBonus(RaceInfo info)
+            {
+                return info.Stat switch
+                {
+                    Statistic.Health => this.HealthSprite,
+                    Statistic.Mana => this.ManaSprite,
+                    Statistic.Damage => this.DamageSprite,
+                    Statistic.Armor => this.ArmorSprite,
+                    Statistic.Evasion => this.EvasionSprite,
+                    Statistic.Precision => this.PrecisionSprite,
+                    Statistic.CritChance => this.CritChanceSprite,
+                    Statistic.CritMultiplier => this.CritMultSprite,
+                    _ => null,
+                };
+            }
+
+            string GetStringForBonus(RaceInfo info)
+            {
+                return (info.Modifier * 100.0f).ToString() + "% " + info.Stat switch
+                {
+                    Statistic.Health => "HEALTH",
+                    Statistic.Mana => "MANA",
+                    Statistic.Damage => "DAMAGE",
+                    Statistic.Armor => "ARMOR",
+                    Statistic.Evasion => "EVASION",
+                    Statistic.Precision => "PRECISION",
+                    Statistic.CritChance => "CRIT. CHANCE",
+                    Statistic.CritMultiplier => "CRIT. DAMAGE",
+                    _ => null,
+                } + " BONUS";
             }
         }
 
         private void UpdateCharacterAndFinish()
         {
-            var stats = default(BaseStats);
-
+            var raceInfo = default(RaceInfo);
+            var classInfo = default(ClassInfo);
+            
             if (this.IsFinishButtonInteractable())
             {
-                var @class = this.m_classIcons[this.m_selectedClass].Name;
-                var race = this.m_raceIcons[this.m_selectedRace].Name;
-
-                stats = ResourceManager.Stats.Find(_ => _.Class == @class && _.Race == race);
-
-                if (stats is null)
-                {
-                    Debug.Log($"Stats for character with class \"{@class}\" and race \"{race}\" does not exist!");
-                }
+                raceInfo = this.m_raceIcons[this.m_selectedRace].Race;
+                classInfo = this.m_classIcons[this.m_selectedClass].Class;
             }
 
             var finish = this.UI.rootVisualElement.Q<VisualElement>(kFinishButton);
 
             if (finish is not null)
             {
-                if (stats is null)
+                if (raceInfo is null || classInfo is null)
                 {
                     finish.style.unityBackgroundImageTintColor = Color.clear;
 
@@ -506,17 +635,17 @@ namespace Project.UI
 
             if (character is not null)
             {
-                if (stats is null)
+                if (raceInfo is null || classInfo is null)
                 {
                     character.style.backgroundImage = new StyleBackground(StyleKeyword.None);
                 }
                 else
                 {
-                    character.style.backgroundImage = new StyleBackground(stats.Sprite);
+                    character.style.backgroundImage = new StyleBackground(Player.GetSpriteForRaceClass(raceInfo.Name, classInfo.Name));
                 }
             }
 
-            this.UpdateStatistics(stats);
+            this.UpdateStatistics(raceInfo, classInfo);
         }
 
         private bool IsFinishButtonInteractable()
@@ -528,8 +657,8 @@ namespace Project.UI
         {
             if (this.IsFinishButtonInteractable())
             {
-                var @class = this.m_classIcons[this.m_selectedClass].Name;
-                var race = this.m_raceIcons[this.m_selectedRace].Name;
+                var race = this.m_raceIcons[this.m_selectedRace].Race;
+                var @class = this.m_classIcons[this.m_selectedClass].Class;
 
                 Player.Initialize(race, @class);
 

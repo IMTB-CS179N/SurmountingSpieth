@@ -869,6 +869,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa1cd8273d138f04c90e8254bb70b092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HealthSprite: {fileID: 21300000, guid: 17422b6c46e30f84fb2a0f0cf9618417, type: 3}
+  ManaSprite: {fileID: 21300000, guid: 142d64fc2400634408099d568cdcbb70, type: 3}
+  DamageSprite: {fileID: 21300000, guid: be5b0b4cf56e1d8488e53d4e11b8e2cc, type: 3}
+  ArmorSprite: {fileID: 21300000, guid: 44d5493da4dcfa141b8b13bdcd13046c, type: 3}
+  EvasionSprite: {fileID: 21300000, guid: a5b851049abbbc949bf456a568df299b, type: 3}
+  PrecisionSprite: {fileID: 21300000, guid: 07ae84518ee85e14a9328ba8de99e1a5, type: 3}
+  CritChanceSprite: {fileID: 21300000, guid: efc514e323ba9c547ad7d6a7e2b85482, type: 3}
+  CritMultSprite: {fileID: 21300000, guid: 7ffc2b6e5b97553449cdd31b623b4490, type: 3}
 --- !u!1 &1804606728
 GameObject:
   m_ObjectHideFlags: 0

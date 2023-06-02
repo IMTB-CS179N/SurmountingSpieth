@@ -1,0 +1,18 @@
+Enemy,Oozing Growth,"Slow, Dizzyness",,"0.15, 30",,"3, 2",,1,0,FALSE,4,Sprites/EnemyAbilities/OozingGrowth,Description
+Enemy,Slime Spear,"Shred, Weaken",,"0.20, 0.10",,"2, 2",,0.75,0,FALSE,3,Sprites/EnemyAbilities/SlimeSpear,Description
+Enemy,Pollute,,Flow,,0.3,,4,0,0,FALSE,5,Sprites/EnemyAbilities/Pollute,Description
+Enemy,Marching Cow,,Amplify,,0.25,,3,0,0,FALSE,4,Sprites/EnemyAbilities/MarchingCow,Description
+Enemy,Rasterbolt,Dispel,,0,,,0,1,0,FALSE,2,Sprites/EnemyAbilities/Rasterbolt,Description
+Enemy,Sickly Breath,Poison,,0.25,,3,,1,0,FALSE,3,Sprites/EnemyAbilities/SicklyBreath,Description
+Enemy,Quick Swing,Shred,,0.3,,2,,1.25,0,FALSE,3,Sprites/EnemyAbilities/QuickSwing,Description
+Enemy,Piercing Stare,,Cleanse,,0,,0,0,0,FALSE,5,Sprites/EnemyAbilities/PiercingStare,Description
+Enemy,Enraged Strike,,"Amplify, Shatter",,"0.2, 1",,"2, 2",1.15,0,FALSE,4,Sprites/EnemyAbilities/EnragedStrike,Description
+Enemy,Ramble,"Burn, Weaken",Sharpness,"0.5, 0.2",40,"3, 3",3,1,0,FALSE,5,Sprites/EnemyAbilities/Ramble,Description
+Enemy,Demo Feedback,"Slow, Dizzyness, Weaken, Shred, Dispel",Cleanse,"0.2, 40, 0.2, 0.3, 0",0,"3, 3, 3, 3, 0",0,2,0,FALSE,6,Sprites/EnemyAbilities/DemoFeedback,Description
+Enemy,Lab,"Dizzyness, Weaken",,"15, 0.2",,"3, 4",,1.2,0,FALSE,5,Sprites/EnemyAbilities/Lab,Description
+Enemy,Ticket,"Shred, Poison",,"0.2, 0.25",,"2, 4",,1,0,FALSE,5,Sprites/EnemyAbilities/Ticket,Description
+Enemy,TA,,Amplify,,0.25,,3,1.2,0,FALSE,4,Sprites/EnemyAbilities/TA,Description
+Enemy,Stench,Slow,,0.3,,3,,1,0,FALSE,4,Sprites/EnemyAbilities/Stench,Description
+Enemy,ChatGPT,,Barricade,,0.3,,4,1,0,FALSE,6,Sprites/EnemyAbilities/ChatGPT,Description
+Enemy,Bill,,Lethality,,0.2,,3,1,0,FALSE,4,Sprites/EnemyAbilities/Bill,Description
+Enemy,Workshop,Shred,Flow,0.2,0.25,2,3,1,0,FALSE,5,Sprites/EnemyAbilities/Workshop,Description

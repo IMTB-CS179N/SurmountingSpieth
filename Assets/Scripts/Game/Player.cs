@@ -18,7 +18,9 @@ namespace Project.Game
         private readonly List<ArmorData> m_armors;
         private readonly List<Effect> m_effects;
         private readonly Ability[] m_abilities;
-        private readonly BaseStats m_baseStats;
+        private readonly ClassInfo m_classInfo;
+        private readonly RaceInfo m_raceInfo;
+        private readonly Sprite m_sprite;
 
         private readonly Potion[] m_equippedPotions;
 
@@ -40,23 +42,25 @@ namespace Project.Game
 
         public const int MaxPotionSlots = 3;
 
+        public const int ManaRegeneration = 5;
+
+        public const int HealthRegeneration = 2;
+
+        public const string CharacterSpriteDB = "Sprites/Characters/";
+
         public static readonly float SellMultiplier = 0.8f;
-
-        public static readonly int HealthRegeneration = 20;
-
-        public static readonly int ManaRegeneration = 10;
 
         public static readonly int InitialPlayerBank = 10000;
 
         public static Player Instance => ms_instance ?? throw new Exception("Cannot access player when not in game");
 
-        public Sprite Sprite => this.m_baseStats.Sprite;
+        public Sprite Sprite => this.m_sprite;
 
         public bool IsPlayer => true;
 
         public bool IsAlive => this.m_stats.CurHealth > 0;
 
-        public bool IsMelee => true;
+        public bool IsMelee => this.m_classInfo.IsMelee;
 
         public ref readonly EntityStats EntityStats => ref this.m_stats;
 
@@ -94,28 +98,38 @@ namespace Project.Game
 
         public IReadOnlyList<Ability> Abilities => this.m_abilities;
 
-        public Player(string race, string @class)
+        public Player(string race, string @class) : this(ResourceManager.Races.Find(_ => _.Name == race), ResourceManager.Classes.Find(_ => _.Name == @class))
         {
-            var stats = ResourceManager.Stats.Find(_ => _.Race == race && _.Class == @class);
+        }
 
-            if (stats is null)
+        public Player(RaceInfo race, ClassInfo @class)
+        {
+            if (race is null)
             {
-                throw new ArgumentException($"Player initialization failure: cannot find stats for race \"{race}\" and class \"{@class}\"");
+                throw new ArgumentException(nameof(race));
             }
 
-            this.m_baseStats = stats;
+            if (@class is null)
+            {
+                throw new ArgumentException(nameof(@class));
+            }
+
+            this.m_raceInfo = race;
+            this.m_classInfo = @class;
             this.m_armors = new();
             this.m_weapons = new();
             this.m_potions = new();
             this.m_effects = new();
             this.m_trinkets = new();
-            this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == @class).Select(_ => new Ability(this, _)).ToArray();
+            this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == @class.Name).Select(_ => new Ability(this, _)).ToArray();
 
             this.m_equippedPotions = new Potion[Player.MaxPotionSlots];
             this.m_helmetTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
             this.m_chestplateTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
             this.m_leggingsTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
             this.m_weaponTrinkets = new WeaponTrinket[Weapon.MaxTrinketSlots];
+
+            this.m_sprite = Player.GetSpriteForRaceClass(race.Name, @class.Name);
 
             this.m_money = Player.InitialPlayerBank;
 
@@ -126,14 +140,14 @@ namespace Project.Game
 
         private void RecalculateStats()
         {
-            this.m_stats.MaxHealth = this.m_baseStats.Health;
-            this.m_stats.MaxMana = this.m_baseStats.Mana;
-            this.m_stats.Armor = this.m_baseStats.Armor;
-            this.m_stats.Damage = this.m_baseStats.Damage;
-            this.m_stats.Evasion = this.m_baseStats.Evasion;
-            this.m_stats.Precision = this.m_baseStats.Precision;
-            this.m_stats.CritChance = this.m_baseStats.CritChance;
-            this.m_stats.CritMultiplier = this.m_baseStats.CritMultiplier;
+            this.m_stats.MaxHealth = this.m_classInfo.Health;
+            this.m_stats.MaxMana = this.m_classInfo.Mana;
+            this.m_stats.Armor = this.m_classInfo.Armor;
+            this.m_stats.Damage = this.m_classInfo.Damage;
+            this.m_stats.Evasion = this.m_classInfo.Evasion;
+            this.m_stats.Precision = this.m_classInfo.Precision;
+            this.m_stats.CritChance = this.m_classInfo.CritChance;
+            this.m_stats.CritMultiplier = this.m_classInfo.CritMultiplier + 1.0f;
 
             if (this.m_helmet is not null)
             {
@@ -215,6 +229,41 @@ namespace Project.Game
             for (int i = 0; i < this.m_effects.Count; ++i)
             {
                 this.m_effects[i].ModifyStats(ref this.m_stats, ref this.m_turn);
+            }
+
+            switch (this.m_raceInfo.Stat)
+            {
+                case Statistic.Health:
+                    this.m_stats.MaxHealth += (int)(this.m_stats.MaxHealth * this.m_raceInfo.Modifier);
+                    break;
+
+                case Statistic.Mana:
+                    this.m_stats.MaxMana += (int)(this.m_stats.MaxMana * this.m_raceInfo.Modifier);
+                    break;
+
+                case Statistic.Damage:
+                    this.m_stats.Damage += (int)(this.m_stats.Damage * this.m_raceInfo.Modifier);
+                    break;
+
+                case Statistic.Armor:
+                    this.m_stats.Armor += (int)(this.m_stats.Armor * this.m_raceInfo.Modifier);
+                    break;
+
+                case Statistic.Evasion:
+                    this.m_stats.Evasion += this.m_stats.Evasion * this.m_raceInfo.Modifier;
+                    break;
+
+                case Statistic.Precision:
+                    this.m_stats.Precision += this.m_stats.Precision * this.m_raceInfo.Modifier;
+                    break;
+
+                case Statistic.CritChance:
+                    this.m_stats.CritChance += this.m_stats.CritChance * this.m_raceInfo.Modifier;
+                    break;
+
+                case Statistic.CritMultiplier:
+                    this.m_stats.CritMultiplier += this.m_stats.CritMultiplier * this.m_raceInfo.Modifier;
+                    break;
             }
 
             this.m_stats.CurHealth = Mathf.Clamp(this.m_stats.CurHealth, 0, this.m_stats.MaxHealth);
@@ -300,6 +349,12 @@ namespace Project.Game
         public void InitTurn()
         {
             this.m_turn = default;
+        }
+
+        public void Regenerate()
+        {
+            this.m_stats.CurHealth = Mathf.Min(this.m_stats.CurHealth + Player.HealthRegeneration, this.m_stats.MaxHealth);
+            this.m_stats.CurMana = Mathf.Min(this.m_stats.CurMana + Player.ManaRegeneration, this.m_stats.MaxMana);
         }
 
         public void Cooldown(out int totalHeal, out int totalMana, out int totalDmgs)
@@ -1340,6 +1395,11 @@ namespace Project.Game
             ms_instance = new Player(race, @class);
         }
 
+        public static void Initialize(RaceInfo race, ClassInfo @class)
+        {
+            ms_instance = new Player(race, @class);
+        }
+
         public static void InitializeFromSaveData()
         {
             // #TODO
@@ -1348,6 +1408,11 @@ namespace Project.Game
         public static void Deinitialize()
         {
             ms_instance = null;
+        }
+
+        public static Sprite GetSpriteForRaceClass(string race, string @class)
+        {
+            return ResourceManager.LoadSprite(CharacterSpriteDB + race + @class);
         }
     }
 }

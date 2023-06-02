@@ -21,6 +21,33 @@ namespace Project.Game
         }
 
         [Order(1)]
+        public bool IsMelee { get; set; }
+
+        [Order(2)]
+        public int Health { get; set; }
+
+        [Order(3)]
+        public int Mana { get; set; }
+
+        [Order(4)]
+        public int Damage { get; set; }
+
+        [Order(5)]
+        public int Armor { get; set; }
+
+        [Order(6)]
+        public float Evasion { get; set; }
+
+        [Order(7)]
+        public float Precision { get; set; }
+
+        [Order(8)]
+        public float CritChance { get; set; }
+
+        [Order(9)]
+        public float CritMultiplier { get; set; }
+
+        [Order(10)]
         public Sprite Sprite
         {
             get
