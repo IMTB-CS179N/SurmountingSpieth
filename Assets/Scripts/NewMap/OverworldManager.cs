@@ -100,7 +100,15 @@ namespace Project.Overworld
                 // Debug.Log("dlksjfslkj");
                 int playerY = (int)(player.position.y) / UNIT_SIZE + 2;
                 Debug.Log("Arrived at position " + GridTiles[playerY, 6].transform.position);
-                GenerateLevel(newCells);
+                int rand = Random.Range(0, 2);
+                if (rand == 0)
+                {
+                    GenerateLevel(newCells);
+                }
+                else
+                {
+                    GenerateShop();
+                }
                 SetSprites();
                 switch (this.columns[this.currentX].GetCell(playerY).tileType)
                 {
@@ -148,6 +156,10 @@ namespace Project.Overworld
             int tilesX = -(int)TilesParent.position.x / UNIT_SIZE;
             int playerY = (int)player.position.y / UNIT_SIZE;
             int newX = (int)newPos.x / UNIT_SIZE;
+            if (newX <= tilesX)
+            {
+                return;
+            }
             int newY = (int)newPos.y / UNIT_SIZE;
 
             int deltaX = newX - tilesX;
@@ -395,6 +407,17 @@ namespace Project.Overworld
                 spacer.SetCell(new BackgroundInfo(playerHeight, CellInfo.TileType.Horizontal));
                 columns.Add(spacer);
             }
+            for (
+                int i = playerSideTurns.nonBlank[0] + 1;
+                i < playerSideTurns.nonBlank[playerSideTurns.nonBlank.Count - 1];
+                i++
+            )
+            {
+                if (!playerSideTurns.nonBlank.Contains(i))
+                {
+                    playerSideTurns.SetCell(new BackgroundInfo(i, CellInfo.TileType.Vertical));
+                }
+            }
             columns.Add(playerSideTurns);
             for (int i = numDist / 2; i < numDist; i++)
             {
@@ -446,6 +469,15 @@ namespace Project.Overworld
         bool Moving()
         {
             return player.position.y != movePointY || TilesParent.position.x != -movePointX;
+        }
+
+        void GenerateShop()
+        {
+            List<CellInfo> level = new List<CellInfo>();
+            int height = Random.Range(0, 5);
+            ShopInfo shop = new ShopInfo(height, 0);
+            level.Add(shop);
+            GenerateLevel(level);
         }
 
         void SetSprites()
