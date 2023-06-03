@@ -1,5 +1,6 @@
 ﻿using Project.Game;
 using Project.UI;
+using Project.Overworld;
 
 using System.Collections;
 
@@ -11,15 +12,28 @@ namespace Project.Battle
     {
         private static MapManager ms_instance;
 
-        private GameObject m_overworld;
+        // private GameObject m_overworld;
 
-        public static MapManager Instance => ms_instance == null ? (ms_instance = FindFirstObjectByType<MapManager>()) : ms_instance;
+        public static MapManager Instance =>
+            ms_instance == null ? (ms_instance = FindFirstObjectByType<MapManager>()) : ms_instance;
 
         [SerializeField]
-        private InGameBuilder InGameUI;
+        public InGameBuilder InGameUI;
 
         [SerializeField]
         private GameObject OverworldPrefab;
+
+        public enum DifficultyLevel
+        {
+            None,
+            Easy,
+            Medium,
+            Hard
+        }
+
+        public DifficultyLevel Difficulty;
+
+        public int LevelIndex = -1;
 
         private void Awake()
         {
@@ -34,18 +48,18 @@ namespace Project.Battle
             }
         }
 
+        public OverworldManager CreateOverworld() {
+            return GameObject.Instantiate(this.OverworldPrefab).GetComponent<OverworldManager>();
+        }
+
         public void LoadInGame()
         {
-            UIManager.Instance.TransitionWithDelay(() =>
-            {
-                if (this.m_overworld == null)
+            UIManager.Instance.TransitionWithDelay(
+                () =>
                 {
-                    this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+                    var overworld = OverworldManager.Instance;
 
-                    this.m_overworld.name = "Overworld";
-                }
-
-                this.m_overworld.SetActive(true);
+                    overworld.gameObject.SetActive(true);
 
                 UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
             }, null, 2.0f);
@@ -53,15 +67,16 @@ namespace Project.Battle
 
         public void ReturnToMain()
         {
-            UIManager.Instance.TransitionWithDelay(() =>
-            {
-                if (this.m_overworld != null)
+            UIManager.Instance.TransitionWithDelay(
+                () =>
                 {
-                    this.m_overworld.SetActive(false);
-                }
+                    OverworldManager.Instance.gameObject.SetActive(false);
 
-                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
-            }, null, 2.0f);
+                    UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
+                },
+                null,
+                2.0f
+            );
         }
 
         public void StartBattle()
@@ -90,21 +105,33 @@ namespace Project.Battle
                 yield return null;
             }
 
-            // #TODO get enemy information based on map cell here
+            Debug.Assert(this.LevelIndex >= 0 && this.LevelIndex < ResourceManager.Campaign.Count);
+            Debug.Assert(this.Difficulty != DifficultyLevel.None);
 
-            var enemies = new Enemy[Random.Range(3, 5)];
+            var encounter = ResourceManager.Campaign[this.LevelIndex];
+
+            (string[] names, int[] health, int[] damage) enemyData = this.Difficulty switch
+            {
+                DifficultyLevel.Easy => (encounter.EasyEnemyList, encounter.EasyEnemyHealth, encounter.EasyEnemyDamage),
+                DifficultyLevel.Medium => (encounter.NormalEnemyList, encounter.NormalEnemyHealth, encounter.NormalEnemyDamage),
+                DifficultyLevel.Hard => (encounter.HardEnemyList, encounter.HardEnemyHealth, encounter.HardEnemyDamage),
+                _ => default, // never should be here b/c of assert and yes
+            };
+
+            Debug.Assert(enemyData.names.Length != 0);
+            Debug.Assert(enemyData.names.Length == enemyData.health.Length);
+            Debug.Assert(enemyData.names.Length == enemyData.damage.Length);
+
+            var enemies = new Enemy[enemyData.names.Length];
 
             for (int i = 0; i < enemies.Length; ++i)
             {
-                enemies[i] = Enemy.CreateDefaultEnemy();
+                enemies[i] = new Enemy(enemyData.names[i], enemyData.health[i], enemyData.damage[i]);
             }
 
             yield return null;
 
-            if (this.m_overworld != null)
-            {
-                this.m_overworld.SetActive(false);
-            }
+            OverworldManager.Instance.gameObject.SetActive(false);
 
             yield return null;
 
@@ -135,20 +162,31 @@ namespace Project.Battle
 
             yield return null;
 
-            if (this.m_overworld == null)
-            {
-                this.m_overworld = GameObject.Instantiate(this.OverworldPrefab);
+            var overworld = OverworldManager.Instance;
 
-                this.m_overworld.name = "Overworld";
-            }
-
-            this.m_overworld.SetActive(true);
+            overworld.gameObject.SetActive(true);
 
             yield return null;
 
             UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
 
             yield return null;
+
+            switch (outcome)
+            {
+                case BattleManager.BattleOutcome.Exit:
+                    MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
+                    break;
+
+                case BattleManager.BattleOutcome.Victory:
+                    MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
+                    Difficulty = DifficultyLevel.None;
+                    OverworldManager.Instance.GenerateShop();
+                    break;
+
+                default:
+                    break;
+            }
 
             yield return this.StartCoroutine(this.EndTransitionsAfterDelay(2.0f));
         }

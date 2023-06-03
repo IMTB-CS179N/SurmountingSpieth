@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Project.Input;
 using Project.Battle;
+using Project.Game;
 
 namespace Project.Overworld
 {
@@ -11,7 +12,7 @@ namespace Project.Overworld
         private static OverworldManager ms_instance;
         public static OverworldManager Instance =>
             ms_instance == null
-                ? (ms_instance = FindFirstObjectByType<OverworldManager>())
+                ? (ms_instance = MapManager.Instance.CreateOverworld())
                 : ms_instance;
         public static OverworldInfo[] stages;
         int UNIT_SIZE = 16;
@@ -29,31 +30,27 @@ namespace Project.Overworld
         int currentX = 0;
         bool destination = false;
 
+        private UI.InGameBuilder.ActionType m_action;
+
         List<ColumnInfo> columns = new List<ColumnInfo>();
         ColumnInfo blank = new ColumnInfo();
         Queue<Vector3> moveQueue = new Queue<Vector3>();
 
+        void Awake()
+        {
+            MapManager.Instance.InGameUI.OnUIEnabled += this.InGameUICallback;
+        }
+
+        void OnDestroy()
+        {
+            if (MapManager.Instance != null && MapManager.Instance.InGameUI != null)
+            {
+                MapManager.Instance.InGameUI.OnUIEnabled -= this.InGameUICallback;
+            }
+        }
+
         void Start()
         {
-            // Add blanks to the left side of character starting point
-            for (int i = 0; i < 6; i++)
-            {
-                columns.Add(new ColumnInfo());
-                currentX++;
-            }
-            ColumnInfo starterColumn = new ColumnInfo();
-            starterColumn.SetCell(new BackgroundInfo(2, CellInfo.TileType.Horizontal));
-            columns.Add(starterColumn);
-
-            List<CellInfo> newCells = new List<CellInfo>();
-            newCells.Add(new ShopInfo(0, 1));
-            newCells.Add(new BattleInfo(1));
-            newCells.Add(new ShopInfo(2, 1));
-            newCells.Add(new ShopInfo(3, 1));
-            newCells.Add(new ShopInfo(4, 1));
-            GenerateLevel(newCells);
-            // GenerateLevel(newCells);
-
             // Instantiate GameObjects to act as tiles
             for (int i = 0; i < 5; i++)
             {
@@ -68,6 +65,26 @@ namespace Project.Overworld
                     GridTiles[i, j].AddComponent<Click>();
                 }
             }
+            // Add blanks to the left side of character starting point
+            for (int i = 0; i < 6; i++)
+            {
+                columns.Add(new ColumnInfo());
+                currentX++;
+            }
+            ColumnInfo starterColumn = new ColumnInfo();
+            starterColumn.SetCell(new BackgroundInfo(2, CellInfo.TileType.Horizontal));
+            columns.Add(starterColumn);
+
+            List<CellInfo> newCells = new List<CellInfo>();
+            newCells.Add(new ShopInfo(0, 1));
+            newCells.Add(new BattleInfo(1, CellInfo.TileType.BattleEasy));
+            newCells.Add(new ShopInfo(2, 1));
+            newCells.Add(new ShopInfo(3, 1));
+            newCells.Add(new ShopInfo(4, 1));
+            // GenerateLevel(newCells);
+            GenerateBattle();
+            // GenerateShop();
+
             SetSprites();
         }
 
@@ -102,39 +119,38 @@ namespace Project.Overworld
             }
             else if (!Moving() && moveQueue.Count == 0 && destination)
             {
-                List<CellInfo> newCells = new List<CellInfo>();
-                newCells.Add(new ShopInfo(0, 1));
-                newCells.Add(new ShopInfo(1, 1));
-                newCells.Add(new ShopInfo(2, 1));
-                newCells.Add(new BattleInfo(3));
-                newCells.Add(new ShopInfo(4, 1));
                 destination = false;
-                // Debug.Log("dlksjfslkj");
                 int playerY = (int)(player.position.y) / UNIT_SIZE + 2;
                 Debug.Log("Arrived at position " + GridTiles[playerY, 6].transform.position);
-                int rand = Random.Range(0, 2);
-                if (rand == 0)
-                {
-                    GenerateLevel(newCells);
-                }
-                else
-                {
-                    GenerateShop();
-                }
                 SetSprites();
                 switch (this.columns[this.currentX].GetCell(playerY).tileType)
                 {
                     case CellInfo.TileType.Shop:
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.None;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Enter);
+                        m_action = UI.InGameBuilder.ActionType.Enter;
+                        GenerateBattle();
                         break;
 
                     case CellInfo.TileType.BattleEasy:
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.Easy;
+                        m_action = UI.InGameBuilder.ActionType.Battle;
+                        MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
+                        break;
                     case CellInfo.TileType.BattleMedium:
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.Medium;
+                        m_action = UI.InGameBuilder.ActionType.Battle;
+                        MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
+                        break;
                     case CellInfo.TileType.BattleHard:
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.Hard;
+                        m_action = UI.InGameBuilder.ActionType.Battle;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
                         break;
 
                     default:
+                        MapManager.Instance.Difficulty = MapManager.DifficultyLevel.None;
+                        m_action = UI.InGameBuilder.ActionType.None;
                         MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
                         break;
                 }
@@ -230,10 +246,6 @@ namespace Project.Overworld
                 1
                 0
             */
-            if (!Moving() && currentX == (columns.Count - 1))
-            {
-                Debug.Log("test");
-            }
             ColumnInfo playerSideTurns = new ColumnInfo();
             ColumnInfo tileColumn = new ColumnInfo();
             int playerHeight = (int)(player.position.y + (UNIT_SIZE * 2)) / UNIT_SIZE;
@@ -476,6 +488,7 @@ namespace Project.Overworld
             -* bottom and same -> fork_up
             -* bottom and below -> bottom_left
             */
+            SetSprites();
         }
 
         bool Moving()
@@ -483,12 +496,50 @@ namespace Project.Overworld
             return player.position.y != movePointY || TilesParent.position.x != -movePointX;
         }
 
-        void GenerateShop()
+        public void GenerateShop()
         {
             List<CellInfo> level = new List<CellInfo>();
             int height = Random.Range(0, 5);
             ShopInfo shop = new ShopInfo(height, 0);
             level.Add(shop);
+            GenerateLevel(level);
+        }
+
+        void GenerateBattle()
+        {
+            MapManager.Instance.LevelIndex++;
+            Encounter currentEncounter = ResourceManager.Campaign[MapManager.Instance.LevelIndex];
+
+            List<CellInfo> level = new List<CellInfo>();
+            List<int> yValues = new List<int>();
+            HashSet<int> heights = new HashSet<int>();
+            int random = Random.Range(0, 5);
+            List<CellInfo.TileType> battleTypes = new List<CellInfo.TileType>();
+            if (currentEncounter.EasyEnemyList.Length > 0)
+            {
+                battleTypes.Add(CellInfo.TileType.BattleEasy);
+            }
+            if (currentEncounter.NormalEnemyList.Length > 0)
+            {
+                battleTypes.Add(CellInfo.TileType.BattleMedium);
+            }
+            if (currentEncounter.HardEnemyList.Length > 0)
+            {
+                battleTypes.Add(CellInfo.TileType.BattleHard);
+            }
+            for (int i = 0; i < battleTypes.Count; i++)
+            {
+                while (heights.Contains(random))
+                {
+                    random = Random.Range(0, 5);
+                }
+                heights.Add(random);
+                level.Add(new BattleInfo(random, battleTypes[i]));
+            }
+
+            yValues.Sort();
+            level.Sort((x, y) => x.yValue.CompareTo(y.yValue));
+
             GenerateLevel(level);
         }
 
@@ -520,6 +571,11 @@ namespace Project.Overworld
                     }
                 }
             }
+        }
+
+        public void InGameUICallback()
+        {
+            MapManager.Instance.UpdateAction(this.m_action);
         }
     }
 }
