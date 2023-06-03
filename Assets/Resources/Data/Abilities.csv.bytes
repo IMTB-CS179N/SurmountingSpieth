@@ -1,18 +1,18 @@
-Bard,Expertise,,"Sharpness, Healing",,"40, 0.25",,"3, 0",0,15,FALSE,5,Sprites/Abilities/Expertise,Proficiency bonus and health addition
-Bard,Blindside Wack,"Slow, Dizzyness",,"0.25, 30",,"3, 3",,1.3,10,FALSE,4,Sprites/Abilities/BlindsideWack,Thunder strikes from the sky
-Bard,Sound Shock,Stun,,1,"0.20, 0.25",1,"3, 3",1.6,25,FALSE,6,Sprites/Abilities/SoundShock,Sound wave that damages opponent
-Rogue,Venom Slash,"Poison, Dizzyness",,"0.20, 30",,"6, 3",,1,15,FALSE,5,Sprites/Abilities/VenomSlash,Double attack
-Rogue,Eviscerate,"Shred, Weaken",,"0.40, 0.25",,"3, 3",,1.5,15,FALSE,5,Sprites/Abilities/Eviscerate,Knife attack 
-Rogue,Bloody Storm,,"Flow, Lethality, Shatter",,"0.30, 0.30, 1.00",,"3, 3, 3",0,20,FALSE,6,Sprites/Abilities/BloodyStorm,Bolts of blood fall on all opponents and deals damage
-Paladin,Divine Intervention,,"Barricade, Cleanse",,"0.50, 0",,"3, 0",0,10,FALSE,5,Sprites/Abilities/DivineIntervention,Charge of holy power
-Paladin,Divine Swing,,"Amplify, Healing",,"0.15, 0.10",,"3, 3",0,15,FALSE,5,Sprites/Abilities/DivineSwing,Swings weapon and deals damage to all opponents
-Paladin,Divine Charge,"Burn, Dispel, Slow",,"0.40, 0, 0.50",,"3, 0, 3",,1.4,25,TRUE,7,Sprites/Abilities/DivineCharge,Power of holy light that deals damage to all opponents
-Wizard,Spell Mastery,Weaken,Amplify,0.25,0.25,3,3,1,10,FALSE,4,Sprites/Abilities/SpellMastery,Proficiency bonus and health addition
-Wizard,Arcane Bolt,Dispel,,0,,0,,2,15,FALSE,4,Sprites/Abilities/ArcaneBolt,Bolt of energy that deals damage to all opponents
-Wizard,Thunderstorm,Stun,Regeneration,1,0.08,1,3,1.8,30,TRUE,7,Sprites/Abilities/Thunderstorm,Lightning strikesthat deals damage to all opponents
-Cleric,Blazing Light,,"Regeneration, Cleanse",,"0.06, 0",,"5, 0",1,15,FALSE,5,Sprites/Abilities/BlazingLight,Regeneration of health and mana
-Cleric,Confusing Ray,"Dizzyness, Slow, Dispel",,"0.25, 0.25, 0",,"3, 3, 0",,1.3,10,FALSE,4,Sprites/Abilities/ConfusingRay,Arrow with holy power that weakens an opponent
-Cleric,Sacrilige ,"Poison, Shred",,"0.35, 0.35",,"4, 3",,1.4,25,TRUE,6,Sprites/Abilities/Sacrilige,Attack with immense holy power
-Barbarian,Whirlwind Slash,Slow,,0.20,,2,,0.8,10,TRUE,2,Sprites/Abilities/WhirlwindSlash,Bolt of hatred energy that damages opponent
-Barbarian,Groundquake,Shred,,0.40,,3,,1.5,15,TRUE,4,Sprites/Abilities/Groundquake,Inflicts massage damage to an opponent
-Barbarian,Ancestral Warcry,,"Lethality, Shatter",,"0.50, 2.00",,"3, 3",0,20,FALSE,6,Sprites/Abilities/AncestralWarcry,Concentrated power of hatred that damages all opponents
+Bard,Expertise,,"Sharpness, Healing",,"40, 0.25",,"3, 0",0,15,FALSE,5,Sprites/Abilities/Expertise,"Immediately restores 25% of the maximum health, as well as increases precision by 40 points for 3 turns."
+Bard,Blindside Wack,"Slow, Dizzyness",,"0.25, 30",,"3, 3",,1.3,10,FALSE,4,Sprites/Abilities/BlindsideWack,"Deals 130% of current damage, reducing target's evasion by 25% and precision by 30 points for 3 turns."
+Bard,Sound Shock,Stun,"Lethality, Amplify",1,"0.20, 0.25",1,"3, 3",1.6,25,FALSE,6,Sprites/Abilities/SoundShock,"Increases critical chance by 20% and damage by 25% for 3 turns. Deals 160% of current damage, stunning the target."
+Rogue,Venom Slash,"Poison, Dizzyness",,"0.20, 30",,"6, 3",,1,15,FALSE,5,Sprites/Abilities/VenomSlash,"Deals 100% of current damage, reducing target's precision by 30 points for 3 turns and applying Poison that deals 20% of current damage each turn over 6 turns."
+Rogue,Eviscerate,"Shred, Weaken",,"0.40, 0.25",,"3, 3",,1.5,15,FALSE,5,Sprites/Abilities/Eviscerate,"Deals 150% of current damage, reducing target's armor by 40% and damage by 25% for 3 turns."
+Rogue,Bloody Storm,,"Flow, Lethality, Shatter",,"0.50, 0.25, 1.00",,"3, 3, 3",0,20,FALSE,6,Sprites/Abilities/BloodyStorm,"Increases evasion by 50%, critical chance by 25%, and critical multiplier by 100% for 3 turns."
+Paladin,Divine Intervention,,"Barricade, Cleanse",,"0.50, 0",,"3, 0",0,10,FALSE,5,Sprites/Abilities/DivineIntervention,Immediately removes all negative effects and increases armor by 50% for 3 turns.
+Paladin,Divine Swing,,"Amplify, Healing",,"0.15, 0.10",,"3, 3",0,15,FALSE,5,Sprites/Abilities/DivineSwing,Increases damage by 15% for 3 turns and restores 10% of the maximum health each turn over 3 turns.
+Paladin,Divine Charge,"Burn, Dispel, Slow",,"0.40, 0, 0.50",,"3, 0, 3",,1.4,25,TRUE,7,Sprites/Abilities/DivineCharge,"Deals 140% of current damage to all targets, removing all positive effects from them, reducing evasion by 50% for 3 turns and applying Burn that deals 40% of current damage each turn over 3 turns."
+Wizard,Spell Mastery,Weaken,Amplify,0.25,0.25,3,3,1,10,FALSE,4,Sprites/Abilities/SpellMastery,"Increases damage by 25% for 3 turns. Deals 100% of current damage, reducing target's damage by 25% for 3 turns."
+Wizard,Arcane Bolt,Dispel,,0,,0,,2,15,FALSE,4,Sprites/Abilities/ArcaneBolt,Deals 200% of current damage and removes all target's positive effects.
+Wizard,Thunderstorm,Stun,Regeneration,1,0.08,1,3,1.8,30,TRUE,7,Sprites/Abilities/Thunderstorm,"Restores 8% of the maximum health each turn over 3 turns. Deals 180% of current damage to all targets, applying stun to all of them."
+Cleric,Blazing Light,,"Regeneration, Cleanse",,"0.06, 0",,"5, 0",1,15,FALSE,5,Sprites/Abilities/BlazingLight,Immediately removes all negative effects and restores 6% of the maximum health each turn over 5 turns.
+Cleric,Confusing Ray,"Dizzyness, Slow, Dispel",,"20, 0.20, 0",,"3, 3, 0",,1.3,10,FALSE,4,Sprites/Abilities/ConfusingRay,"Deals 130% of current damage, removing all target's positive effects, as well as reducing its precision by 20 points and evasion by 20% for 3 turns."
+Cleric,Sacrilige ,"Poison, Shred",,"0.35, 0.70",,"4, 3",,1.4,25,TRUE,6,Sprites/Abilities/Sacrilige,"Deals 140% of current damage to all targets, reducing their armor by 70% for 3 turns and applying Poison that deals 35% of current damage each turn over 4 turns."
+Barbarian,Whirlwind Slash,Slow,,0.20,,2,,0.8,10,TRUE,2,Sprites/Abilities/WhirlwindSlash,"Deals 80% of current damage to all targets, reducing their evasion by 20% for 2 turns."
+Barbarian,Groundquake,"Weaken, Shred",,"0.20, 0.40",,"3, 3",,1.5,15,TRUE,4,Sprites/Abilities/Groundquake,"Deals 150% of current damage to all targets, reducing their damage by 20% and armor by 40% for 4 turns."
+Barbarian,Ancestral Warcry,,"Lethality, Shatter",,"0.50, 2.00",,"3, 3",0,20,FALSE,6,Sprites/Abilities/AncestralWarcry,Increases critical chance by 50% and critical multiplier by 200% for 3 turns.

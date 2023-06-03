@@ -76,11 +76,11 @@ namespace Project.Overworld
             columns.Add(starterColumn);
 
             List<CellInfo> newCells = new List<CellInfo>();
-            newCells.Add(new ShopInfo(0, 1));
+            newCells.Add(new ShopInfo(0));
             newCells.Add(new BattleInfo(1, CellInfo.TileType.BattleEasy));
-            newCells.Add(new ShopInfo(2, 1));
-            newCells.Add(new ShopInfo(3, 1));
-            newCells.Add(new ShopInfo(4, 1));
+            newCells.Add(new ShopInfo(2));
+            newCells.Add(new ShopInfo(3));
+            newCells.Add(new ShopInfo(4));
             // GenerateLevel(newCells);
             GenerateBattle();
             // GenerateShop();
@@ -500,7 +500,7 @@ namespace Project.Overworld
         {
             List<CellInfo> level = new List<CellInfo>();
             int height = Random.Range(0, 5);
-            ShopInfo shop = new ShopInfo(height, 0);
+            ShopInfo shop = new ShopInfo(height);
             level.Add(shop);
             GenerateLevel(level);
         }

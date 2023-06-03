@@ -443,6 +443,8 @@ namespace Project.Game
 
                 this.m_equippedPotions[potionIndex] = null;
 
+                this.m_potions.Remove(potion.Data);
+
                 if (effect.Type == EffectType.IsImmediate)
                 {
                     effect.ApplyImmediate(ref this.m_stats, ref this.m_turn);
@@ -1333,6 +1335,8 @@ namespace Project.Game
                 this.m_money += (int)(potion.Price * Player.SellMultiplier);
 
                 this.m_potions.RemoveAt(index);
+
+                this.UnattachPotion(potion);
             }
         }
 
