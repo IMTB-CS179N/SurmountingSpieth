@@ -19,6 +19,8 @@ namespace Project.Battle
 
         private const float kOrthoDefault = 0.2f;
 
+        private static Sprite ms_glowSprite;
+
         private BattleBehavior m_animDest;
         private AnimationType m_animation;
         private GameObject m_attackObj;
@@ -30,6 +32,10 @@ namespace Project.Battle
         private SpriteRenderer m_renderer;
         private BoxCollider2D m_collider;
         private float m_animationSpeed;
+
+        private SpriteRenderer m_glowEffect;
+        private Color m_currentGlow;
+        private Color m_requestGlow;
 
         private Vector2 m_unitPosition;
         private Vector2 m_unitOrigin;
@@ -43,6 +49,8 @@ namespace Project.Battle
         
         private IEntity m_entity;
         private int m_index;
+
+        public static Sprite GlowSprite => ms_glowSprite == null ? (ms_glowSprite = ResourceManager.LoadSprite("Sprites/Battle/GlowUnderlay")) : ms_glowSprite;
 
         public IEntity Entity => this.m_entity;
 
@@ -122,6 +130,13 @@ namespace Project.Battle
                 case AnimationType.Death:
                     this.AnimateDeath();
                     break;
+            }
+
+            if (this.m_currentGlow != this.m_requestGlow)
+            {
+                this.m_currentGlow = this.m_requestGlow;
+
+                this.m_glowEffect.color = this.m_currentGlow;
             }
         }
 
@@ -362,6 +377,8 @@ namespace Project.Battle
 
         public void Initialize(IEntity entity, string name, int layer)
         {
+            const float GlowScale = 1.5f;
+
             this.m_entity = entity;
             this.gameObject.name = name;
 
@@ -377,9 +394,20 @@ namespace Project.Battle
 
             this.m_worldScale = this.m_renderer.bounds.size;
 
-            this.RecalculateTransform();
+            this.m_glowEffect = new GameObject(this.name + "-glow").AddComponent<SpriteRenderer>();
 
-            // #TODO effect children
+            this.m_glowEffect.gameObject.transform.parent = this.gameObject.transform;
+            this.m_glowEffect.sprite = BattleBehavior.GlowSprite;
+            this.m_glowEffect.color = Color.clear;
+            this.m_currentGlow = Color.clear;
+            this.m_requestGlow = Color.clear;
+
+            var slength = Mathf.Sqrt((this.m_worldScale.x * this.m_worldScale.x) + (this.m_worldScale.y * this.m_worldScale.y)) * GlowScale;
+            var gbounds = this.m_glowEffect.bounds.size;
+
+            this.m_glowEffect.gameObject.transform.localScale = new Vector3(slength / (gbounds.x * this.m_maximumScale), slength / (gbounds.y * this.m_maximumScale), 1.0f);
+
+            this.RecalculateTransform();
         }
 
         public void RecalculateTransform()
@@ -444,6 +472,11 @@ namespace Project.Battle
         public Vector2 GetPositionForHealthIndicator()
         {
             return ScreenManager.Instance.WorldPositionToUnitScreenPoint(this.m_worldPosition - new Vector2(0.0f, this.m_worldScale.y * 0.6f));
+        }
+
+        public void SetGlowHighlight(bool enable, Color color)
+        {
+            this.m_requestGlow = enable ? color : Color.clear;
         }
     }
 }

@@ -472,6 +472,9 @@ namespace Project.Battle
                         // we can change cursor texture to 'target' texture if we hover over an enemy
                         this.MaybeChangeCursorToTarget(false);
 
+                        // we can also highlight enemy over which we are hovering, granted if it's a target enemy
+                        this.MaybeHighlightTargetEnemies(false);
+
                         // note: do not allow changing currently selected entity for the UI until 'cancel' on the UI is clicked (callback)
 
                         // if we clicked this frame
@@ -1409,6 +1412,26 @@ namespace Project.Battle
             }
 
             ScreenManager.Instance.SetCursorTexture(ResourceManager.DefaultCursor, Vector2.zero);
+        }
+
+        private void MaybeHighlightTargetEnemies(bool playerIsTarget)
+        {
+            this.m_playerBehavior.SetGlowHighlight(false, Color.clear);
+
+            for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
+            {
+                this.m_enemyBehaviors[i].SetGlowHighlight(false, Color.clear);
+            }
+
+            if (InputProcessor.Instance.IsPointerOverCollider(out var collider))
+            {
+                var behavior = collider.GetComponent<BattleBehavior>();
+
+                if (behavior.Entity.IsPlayer == playerIsTarget)
+                {
+                    behavior.SetGlowHighlight(true, Color.red);
+                }
+            }
         }
 
         private void MaybeChangeEntityDisplayed()
