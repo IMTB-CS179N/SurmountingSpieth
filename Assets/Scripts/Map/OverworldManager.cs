@@ -14,7 +14,6 @@ namespace Project.Overworld
             ms_instance == null
                 ? (ms_instance = MapManager.Instance.CreateOverworld())
                 : ms_instance;
-        public static OverworldInfo[] stages;
         int UNIT_SIZE = 16;
 
         // Start is called before the first frame update
@@ -36,6 +35,8 @@ namespace Project.Overworld
         ColumnInfo blank = new ColumnInfo();
         Queue<Vector3> moveQueue = new Queue<Vector3>();
 
+        public GameObject playerObject;
+
         void Awake()
         {
             MapManager.Instance.InGameUI.OnUIEnabled += this.InGameUICallback;
@@ -51,6 +52,7 @@ namespace Project.Overworld
 
         void Start()
         {
+            playerObject.GetComponent<SpriteRenderer>().sprite = Player.Instance.Sprite;
             // Instantiate GameObjects to act as tiles
             for (int i = 0; i < 5; i++)
             {
@@ -75,15 +77,7 @@ namespace Project.Overworld
             starterColumn.SetCell(new BackgroundInfo(2, CellInfo.TileType.Horizontal));
             columns.Add(starterColumn);
 
-            List<CellInfo> newCells = new List<CellInfo>();
-            newCells.Add(new ShopInfo(0));
-            newCells.Add(new BattleInfo(1, CellInfo.TileType.BattleEasy));
-            newCells.Add(new ShopInfo(2));
-            newCells.Add(new ShopInfo(3));
-            newCells.Add(new ShopInfo(4));
-            // GenerateLevel(newCells);
             GenerateBattle();
-            // GenerateShop();
 
             SetSprites();
         }
@@ -188,6 +182,9 @@ namespace Project.Overworld
             {
                 return;
             }
+            m_action = UI.InGameBuilder.ActionType.None;
+            MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
+
             int newY = (int)newPos.y / UNIT_SIZE;
 
             int deltaX = newX - tilesX;
