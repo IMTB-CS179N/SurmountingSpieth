@@ -77,6 +77,9 @@ namespace Project.Battle
         private BattleState m_state;
         private int m_abilityIndex;
 
+        private int m_victoryReward;
+        private int m_defeatReward;
+
         private Coroutine m_currentRoutine;
         private bool m_forceExit;
 
@@ -90,7 +93,7 @@ namespace Project.Battle
 
         public BattleOutcome Outcome => this.m_state == BattleState.FinishBattle ? this.m_outcome : throw new Exception("Cannot decide battle outcome when it is not finished");
 
-        public void StartBattle(Player player, Enemy[] enemies, Action onBattleStarted, Action onBattleEnded)
+        public void StartBattle(Player player, Enemy[] enemies, int victoryReward, int defeatReward, Action onBattleStarted, Action onBattleEnded)
         {
             if (this.m_state != BattleState.None)
             {
@@ -115,6 +118,8 @@ namespace Project.Battle
             this.m_state = BattleState.StartBattle;
             this.m_outcome = BattleOutcome.Exit;
 
+            this.m_victoryReward = victoryReward;
+            this.m_defeatReward = defeatReward;
             this.m_forceExit = false;
             this.m_onBattleEnded = onBattleEnded;
             this.m_playerEntity = player;
@@ -149,6 +154,19 @@ namespace Project.Battle
                 for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
                 {
                     Object.Destroy(this.m_enemyBehaviors[i].gameObject);
+                }
+            }
+
+            if (this.m_playerEntity is not null)
+            {
+                this.m_playerEntity.FinishBattle();
+            }
+
+            if (this.m_enemyEntities is not null)
+            {
+                for (int i = 0; i < this.m_enemyEntities.Length; ++i)
+                {
+                    this.m_enemyEntities[i].FinishBattle();
                 }
             }
 
@@ -269,6 +287,8 @@ namespace Project.Battle
 
             this.MaybeChangeCursorTexture(true);
 
+            this.ForceUnhighlightAll();
+
             this.BattleUI.CurrentEntity = null;
 
             yield return null;
@@ -277,11 +297,11 @@ namespace Project.Battle
             {
                 if (outcome == BattleOutcome.Victory)
                 {
-                    this.BattleUI.ShowGameOverOverlay("VICTORY", "REWARD: $100", new Color32(255, 220, 0, 255)); // #TODO actual reward for winning
+                    this.BattleUI.ShowGameOverOverlay("VICTORY", $"REWARD: ${this.m_victoryReward}", new Color32(255, 220, 0, 255));
                 }
                 else
                 {
-                    this.BattleUI.ShowGameOverOverlay("DEFEAT", "REWARD: $5", new Color32(180, 0, 0, 255)); // #TODO actual reward for losing
+                    this.BattleUI.ShowGameOverOverlay("DEFEAT", $"REWARD: ${this.m_defeatReward}", new Color32(180, 0, 0, 255));
                 }
 
                 yield return new WaitForSeconds(5.0f);
@@ -503,6 +523,9 @@ namespace Project.Battle
 
                         // change cursor texture immediately from 'target' one
                         this.MaybeChangeCursorTexture(false);
+
+                        // unhighlight targetted enemy (remove glowing effects)
+                        this.ForceUnhighlightAll();
 
                         // break from this loop and go next
                         break;
@@ -1416,12 +1439,7 @@ namespace Project.Battle
 
         private void MaybeHighlightTargetEnemies(bool playerIsTarget)
         {
-            this.m_playerBehavior.SetGlowHighlight(false, Color.clear);
-
-            for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
-            {
-                this.m_enemyBehaviors[i].SetGlowHighlight(false, Color.clear);
-            }
+            this.ForceUnhighlightAll();
 
             if (InputProcessor.Instance.IsPointerOverCollider(out var collider))
             {
@@ -1446,6 +1464,16 @@ namespace Project.Battle
                 {
                     this.BattleUI.CurrentEntity = null;
                 }
+            }
+        }
+
+        private void ForceUnhighlightAll()
+        {
+            this.m_playerBehavior.SetGlowHighlight(false, Color.clear);
+
+            for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
+            {
+                this.m_enemyBehaviors[i].SetGlowHighlight(false, Color.clear);
             }
         }
 

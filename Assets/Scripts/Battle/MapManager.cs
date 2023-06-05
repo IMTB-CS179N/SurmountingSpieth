@@ -1,6 +1,7 @@
 ﻿using Project.Game;
+using Project.Input;
+using Project.Map;
 using Project.UI;
-using Project.Overworld;
 
 using System.Collections;
 
@@ -10,19 +11,6 @@ namespace Project.Battle
 {
     public class MapManager : MonoBehaviour
     {
-        private static MapManager ms_instance;
-
-        // private GameObject m_overworld;
-
-        public static MapManager Instance =>
-            ms_instance == null ? (ms_instance = FindFirstObjectByType<MapManager>()) : ms_instance;
-
-        [SerializeField]
-        public InGameBuilder InGameUI;
-
-        [SerializeField]
-        private GameObject OverworldPrefab;
-
         public enum DifficultyLevel
         {
             None,
@@ -30,6 +18,15 @@ namespace Project.Battle
             Medium,
             Hard
         }
+
+        private static MapManager ms_instance;
+
+        public static MapManager Instance => ms_instance == null ? (ms_instance = FindFirstObjectByType<MapManager>()) : ms_instance;
+
+        [SerializeField]
+        private GameObject OverworldPrefab;
+
+        public InGameBuilder InGameUI;
 
         public DifficultyLevel Difficulty;
 
@@ -48,35 +45,38 @@ namespace Project.Battle
             }
         }
 
-        public OverworldManager CreateOverworld() {
-            return GameObject.Instantiate(this.OverworldPrefab).GetComponent<OverworldManager>();
+        public bool CanContinue()
+        {
+            return Player.IsPlayerLoaded || SaveSystem.HasData();
+        }
+
+        public OverworldManager CreateOverworld()
+        {
+            var obj = GameObject.Instantiate(this.OverworldPrefab);
+
+            obj.name = "Overworld";
+
+            return obj.GetComponent<OverworldManager>();
         }
 
         public void LoadInGame()
         {
-            UIManager.Instance.TransitionWithDelay(
-                () =>
-                {
-                    var overworld = OverworldManager.Instance;
+            this.StartCoroutine(this.LoadWithNewGameInternal());
+        }
 
-                    overworld.gameObject.SetActive(true);
-
-                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
-            }, null, 2.0f);
+        public void LoadInGameWithContinue()
+        {
+            this.StartCoroutine(this.LoadWithContinueInternal());
         }
 
         public void ReturnToMain()
         {
-            UIManager.Instance.TransitionWithDelay(
-                () =>
-                {
-                    OverworldManager.Instance.gameObject.SetActive(false);
-
-                    UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
-                },
-                null,
-                2.0f
-            );
+            UIManager.Instance.TransitionWithDelay(() =>
+            {
+                OverworldManager.Instance.gameObject.SetActive(false);
+                
+                UIManager.Instance.PerformScreenChange(UIManager.ScreenType.Main);
+            }, null, 2.0f);
         }
 
         public void StartBattle()
@@ -94,6 +94,83 @@ namespace Project.Battle
             this.InGameUI.UpdateAction(action);
         }
 
+        private IEnumerator LoadWithNewGameInternal()
+        {
+            Debug.Assert(Player.IsPlayerLoaded);
+
+            bool done = false;
+
+            UIManager.Instance.BeginTransitioning(() => done = true);
+
+            while (!done)
+            {
+                yield return null;
+            }
+
+            this.LevelIndex = -1;
+            this.Difficulty = DifficultyLevel.None;
+
+            bool isNull = OverworldManager.IsOverworldNull;
+
+            var overworld = OverworldManager.Instance;
+
+            overworld.gameObject.SetActive(true);
+
+            yield return null;
+
+            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+
+            yield return null;
+
+            if (!isNull)
+            {
+                overworld.Reinitialize();
+            }
+
+            yield return null;
+
+            this.InGameUI.UpdateMoneyInfo();
+
+            yield return new WaitForSeconds(2.0f);
+
+            UIManager.Instance.EndTransitioning(null);
+        }
+
+        private IEnumerator LoadWithContinueInternal()
+        {
+            bool done = false;
+
+            UIManager.Instance.BeginTransitioning(() => done = true);
+
+            while (!done)
+            {
+                yield return null;
+            }
+
+            var overworld = OverworldManager.Instance;
+
+            overworld.gameObject.SetActive(true);
+
+            yield return null;
+
+            UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+
+            yield return null;
+
+            if (!Player.IsPlayerLoaded)
+            {
+                SaveSystem.LoadData();
+            }
+
+            yield return null;
+
+            this.InGameUI.UpdateMoneyInfo();
+
+            yield return new WaitForSeconds(2.0f);
+
+            UIManager.Instance.EndTransitioning(null);
+        }
+
         private IEnumerator StartBattleInternal()
         {
             bool done = false;
@@ -105,28 +182,48 @@ namespace Project.Battle
                 yield return null;
             }
 
-            Debug.Assert(this.LevelIndex >= 0 && this.LevelIndex < ResourceManager.Campaign.Count);
-            Debug.Assert(this.Difficulty != DifficultyLevel.None);
+            Enemy[] enemies;
 
-            var encounter = ResourceManager.Campaign[this.LevelIndex];
+            int reward;
 
-            (string[] names, int[] health, int[] damage) enemyData = this.Difficulty switch
+            if (false)
             {
-                DifficultyLevel.Easy => (encounter.EasyEnemyList, encounter.EasyEnemyHealth, encounter.EasyEnemyDamage),
-                DifficultyLevel.Medium => (encounter.NormalEnemyList, encounter.NormalEnemyHealth, encounter.NormalEnemyDamage),
-                DifficultyLevel.Hard => (encounter.HardEnemyList, encounter.HardEnemyHealth, encounter.HardEnemyDamage),
-                _ => default, // never should be here b/c of assert and yes
-            };
+                reward = 777;
 
-            Debug.Assert(enemyData.names.Length != 0);
-            Debug.Assert(enemyData.names.Length == enemyData.health.Length);
-            Debug.Assert(enemyData.names.Length == enemyData.damage.Length);
+                enemies = new Enemy[4];
 
-            var enemies = new Enemy[enemyData.names.Length];
-
-            for (int i = 0; i < enemies.Length; ++i)
+                for (int i = 0; i < enemies.Length; ++i)
+                {
+                    enemies[i] = Enemy.CreateDefaultEnemy();
+                }
+            }
+            else
             {
-                enemies[i] = new Enemy(enemyData.names[i], enemyData.health[i], enemyData.damage[i]);
+                Debug.Assert(this.LevelIndex >= 0 && this.LevelIndex < ResourceManager.Campaign.Count);
+                Debug.Assert(this.Difficulty != DifficultyLevel.None);
+
+                var encounter = ResourceManager.Campaign[this.LevelIndex];
+
+                reward = encounter.EncounterReward;
+
+                (string[] names, int[] health, int[] damage) enemyData = this.Difficulty switch
+                {
+                    DifficultyLevel.Easy => (encounter.EasyEnemyList, encounter.EasyEnemyHealth, encounter.EasyEnemyDamage),
+                    DifficultyLevel.Medium => (encounter.NormalEnemyList, encounter.NormalEnemyHealth, encounter.NormalEnemyDamage),
+                    DifficultyLevel.Hard => (encounter.HardEnemyList, encounter.HardEnemyHealth, encounter.HardEnemyDamage),
+                    _ => default, // never should be here b/c of assert and yes
+                };
+
+                Debug.Assert(enemyData.names.Length != 0);
+                Debug.Assert(enemyData.names.Length == enemyData.health.Length);
+                Debug.Assert(enemyData.names.Length == enemyData.damage.Length);
+
+                enemies = new Enemy[enemyData.names.Length];
+
+                for (int i = 0; i < enemies.Length; ++i)
+                {
+                    enemies[i] = new Enemy(enemyData.names[i], enemyData.health[i], enemyData.damage[i]);
+                }
             }
 
             yield return null;
@@ -139,7 +236,7 @@ namespace Project.Battle
 
             yield return null;
 
-            BattleManager.Instance.StartBattle(Player.Instance, enemies, () =>
+            BattleManager.Instance.StartBattle(Player.Instance, enemies, reward, Player.RewardForDefeat, () =>
             {
                 this.StartCoroutine(this.EndTransitionsAfterDelay(2.0f));
             }, this.FinishBattle);
@@ -162,7 +259,10 @@ namespace Project.Battle
 
             yield return null;
 
+            var encounter = ResourceManager.Campaign[this.LevelIndex];
             var overworld = OverworldManager.Instance;
+
+            Player.Instance.AwardReward(GetMoneyReward(encounter.EncounterReward, outcome, this.Difficulty));
 
             overworld.gameObject.SetActive(true);
 
@@ -175,12 +275,16 @@ namespace Project.Battle
             switch (outcome)
             {
                 case BattleManager.BattleOutcome.Exit:
-                    MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.Battle);
+                    this.UpdateAction(InGameBuilder.ActionType.Battle);
+                    break;
+
+                case BattleManager.BattleOutcome.Defeat:
+                    Player.Instance.AwardReward(5);
                     break;
 
                 case BattleManager.BattleOutcome.Victory:
-                    MapManager.Instance.UpdateAction(UI.InGameBuilder.ActionType.None);
-                    Difficulty = DifficultyLevel.None;
+                    this.UpdateAction(InGameBuilder.ActionType.None);
+                    this.Difficulty = DifficultyLevel.None;
                     OverworldManager.Instance.GenerateShop();
                     break;
 
@@ -189,6 +293,32 @@ namespace Project.Battle
             }
 
             yield return this.StartCoroutine(this.EndTransitionsAfterDelay(2.0f));
+
+            static int GetMoneyReward(int money, BattleManager.BattleOutcome outcome, DifficultyLevel difficulty)
+            {
+                if (outcome == BattleManager.BattleOutcome.Exit)
+                {
+                    return 0;
+                }
+
+                if (outcome == BattleManager.BattleOutcome.Defeat)
+                {
+                    return Player.RewardForDefeat;
+                }
+
+                if (outcome == BattleManager.BattleOutcome.Victory)
+                {
+                    return difficulty switch
+                    {
+                        DifficultyLevel.Easy => money,
+                        DifficultyLevel.Medium => (int)(money * 1.25f),
+                        DifficultyLevel.Hard => (int)(money * 1.5f),
+                        _ => 0,
+                    };
+                }
+
+                return 0;
+            }
         }
 
         private IEnumerator EndTransitionsAfterDelay(float delay)

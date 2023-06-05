@@ -1,3 +1,6 @@
+using Project.Battle;
+using Project.Input;
+
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -117,7 +120,7 @@ namespace Project.UI
 
             if (this.m_continueButton is not null)
             {
-                if (Main.Instance.CanInitializeFromSaveData())
+                if (MapManager.Instance.CanContinue())
                 {
                     this.m_continueButton.pickingMode = PickingMode.Position;
 
@@ -168,9 +171,7 @@ namespace Project.UI
 
                         this.m_continuePressed = false;
 
-                        Main.Instance.InitializeFromSaveData();
-
-                        UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
+                        MapManager.Instance.LoadInGameWithContinue();
                     }
                 });
             }

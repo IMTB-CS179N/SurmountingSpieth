@@ -226,12 +226,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89438cba3fb96413783df19b1dfd7599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MovePointX: 0
+  MovePointY: 0
+  Player: {fileID: 8622999623533104997}
   BaseTile: {fileID: 5937030515079252130, guid: 95c97e6eba48c41a484d10d1172f0b31, type: 3}
   TilesParent: {fileID: 410404250202029328}
-  movePointX: 0
-  movePointY: 0
-  player: {fileID: 8622999623533104997}
-  playerObject: {fileID: 8622999623533105003}
+  PlayerObject: {fileID: 8622999623533105003}
 --- !u!1001 &410404250533554204
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -371,15 +371,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &410404249846195137
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8622999623533105003}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64d87eeeb9aae4e9099a2ea5fa8a2e62, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

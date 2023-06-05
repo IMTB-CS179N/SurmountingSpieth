@@ -61,7 +61,9 @@ namespace Project.Input
 
                 this.m_cursorMode = mode;
 
-                Cursor.SetCursor(cursorTexture, origin, mode);
+#if PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN
+                Cursor.SetCursor(cursorTexture, origin, mode); // this only works properly on windows
+#endif
             }
         }
 

@@ -194,7 +194,7 @@ namespace Project.Game
 
         public const string SpritePath = "Sprites/Effects/ShredEffect";
 
-        public ShredEffect(float value, int duration) : base(EffectType.AffectStats, EffectSide.Negative, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
+        public ShredEffect(float value, int duration) : base(EffectType.ModifyStats, EffectSide.Negative, value, duration, EffectName, String.Empty, GetDescription(value, duration), SpritePath)
         {
         }
 
@@ -591,7 +591,7 @@ namespace Project.Game
 
         private static string GetDescription(float value, int duration)
         {
-            return $"Decreases precision by {value * 100.0f} points for {duration} turns.";
+            return $"Decreases precision by {value} points for {duration} turns.";
         }
 
         public static void RegisterForFactory()

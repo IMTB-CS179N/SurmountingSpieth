@@ -16,6 +16,7 @@ namespace Project.UI
         {
             private bool m_hovered;
             private bool m_pressed;
+            private bool m_locked;
 
             public readonly VisualElement Image;
 
@@ -33,39 +34,45 @@ namespace Project.UI
             {
                 this.Layout.RegisterCallback<PointerLeaveEvent>(e =>
                 {
-                    this.m_hovered = false;
-                    this.m_pressed = false;
-
-                    if (this.Layout is not null)
+                    if (!this.m_locked)
                     {
-                        this.Layout.style.backgroundColor = ms_backIdledColor;
-                    }
+                        this.m_hovered = false;
+                        this.m_pressed = false;
 
-                    if (this.Image is not null)
-                    {
-                        this.Image.style.unityBackgroundImageTintColor = ms_foreIdledColor;
+                        if (this.Layout is not null)
+                        {
+                            this.Layout.style.backgroundColor = ms_backIdledColor;
+                        }
+
+                        if (this.Image is not null)
+                        {
+                            this.Image.style.unityBackgroundImageTintColor = ms_foreIdledColor;
+                        }
                     }
                 });
 
                 this.Layout.RegisterCallback<PointerEnterEvent>(e =>
                 {
-                    this.m_hovered = true;
-                    this.m_pressed = false;
-
-                    if (this.Layout is not null)
+                    if (!this.m_locked)
                     {
-                        this.Layout.style.backgroundColor = ms_backHoverColor;
-                    }
+                        this.m_hovered = true;
+                        this.m_pressed = false;
 
-                    if (this.Image is not null)
-                    {
-                        this.Image.style.unityBackgroundImageTintColor = ms_foreHoverColor;
+                        if (this.Layout is not null)
+                        {
+                            this.Layout.style.backgroundColor = ms_backHoverColor;
+                        }
+
+                        if (this.Image is not null)
+                        {
+                            this.Image.style.unityBackgroundImageTintColor = ms_foreHoverColor;
+                        }
                     }
                 });
 
                 this.Layout.RegisterCallback<PointerDownEvent>(e =>
                 {
-                    if (e.button == 0)
+                    if (!this.m_locked && e.button == 0)
                     {
                         this.m_hovered = false;
                         this.m_pressed = true;
@@ -84,7 +91,7 @@ namespace Project.UI
 
                 this.Layout.RegisterCallback<PointerUpEvent>(e =>
                 {
-                    if (e.button == 0)
+                    if (!this.m_locked && e.button == 0)
                     {
                         if (this.m_pressed)
                         {
@@ -106,6 +113,61 @@ namespace Project.UI
                     }
                 });
             }
+
+            public void Lock()
+            {
+                if (!this.m_locked)
+                {
+                    this.m_locked = true;
+
+                    if (this.Layout is not null)
+                    {
+                        this.Layout.style.backgroundColor = ms_backLockedColor;
+                    }
+
+                    if (this.Image is not null)
+                    {
+                        this.Image.style.unityBackgroundImageTintColor = ms_foreLockedColor;
+                    }
+                }
+            }
+
+            public void Unlock()
+            {
+                if (this.m_locked)
+                {
+                    this.m_locked = false;
+
+                    Color backColor;
+                    Color foreColor;
+
+                    if (this.m_hovered)
+                    {
+                        backColor = ms_backHoverColor;
+                        foreColor = ms_foreHoverColor;
+                    }
+                    else if (this.m_pressed)
+                    {
+                        backColor = ms_backPressColor;
+                        foreColor = ms_forePressColor;
+                    }
+                    else
+                    {
+                        backColor = ms_backIdledColor;
+                        foreColor = ms_foreIdledColor;
+                    }
+
+                    if (this.Layout is not null)
+                    {
+                        this.Layout.style.backgroundColor = backColor;
+                    }
+
+                    if (this.Image is not null)
+                    {
+                        this.Image.style.unityBackgroundImageTintColor = foreColor;
+                    }
+                }
+            }
         }
 
         public enum ActionType
@@ -122,6 +184,9 @@ namespace Project.UI
         private static readonly Color ms_foreIdledColor = new Color32(255, 255, 255, 255);
         private static readonly Color ms_foreHoverColor = new Color32(215, 215, 215, 255);
         private static readonly Color ms_forePressColor = new Color32(175, 175, 175, 255);
+
+        private static readonly Color ms_backLockedColor = new Color32(100, 80, 35, 255);
+        private static readonly Color ms_foreLockedColor = new Color32(100, 100, 100, 255);
 
         private const string kBackButton = "back-button";
 
@@ -183,7 +248,7 @@ namespace Project.UI
 
             this.m_saveButton = new HoverableButton(root.Q<VisualElement>(kSaveLayout), root.Q<VisualElement>(kSaveButton), () =>
             {
-                // #TODO PERFORM SAVE
+                SaveSystem.SaveData();
             });
         }
 
@@ -264,14 +329,14 @@ namespace Project.UI
                 {
                     pressed = false;
 
-                    button.style.unityBackgroundImageTintColor = ms_foreIdledColor;
+                    button.style.unityBackgroundImageTintColor = Color.black;
                 });
 
                 button.RegisterCallback<PointerEnterEvent>(e =>
                 {
                     pressed = false;
 
-                    button.style.unityBackgroundImageTintColor = ms_foreHoverColor;
+                    button.style.unityBackgroundImageTintColor = (Color)new Color32(235, 30, 30, 255);
                 });
 
                 button.RegisterCallback<PointerDownEvent>(e =>
@@ -280,7 +345,7 @@ namespace Project.UI
                     {
                         pressed = true;
 
-                        button.style.unityBackgroundImageTintColor = ms_forePressColor;
+                        button.style.unityBackgroundImageTintColor = (Color)new Color32(200, 0, 0, 255);
                     }
                 });
 
@@ -292,7 +357,7 @@ namespace Project.UI
                         {
                             pressed = false;
 
-                            button.style.unityBackgroundImageTintColor = ms_foreHoverColor;
+                            button.style.unityBackgroundImageTintColor = (Color)new Color32(235, 30, 30, 255);
 
                             MapManager.Instance.ReturnToMain();
                         }
@@ -305,7 +370,7 @@ namespace Project.UI
         {
             var label = this.UI.rootVisualElement.Q<Label>(kMoneyLabel);
 
-            if (label is not null)
+            if (label is not null && Player.IsPlayerLoaded)
             {
                 label.text = "$" + Player.Instance.Money.ToString();
             }
@@ -341,6 +406,26 @@ namespace Project.UI
                 this.m_actionButton.Image.pickingMode = PickingMode.Position;
 
                 Unsafe.As<Label>(this.m_actionButton.Image).text = "ENTER";
+            }
+        }
+
+        public void UpdateMoneyInfo()
+        {
+            this.SetupMoneyLabel();
+        }
+
+        public void AllowSaving(bool allow)
+        {
+            if (this.m_saveButton is not null)
+            {
+                if (allow)
+                {
+                    this.m_saveButton.Unlock();
+                }
+                else
+                {
+                    this.m_saveButton.Lock();
+                }
             }
         }
 

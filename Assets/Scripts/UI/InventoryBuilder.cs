@@ -1300,7 +1300,7 @@ namespace Project.UI
                 {
                     this.m_closedPressed = false;
 
-                    this.m_back.style.unityBackgroundImageTintColor = (Color)new Color32(255, 100, 100, 255);
+                    this.m_back.style.unityBackgroundImageTintColor = (Color)new Color32(235, 30, 30, 255);
                 });
 
                 this.m_back.RegisterCallback<PointerDownEvent>(e =>
@@ -1321,7 +1321,7 @@ namespace Project.UI
                         {
                             this.m_closedPressed = false;
 
-                            this.m_back.style.unityBackgroundImageTintColor = (Color)new Color32(255, 100, 100, 255);
+                            this.m_back.style.unityBackgroundImageTintColor = (Color)new Color32(235, 30, 30, 255);
 
                             UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
                         }

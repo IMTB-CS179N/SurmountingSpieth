@@ -1,6 +1,5 @@
 using Project.Game;
 using Project.Input;
-using Project.Overworld;
 
 using System;
 
@@ -62,7 +61,7 @@ namespace Project
 
         public bool CanInitializeFromSaveData()
         {
-            return PlayerPrefs.HasKey("PlayerSave");
+            return SaveSystem.HasData();
         }
 
         public void InitializeFromSaveData()

@@ -1,5 +1,7 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using Project.Items;
+
+using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -28,25 +30,25 @@ namespace Project.UI
         private ScreenType m_nextType;
 
         [SerializeField]
-        private UIBuilder MainUI;
+        private MainMenuBuilder MainUI;
 
         [SerializeField]
-        private UIBuilder InGameUI;
+        private InGameBuilder InGameUI;
 
         [SerializeField]
-        private UIBuilder BattleUI;
+        private BattleBuilder BattleUI;
 
         [SerializeField]
-        private UIBuilder CreationUI;
+        private CreationBuilder CreationUI;
 
         [SerializeField]
-        private UIBuilder InventoryUI;
+        private InventoryBuilder InventoryUI;
 
         [SerializeField]
-        private UIBuilder TradeUI;
+        private TradeBuilder TradeUI;
 
         [SerializeField]
-        private UIBuilder TransitionUI;
+        private TransitionBuilder TransitionUI;
 
         private void Awake()
         {
@@ -147,17 +149,58 @@ namespace Project.UI
 
         public void BeginTransitioning(Action callback)
         {
-            Unsafe.As<TransitionBuilder>(this.TransitionUI).BeginTransition(callback);
+            if (this.TransitionUI == null)
+            {
+                callback?.Invoke();
+            }
+            else
+            {
+                this.TransitionUI.BeginTransition(callback);
+            }
         }
 
         public void EndTransitioning(Action callback)
         {
-            Unsafe.As<TransitionBuilder>(this.TransitionUI).EndTransition(callback);
+            if (this.TransitionUI == null)
+            {
+                callback?.Invoke();
+            }
+            else
+            {
+                this.TransitionUI.EndTransition(callback);
+            }
         }
 
         public void TransitionWithDelay(Action onBeginTransitionFinished, Action onEndTransitionFinished, float delay)
         {
-            Unsafe.As<TransitionBuilder>(this.TransitionUI).TransitionWithDelay(onBeginTransitionFinished, onEndTransitionFinished, delay);
+            if (this.TransitionUI == null)
+            {
+                onBeginTransitionFinished?.Invoke();
+                onEndTransitionFinished?.Invoke();
+            }
+            else
+            {
+                this.TransitionUI.TransitionWithDelay(onBeginTransitionFinished, onEndTransitionFinished, delay);
+            }
+        }
+
+        public void SetupTradeItems(IReadOnlyList<ArmorData> armors, IReadOnlyList<WeaponData> weapons, IReadOnlyList<PotionData> potions, IReadOnlyList<TrinketData> trinkets)
+        {
+            if (this.TradeUI != null)
+            {
+                this.TradeUI.SetTradeArmors(armors);
+                this.TradeUI.SetTradeWeapons(weapons);
+                this.TradeUI.SetTradePotions(potions);
+                this.TradeUI.SetTradeTrinkets(trinkets);
+            }
+        }
+
+        public void AllowSaving(bool allow)
+        {
+            if (this.InGameUI != null)
+            {
+                this.InGameUI.AllowSaving(allow);
+            }
         }
 
         public UIBuilder GetUI(ScreenType type)

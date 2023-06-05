@@ -203,6 +203,11 @@ namespace Project.UI
         private readonly List<IconElement> m_sellerInventory = new();
         private readonly bool[] m_pressed = new bool[(int)Tab.Count];
 
+        private IReadOnlyList<TrinketData> m_tradeTrinkets;
+        private IReadOnlyList<PotionData> m_tradePotions;
+        private IReadOnlyList<WeaponData> m_tradeWeapons;
+        private IReadOnlyList<ArmorData> m_tradeArmors;
+
         private ScrollView m_playerView;
         private ScrollView m_sellerView;
 
@@ -210,6 +215,7 @@ namespace Project.UI
         private int m_selectedIndex = -1;
         private Tab m_currentTab = Tab.Armor;
         private bool m_backPressed = false;
+        private bool m_showAllTradeItems = false;
 
         protected override void BindEvents()
         {
@@ -219,6 +225,10 @@ namespace Project.UI
 
         private void OnEnableEvent()
         {
+            this.m_showAllTradeItems = Main.Instance.ShowAllTradeElements;
+
+            Main.Instance.ShowAllTradeElements = false;
+
             this.m_playerView = this.UI.rootVisualElement.Q<ScrollView>(kPlayerInventory);
             this.m_sellerView = this.UI.rootVisualElement.Q<ScrollView>(kSellerInventory);
 
@@ -305,7 +315,7 @@ namespace Project.UI
                 {
                     this.m_backPressed = false;
 
-                    element.style.unityBackgroundImageTintColor = (Color)new Color32(150, 0, 0, 255);
+                    element.style.unityBackgroundImageTintColor = (Color)new Color32(235, 30, 30, 255);
                 });
 
                 element.RegisterCallback<MouseDownEvent>(e =>
@@ -314,7 +324,7 @@ namespace Project.UI
                     {
                         this.m_backPressed = true;
 
-                        element.style.unityBackgroundImageTintColor = (Color)new Color32(115, 0, 0, 255);
+                        element.style.unityBackgroundImageTintColor = (Color)new Color32(200, 0, 0, 255);
                     }
                 });
 
@@ -326,7 +336,7 @@ namespace Project.UI
                         {
                             this.m_backPressed = false;
 
-                            element.style.unityBackgroundImageTintColor = (Color)new Color32(150, 0, 0, 255);
+                            element.style.unityBackgroundImageTintColor = (Color)new Color32(235, 30, 30, 255);
 
                             UIManager.Instance.PerformScreenChange(UIManager.ScreenType.InGame);
                         }
@@ -567,23 +577,47 @@ namespace Project.UI
 
             if (view is not null)
             {
-                switch (this.m_currentTab)
+                if (this.m_showAllTradeItems)
                 {
-                    case Tab.Armor:
-                        this.SetupViewFromItemList(view, ResourceManager.Armors, this.m_sellerInventory, false);
-                        break;
+                    switch (this.m_currentTab)
+                    {
+                        case Tab.Armor:
+                            this.SetupViewFromItemList(view, ResourceManager.Armors, this.m_sellerInventory, false);
+                            break;
 
-                    case Tab.Weapon:
-                        this.SetupViewFromItemList(view, ResourceManager.Weapons, this.m_sellerInventory, false);
-                        break;
+                        case Tab.Weapon:
+                            this.SetupViewFromItemList(view, ResourceManager.Weapons, this.m_sellerInventory, false);
+                            break;
 
-                    case Tab.Potion:
-                        this.SetupViewFromItemList(view, ResourceManager.Potions, this.m_sellerInventory, false);
-                        break;
+                        case Tab.Potion:
+                            this.SetupViewFromItemList(view, ResourceManager.Potions, this.m_sellerInventory, false);
+                            break;
 
-                    case Tab.Trinket:
-                        this.SetupViewFromItemList(view, ResourceManager.Trinkets, this.m_sellerInventory, false);
-                        break;
+                        case Tab.Trinket:
+                            this.SetupViewFromItemList(view, ResourceManager.Trinkets, this.m_sellerInventory, false);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (this.m_currentTab)
+                    {
+                        case Tab.Armor:
+                            this.SetupViewFromItemList(view, this.m_tradeArmors, this.m_sellerInventory, false);
+                            break;
+
+                        case Tab.Weapon:
+                            this.SetupViewFromItemList(view, this.m_tradeWeapons, this.m_sellerInventory, false);
+                            break;
+
+                        case Tab.Potion:
+                            this.SetupViewFromItemList(view, this.m_tradePotions, this.m_sellerInventory, false);
+                            break;
+
+                        case Tab.Trinket:
+                            this.SetupViewFromItemList(view, this.m_tradeTrinkets, this.m_sellerInventory, false);
+                            break;
+                    }
                 }
 
                 view.MarkDirtyRepaint();
@@ -594,14 +628,16 @@ namespace Project.UI
 
         private void SetupViewFromItemList(ScrollView view, IReadOnlyList<IItem> items, List<IconElement> elements, bool isPlayers)
         {
-#if DEBUG
-            Debug.Assert(view is not null);
-            Debug.Assert(items is not null);
-            Debug.Assert(elements is not null);
-#endif
-            for (int i = 0; i < items.Count; ++i)
+            if (items is not null)
             {
-                this.CreateIconElement(view, items[i], elements, isPlayers);
+#if DEBUG
+                Debug.Assert(view is not null);
+                Debug.Assert(elements is not null);
+#endif
+                for (int i = 0; i < items.Count; ++i)
+                {
+                    this.CreateIconElement(view, items[i], elements, isPlayers);
+                }
             }
         }
 
@@ -763,6 +799,26 @@ namespace Project.UI
 
                 action.pickingMode = PickingMode.Ignore;
             }
+        }
+
+        public void SetTradeArmors(IReadOnlyList<ArmorData> armors)
+        {
+            this.m_tradeArmors = armors;
+        }
+
+        public void SetTradeWeapons(IReadOnlyList<WeaponData> weapons)
+        {
+            this.m_tradeWeapons = weapons;
+        }
+
+        public void SetTradePotions(IReadOnlyList<PotionData> potions)
+        {
+            this.m_tradePotions = potions;
+        }
+
+        public void SetTradeTrinkets(IReadOnlyList<TrinketData> trinkets)
+        {
+            this.m_tradeTrinkets = trinkets;
         }
 
         private static int GetFontSizeForString(string value)

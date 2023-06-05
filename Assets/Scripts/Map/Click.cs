@@ -1,29 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Project.Overworld;
 
-public class Click : MonoBehaviour
+namespace Project.Map
 {
-    public bool clickable { get; set; }
-
-    // Start is called before the first frame update
-    void Start() { }
-
-    // Update is called once per frame
-    void Update() { }
-
-    public void TriggerClick()
+    public class Click : MonoBehaviour
     {
-        if (!clickable)
+        public bool Clickable;
+
+        public void TriggerClick()
         {
-            return;
+            if (this.Clickable)
+            {
+                Debug.Log("Moving to " + (this.transform.position - this.transform.parent.transform.position));
+
+                OverworldManager.Instance.SetDestination(this.transform.position - this.transform.parent.transform.position);
+            }
         }
-        Debug.Log(
-            "Moving to " + (this.transform.position - this.transform.parent.transform.position)
-        );
-        OverworldManager.Instance.SetDestination(
-            this.transform.position - this.transform.parent.transform.position
-        );
     }
 }

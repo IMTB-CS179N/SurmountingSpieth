@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using UnityEngine;
@@ -10,6 +11,29 @@ namespace Project.Game
 {
     public class Player : IEntity
     {
+        public class Data
+        {
+            public int Money;
+            public string Race;
+            public string Class;
+
+            public int EquippedHelmet;
+            public int EquippedChestplate;
+            public int EquippedLeggings;
+            public int EquippedWeapon;
+
+            public int[] EquippedPotions;
+            public int[] EquippedHelmetTrinkets;
+            public int[] EquippedChestplateTrinkets;
+            public int[] EquippedLeggingsTrinkets;
+            public int[] EquippedWeaponTrinkets;
+
+            public string[] Armors;
+            public string[] Weapons;
+            public string[] Potions;
+            public string[] Trinkets;
+        }
+
         private static Player ms_instance;
 
         private readonly List<TrinketData> m_trinkets;
@@ -42,15 +66,19 @@ namespace Project.Game
 
         public const int MaxPotionSlots = 3;
 
-        public const int ManaRegeneration = 5;
+        public const int ManaRegeneration = 2;
 
         public const int HealthRegeneration = 2;
+
+        public const int RewardForDefeat = 5;
 
         public const string CharacterSpriteDB = "Sprites/Characters/";
 
         public static readonly float SellMultiplier = 0.8f;
 
         public static readonly int InitialPlayerBank = 10000;
+
+        public static bool IsPlayerLoaded => ms_instance is not null;
 
         public static Player Instance => ms_instance ?? throw new Exception("Cannot access player when not in game");
 
@@ -97,6 +125,150 @@ namespace Project.Game
         public IReadOnlyList<Effect> Effects => this.m_effects;
 
         public IReadOnlyList<Ability> Abilities => this.m_abilities;
+
+        private Player(Data data)
+        {
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            this.m_raceInfo = ResourceManager.Races.Find(_ => _.Name == data.Race);
+            this.m_classInfo = ResourceManager.Classes.Find(_ => _.Name == data.Class);
+
+            this.m_armors = new();
+            this.m_weapons = new();
+            this.m_potions = new();
+            this.m_effects = new();
+            this.m_trinkets = new();
+            this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == data.Class).Select(_ => new Ability(this, _)).ToArray();
+
+            this.m_equippedPotions = new Potion[Player.MaxPotionSlots];
+            this.m_helmetTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
+            this.m_chestplateTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
+            this.m_leggingsTrinkets = new ArmorTrinket[Armor.MaxTrinketSlots];
+            this.m_weaponTrinkets = new WeaponTrinket[Weapon.MaxTrinketSlots];
+
+            this.m_money = data.Money;
+            this.m_sprite = Player.GetSpriteForRaceClass(data.Race, data.Class);
+
+            if (data.Armors is not null)
+            {
+                this.m_armors.Capacity = data.Armors.Length;
+
+                for (int i = 0; i < data.Armors.Length; ++i)
+                {
+                    this.m_armors.Add(ResourceManager.Armors.Find(_ => _.Name == data.Armors[i]));
+                }
+            }
+
+            if (data.Weapons is not null)
+            {
+                this.m_weapons.Capacity = data.Weapons.Length;
+
+                for (int i = 0; i < data.Weapons.Length; ++i)
+                {
+                    this.m_weapons.Add(ResourceManager.Weapons.Find(_ => _.Name == data.Weapons[i]));
+                }
+            }
+
+            if (data.Potions is not null)
+            {
+                this.m_potions.Capacity = data.Potions.Length;
+
+                for (int i = 0; i < data.Potions.Length; ++i)
+                {
+                    this.m_potions.Add(ResourceManager.Potions.Find(_ => _.Name == data.Potions[i]));
+                }
+            }
+
+            if (data.Trinkets is not null)
+            {
+                this.m_trinkets.Capacity = data.Trinkets.Length;
+
+                for (int i = 0; i < data.Trinkets.Length; ++i)
+                {
+                    this.m_trinkets.Add(ResourceManager.Trinkets.Find(_ => _.Name == data.Trinkets[i]));
+                }
+            }
+
+            if (data.EquippedHelmet >= 0)
+            {
+                this.m_helmet = new Armor(this.m_armors[data.EquippedHelmet]);
+            }
+
+            if (data.EquippedChestplate >= 0)
+            {
+                this.m_chestplate = new Armor(this.m_armors[data.EquippedChestplate]);
+            }
+
+            if (data.EquippedLeggings >= 0)
+            {
+                this.m_leggings = new Armor(this.m_armors[data.EquippedLeggings]);
+            }
+
+            if (data.EquippedWeapon >= 0)
+            {
+                this.m_weapon = new Weapon(this.m_weapons[data.EquippedWeapon]);
+            }
+
+            if (data.EquippedPotions is not null && data.EquippedPotions.Length == this.m_equippedPotions.Length)
+            {
+                for (int i = 0; i < this.m_equippedPotions.Length; ++i)
+                {
+                    if (data.EquippedPotions[i] >= 0)
+                    {
+                        this.m_equippedPotions[i] = new Potion(this.m_potions[data.EquippedPotions[i]]);
+                    }
+                }
+            }
+
+            if (data.EquippedHelmetTrinkets is not null && data.EquippedHelmetTrinkets.Length == this.m_helmetTrinkets.Length)
+            {
+                for (int i = 0; i < this.m_helmetTrinkets.Length; ++i)
+                {
+                    if (data.EquippedHelmetTrinkets[i] >= 0)
+                    {
+                        this.m_helmetTrinkets[i] = TrinketFactory.Create(this.m_trinkets[data.EquippedHelmetTrinkets[i]]) as ArmorTrinket;
+                    }
+                }
+            }
+
+            if (data.EquippedChestplateTrinkets is not null && data.EquippedChestplateTrinkets.Length == this.m_chestplateTrinkets.Length)
+            {
+                for (int i = 0; i < this.m_chestplateTrinkets.Length; ++i)
+                {
+                    if (data.EquippedChestplateTrinkets[i] >= 0)
+                    {
+                        this.m_chestplateTrinkets[i] = TrinketFactory.Create(this.m_trinkets[data.EquippedChestplateTrinkets[i]]) as ArmorTrinket;
+                    }
+                }
+            }
+
+            if (data.EquippedLeggingsTrinkets is not null && data.EquippedLeggingsTrinkets.Length == this.m_leggingsTrinkets.Length)
+            {
+                for (int i = 0; i < this.m_leggingsTrinkets.Length; ++i)
+                {
+                    if (data.EquippedLeggingsTrinkets[i] >= 0)
+                    {
+                        this.m_leggingsTrinkets[i] = TrinketFactory.Create(this.m_trinkets[data.EquippedLeggingsTrinkets[i]]) as ArmorTrinket;
+                    }
+                }
+            }
+
+            if (data.EquippedWeaponTrinkets is not null && data.EquippedWeaponTrinkets.Length == this.m_weaponTrinkets.Length)
+            {
+                for (int i = 0; i < this.m_weaponTrinkets.Length; ++i)
+                {
+                    if (data.EquippedWeaponTrinkets[i] >= 0)
+                    {
+                        this.m_weaponTrinkets[i] = TrinketFactory.Create(this.m_trinkets[data.EquippedWeaponTrinkets[i]]) as WeaponTrinket;
+                    }
+                }
+            }
+
+            this.RecalculateStats();
+        }
 
         public Player(string race, string @class) : this(ResourceManager.Races.Find(_ => _.Name == race), ResourceManager.Classes.Find(_ => _.Name == @class))
         {
@@ -333,22 +505,27 @@ namespace Project.Game
 
         public void InitBattle()
         {
-            this.RecalculateStats();
+            this.FinishBattle();
 
             this.m_stats.CurHealth = this.m_stats.MaxHealth;
             this.m_stats.CurMana = this.m_stats.MaxMana;
+        }
 
+        public void InitTurn()
+        {
+            this.m_turn = default;
+        }
+
+        public void FinishBattle()
+        {
             this.m_effects.Clear();
 
             for (int i = 0; i < this.m_abilities.Length; ++i)
             {
                 this.m_abilities[i].Reset();
             }
-        }
 
-        public void InitTurn()
-        {
-            this.m_turn = default;
+            this.RecalculateStats();
         }
 
         public void Regenerate()
@@ -563,6 +740,11 @@ namespace Project.Game
         }
 
 
+
+        public void AwardReward(int money)
+        {
+            this.m_money += money;
+        }
 
         public void EquipHelmet(int index)
         {
@@ -1357,6 +1539,76 @@ namespace Project.Game
             }
         }
 
+        public Data GetDataForSaving()
+        {
+            var data = new Data()
+            {
+                Money = this.m_money,
+                Race = this.m_raceInfo.Name,
+                Class = this.m_classInfo.Name,
+                EquippedHelmet = this.m_armors.IndexOf(this.m_helmet?.Data),
+                EquippedChestplate = this.m_armors.IndexOf(this.m_chestplate?.Data),
+                EquippedLeggings = this.m_armors.IndexOf(this.m_leggings?.Data),
+                EquippedWeapon = this.m_weapons.IndexOf(this.m_weapon?.Data),
+                EquippedPotions = new int[this.m_equippedPotions.Length],
+                EquippedHelmetTrinkets = new int[this.m_helmetTrinkets.Length],
+                EquippedChestplateTrinkets = new int[this.m_chestplateTrinkets.Length],
+                EquippedLeggingsTrinkets = new int[this.m_leggingsTrinkets.Length],
+                EquippedWeaponTrinkets = new int[this.m_weaponTrinkets.Length],
+                Armors = this.m_armors.Count == 0 ? null : new string[this.m_armors.Count],
+                Weapons = this.m_weapons.Count == 0 ? null : new string[this.m_weapons.Count],
+                Potions = this.m_potions.Count == 0 ? null : new string[this.m_potions.Count],
+                Trinkets = this.m_trinkets.Count == 0 ? null : new string[this.m_trinkets.Count],
+            };
+
+            for (int i = 0; i < this.m_equippedPotions.Length; ++i)
+            {
+                data.EquippedPotions[i] = this.m_potions.IndexOf(this.m_equippedPotions[i]?.Data);
+            }
+
+            for (int i = 0; i < this.m_helmetTrinkets.Length; ++i)
+            {
+                data.EquippedHelmetTrinkets[i] = this.m_trinkets.IndexOf(this.m_helmetTrinkets[i]?.Data);
+            }
+
+            for (int i = 0; i < this.m_chestplateTrinkets.Length; ++i)
+            {
+                data.EquippedChestplateTrinkets[i] = this.m_trinkets.IndexOf(this.m_chestplateTrinkets[i]?.Data);
+            }
+
+            for (int i = 0; i < this.m_leggingsTrinkets.Length; ++i)
+            {
+                data.EquippedLeggingsTrinkets[i] = this.m_trinkets.IndexOf(this.m_leggingsTrinkets[i]?.Data);
+            }
+
+            for (int i = 0; i < this.m_weaponTrinkets.Length; ++i)
+            {
+                data.EquippedWeaponTrinkets[i] = this.m_trinkets.IndexOf(this.m_weaponTrinkets[i]?.Data);
+            }
+
+            for (int i = 0; i < this.m_armors.Count; ++i)
+            {
+                data.Armors[i] = this.m_armors[i].Name;
+            }
+
+            for (int i = 0; i < this.m_weapons.Count; ++i)
+            {
+                data.Weapons[i] = this.m_weapons[i].Name;
+            }
+
+            for (int i = 0; i < this.m_potions.Count; ++i)
+            {
+                data.Potions[i] = this.m_potions[i].Name;
+            }
+
+            for (int i = 0; i < this.m_trinkets.Count; ++i)
+            {
+                data.Trinkets[i] = this.m_trinkets[i].Name;
+            }
+
+            return data;
+        }
+
 
 
         private static int BinarySearchInsertionPlace<T>(T item, IReadOnlyList<T> list) where T : IItem
@@ -1404,9 +1656,9 @@ namespace Project.Game
             ms_instance = new Player(race, @class);
         }
 
-        public static void InitializeFromSaveData()
+        public static void ReinitializeFromSaveData(Data data)
         {
-            // #TODO
+            Player.ms_instance = new Player(data);
         }
 
         public static void Deinitialize()

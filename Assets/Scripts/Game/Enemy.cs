@@ -172,22 +172,27 @@ namespace Project.Game
 
         public void InitBattle()
         {
-            this.RecalculateStats();
+            this.FinishBattle();
 
             this.m_stats.CurHealth = this.m_stats.MaxHealth;
             this.m_stats.CurMana = this.m_stats.MaxMana;
+        }
 
+        public void InitTurn()
+        {
+            this.m_turn = default;
+        }
+
+        public void FinishBattle()
+        {
             this.m_effects.Clear();
 
             for (int i = 0; i < this.m_abilities.Length; ++i)
             {
                 this.m_abilities[i].Reset();
             }
-        }
 
-        public void InitTurn()
-        {
-            this.m_turn = default;
+            this.RecalculateStats();
         }
 
         public void Regenerate()
@@ -359,8 +364,8 @@ namespace Project.Game
             return new Enemy(new EnemyData()
             {
                 Name = "Cow",
-                Armor = 5 * Random.Range(4, 9),
-                Precision = 30.0f,
+                Armor = 10 * Random.Range(4, 9),
+                Precision = 70.0f,
                 Evasion = 0.10f,
                 CritChance = 0.05f,
                 CritMultiplier = 1.5f,
@@ -388,7 +393,7 @@ namespace Project.Game
                 },
                 AllyModifiers = new float[]
                 {
-                    15.0f,
+                    0.15f,
                     0.20f,
                     30.0f,
                 },
@@ -403,7 +408,7 @@ namespace Project.Game
                     3,
                     3,
                 },
-                DamageMultiplier = 1.2f,
+                DamageMultiplier = 1.5f,
                 ManaCost = 0,
                 IsAOE = false,
                 CooldownTime = 5,
@@ -412,7 +417,7 @@ namespace Project.Game
                 "Poison effect that deals 30% of base damage over 3 turns. The milk also applies positive effects to the entity itself, " +
                 "healing it by 15% of its maximum health, increasing its damage by 20% for 3 turns and increasing its precision by 30 " +
                 "points for 3 turns.",
-            }, 10 * Random.Range(10, 30), Random.Range(8, 16));
+            }, 10 * Random.Range(30, 50), Random.Range(10, 20));
         }
     }
 }

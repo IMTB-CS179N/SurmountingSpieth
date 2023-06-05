@@ -1,5 +1,5 @@
-using Project.Game;
 using Project.Items;
+using Project.UI;
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using UnityEngine;
 
 using Random = UnityEngine.Random;
 
-namespace Project
+namespace Project.Map
 {
     public class CellInfo
     {
@@ -32,44 +32,53 @@ namespace Project
             BattleHard
         }
 
-        public int yValue { get; set; }
-        public TileType tileType;
-
-        // public Sprite TileSprite;
-        public string SpritePath;
+        public readonly int YValue;
+        public readonly TileType Type;
+        public readonly string SpritePath;
 
         public bool IsClickable()
         {
-            return (
-                tileType == TileType.Shop
-                || tileType == TileType.BattleEasy
-                || tileType == TileType.BattleMedium
-                || tileType == TileType.BattleHard
-            );
+            return this.Type == TileType.Shop || Type == TileType.BattleEasy || Type == TileType.BattleMedium || Type == TileType.BattleHard;
         }
 
-        public CellInfo(int yValue)
+        private CellInfo(OverworldManager.Data.Cell cell)
         {
-            this.yValue = yValue;
+            this.YValue = cell.YValue;
+            this.Type = cell.TileType;
+            this.SpritePath = cell.SpritePath;
+        }
+
+        public CellInfo(int yValue, TileType type, string spritePath)
+        {
+            this.YValue = yValue;
+            this.Type = type;
+            this.SpritePath = spritePath;
         }
 
         public Sprite GetSprite()
         {
             return ResourceManager.LoadSprite(SpritePath);
         }
+
+        public static CellInfo CreateFromData(OverworldManager.Data.Cell cell)
+        {
+            return new CellInfo(cell);
+        }
     }
 
     public class BackgroundInfo : CellInfo
     {
-        public BackgroundInfo(int yValue, TileType type)
-            : base(yValue)
+        private BackgroundInfo(OverworldManager.Data.Cell cell) : base(cell.YValue, cell.TileType, cell.SpritePath)
         {
-            var SpriteName = type.ToString("G");
-            // string path = "Map/PathTiles/" + SpriteName;
-            SpritePath = "Map/PathTiles/" + SpriteName;
-            // TileSprite = Resources.Load<Sprite>(path);
-            // TileSprite = ResourceManager.LoadSprite(path);
-            tileType = type;
+        }
+
+        public BackgroundInfo(int yValue, TileType type) : base(yValue, type, "Map/PathTiles/" + type.ToString())
+        {
+        }
+
+        public static new BackgroundInfo CreateFromData(OverworldManager.Data.Cell cell)
+        {
+            return new BackgroundInfo(cell);
         }
     }
 
@@ -81,7 +90,48 @@ namespace Project
         public readonly HashSet<PotionData> Potions;
         public readonly HashSet<TrinketData> Trinkets;
 
-        public ShopInfo(int yValue) : base(yValue)
+        private ShopInfo(OverworldManager.Data.Cell cell) : base(cell.YValue, cell.TileType, cell.SpritePath)
+        {
+            this.Tier = cell.Tier;
+            this.Armors = new();
+            this.Weapons = new();
+            this.Potions = new();
+            this.Trinkets = new();
+
+            if (cell.Armors is not null)
+            {
+                for (int i = 0; i < cell.Armors.Length; ++i)
+                {
+                    this.Armors.Add(ResourceManager.Armors.Find(_ => _.Name == cell.Armors[i]));
+                }
+            }
+
+            if (cell.Weapons is not null)
+            {
+                for (int i = 0; i < cell.Weapons.Length; ++i)
+                {
+                    this.Weapons.Add(ResourceManager.Weapons.Find(_ => _.Name == cell.Weapons[i]));
+                }
+            }
+
+            if (cell.Potions is not null)
+            {
+                for (int i = 0; i < cell.Potions.Length; ++i)
+                {
+                    this.Potions.Add(ResourceManager.Potions.Find(_ => _.Name == cell.Potions[i]));
+                }
+            }
+
+            if (cell.Trinkets is not null)
+            {
+                for (int i = 0; i < cell.Trinkets.Length; ++i)
+                {
+                    this.Trinkets.Add(ResourceManager.Trinkets.Find(_ => _.Name == cell.Trinkets[i]));
+                }
+            }
+        }
+
+        public ShopInfo(int yValue) : base(yValue, TileType.Shop, "Map/Trade_Post") // #TODO different tier shop sprites
         {
             this.Tier = Random.Range(1, 4);
 
@@ -94,9 +144,61 @@ namespace Project
             ShopInfo.GenerateItems(ResourceManager.Weapons, this.Weapons, this.Tier);
             ShopInfo.GenerateItems(ResourceManager.Potions, this.Potions, this.Tier);
             ShopInfo.GenerateItems(ResourceManager.Trinkets, this.Trinkets, this.Tier);
+        }
 
-            this.SpritePath = "Map/Trade_Post"; // #TODO different tier based sprites
-            this.tileType = TileType.Shop;
+        public void SetupForUI()
+        {
+            var armors = new ArmorData[this.Armors.Count];
+            var weapons = new WeaponData[this.Weapons.Count];
+            var potions = new PotionData[this.Potions.Count];
+            var trinkets = new TrinketData[this.Trinkets.Count];
+
+            this.Armors.CopyTo(armors);
+            this.Weapons.CopyTo(weapons);
+            this.Potions.CopyTo(potions);
+            this.Trinkets.CopyTo(trinkets);
+
+            Array.Sort(armors, (x, y) =>
+            {
+                if (x.Tier - y.Tier == 0)
+                {
+                    return x.Price - y.Price;
+                }
+
+                return y.Tier - x.Tier;
+            });
+
+            Array.Sort(weapons, (x, y) =>
+            {
+                if (x.Tier - y.Tier == 0)
+                {
+                    return x.Price - y.Price;
+                }
+
+                return y.Tier - x.Tier;
+            });
+
+            Array.Sort(potions, (x, y) =>
+            {
+                if (x.Tier - y.Tier == 0)
+                {
+                    return x.Price - y.Price;
+                }
+
+                return y.Tier - x.Tier;
+            });
+
+            Array.Sort(trinkets, (x, y) =>
+            {
+                if (x.Tier - y.Tier == 0)
+                {
+                    return x.Price - y.Price;
+                }
+
+                return y.Tier - x.Tier;
+            });
+
+            UIManager.Instance.SetupTradeItems(armors, weapons, potions, trinkets);
         }
 
         private static void GenerateItems<T>(IReadOnlyList<T> src, HashSet<T> dst, int tier) where T : IItem
@@ -163,89 +265,78 @@ namespace Project
                 }
             }
         }
+
+        public static new ShopInfo CreateFromData(OverworldManager.Data.Cell cell)
+        {
+            return new ShopInfo(cell);
+        }
     }
 
     public class BattleInfo : CellInfo
     {
-        public List<Enemy> enemies = new List<Enemy>();
-
-        public BattleInfo(int yValue, TileType difficulty)
-            : base(yValue)
+        private BattleInfo(OverworldManager.Data.Cell cell) : base(cell.YValue, cell.TileType, cell.SpritePath)
         {
-            var SpriteName = difficulty.ToString("G");
-            SpritePath = "Sprites/Battle/" + SpriteName;
-            tileType = difficulty;
         }
 
-        public List<Enemy> GetEnemies()
+        public BattleInfo(int yValue, TileType type) : base(yValue, type, "Sprites/Battle/" + type.ToString())
         {
-            return enemies;
+        }
+
+        public static new BattleInfo CreateFromData(OverworldManager.Data.Cell cell)
+        {
+            return new BattleInfo(cell);
         }
     }
 
     public class ColumnInfo
     {
-        CellInfo[] cells = new CellInfo[5];
-        int m_index { get; set; }
+        private readonly CellInfo[] m_cells;
 
-        public List<int> nonBlank = new List<int>();
+        public readonly List<int> NonBlank;
 
         public ColumnInfo()
         {
-            for (int i = 0; i < 5; i++)
-            {
-                cells[i] = new BackgroundInfo(i, CellInfo.TileType.Blank);
-            }
-        }
+            this.NonBlank = new();
+            this.m_cells = new CellInfo[OverworldManager.VerticalTileCount];
 
-        public ColumnInfo(int index, CellInfo[] newCells)
-        {
-            // cells[0] = new BackgroundInfo(0, CellInfo.TileType.BottomLeft);
-            if (newCells.Length != 5)
+            for (int i = 0; i < OverworldManager.VerticalTileCount; ++i)
             {
-                Debug.Log(
-                    "Something went wrong creating a column. Check how many tile types you pass in."
-                );
+                this.m_cells[i] = new BackgroundInfo(i, CellInfo.TileType.Blank);
             }
-            for (int i = 0; i < 5; i++)
-            {
-                cells[i] = newCells[i];
-            }
-
-            m_index = index;
         }
 
         public Sprite GetSprite(int tileRow)
         {
-            return cells[tileRow].GetSprite();
+            return this.m_cells[tileRow].GetSprite();
         }
 
         public CellInfo GetCell(int index)
         {
-            return cells[index];
+            return this.m_cells[index];
         }
 
         public static CellInfo RandomCell(int yValue)
         {
-            int seed = Random.Range(0, 2);
-            switch (seed)
+            if (Random.Range(0, 2) == 1)
             {
-                case 0:
-                    // return new BattleInfo(yValue, new List<Enemy>());
-                    return new BackgroundInfo(yValue, CellInfo.TileType.Blank);
-                case 1:
-                    return new ShopInfo(yValue);
-                default:
-                    break;
+                return new ShopInfo(yValue);
             }
-            return new BackgroundInfo(yValue, CellInfo.TileType.Blank);
+            else
+            {
+                return new BackgroundInfo(yValue, CellInfo.TileType.Blank);
+            }
         }
 
         public void SetCell(CellInfo newCell)
         {
-            cells[newCell.yValue] = newCell;
-            nonBlank.Add(newCell.yValue);
-            nonBlank.Sort();
+            this.m_cells[newCell.YValue] = newCell;
+            this.NonBlank.Add(newCell.YValue);
+            this.NonBlank.Sort();
+        }
+
+        public void SetCellIgnoreBlankness(int index, CellInfo cell)
+        {
+            this.m_cells[index] = cell;
         }
     }
 }
