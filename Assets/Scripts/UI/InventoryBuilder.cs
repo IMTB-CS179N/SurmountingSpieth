@@ -21,6 +21,7 @@ namespace Project.UI
             private bool m_hovered;
             private bool m_pressed;
             private bool m_allowed;
+            private bool m_display;
 
             public static readonly Color BackIdledColor = new Color32(189, 146, 82, 255);
             public static readonly Color BackHoverColor = new Color32(150, 115, 60, 255);
@@ -50,6 +51,7 @@ namespace Project.UI
                 this.pickingMode = PickingMode.Position;
 
                 this.m_allowed = true;
+                this.m_display = true;
                 this.m_hovered = false;
                 this.m_pressed = false;
 
@@ -76,6 +78,7 @@ namespace Project.UI
                 this.style.borderLeftWidth = 1.0f;
                 this.style.borderRightWidth = 1.0f;
 
+                this.style.display = DisplayStyle.Flex;
                 this.style.backgroundColor = BackIdledColor;
                 this.style.unityBackgroundImageTintColor = SelectionInfo.InactiveColor;
                 this.style.backgroundImage = new StyleBackground(ResourceManager.LoadSprite(ResourceManager.SelectedItemPath));
@@ -129,6 +132,16 @@ namespace Project.UI
 
                 this.style.backgroundColor = BackDisallowColor;
                 this.Image.style.unityBackgroundImageTintColor = ForeDisallowColor;
+            }
+
+            public void SetDisplay(bool display)
+            {
+                if (this.m_display != display)
+                {
+                    this.m_display = display;
+
+                    this.style.display = display ? DisplayStyle.Flex : DisplayStyle.None;
+                }
             }
 
             private void SetupCallbacks()
@@ -1458,6 +1471,8 @@ namespace Project.UI
                 {
                     this.AddItemToTheInventory(items[i]);
                 }
+
+                this.UpdateDisplayedInventory();
             }
         }
 
@@ -1638,6 +1653,17 @@ namespace Project.UI
             }
         }
 
+        private void UpdateDisplayedInventory()
+        {
+            var player = Player.Instance;
+            var inventory = this.m_inventory;
+
+            for (int i = 0; i < inventory.Count; ++i)
+            {
+                inventory[i].SetDisplay(!player.HasEquippedItem(inventory[i].Item));
+            }
+        }
+
         private void EquipFromInventory(IconElement src, EquipElement dst)
         {
 #if DEBUG
@@ -1645,6 +1671,7 @@ namespace Project.UI
             Debug.Assert(dst is not null);
 #endif
             this.EquipItemInternal(src.Item, dst.Id, dst.Type);
+            this.UpdateDisplayedInventory();
             this.UpdateDisplayedEquipment();
             this.UpdateDisplayedStatistics();
         }
@@ -1657,6 +1684,7 @@ namespace Project.UI
             Debug.Assert(src.Type == dst.Type);
 #endif
             this.EquipItemInternal(src.Item, dst.Id, dst.Type);
+            this.UpdateDisplayedInventory();
             this.UpdateDisplayedEquipment();
             this.UpdateDisplayedStatistics();
         }

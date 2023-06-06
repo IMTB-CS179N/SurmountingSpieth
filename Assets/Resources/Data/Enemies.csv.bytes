@@ -1,32 +1,32 @@
-SlimeOozingGrowth,10,30,0.4,0.15,1,Oozing Growth,Sprites/Monsters/PhongSlime
-SlimeSlimeSpear,10,30,0.4,0.15,1,Slime Spear,Sprites/Monsters/PhongSlime
-SlimePollute,10,30,0.4,0.15,1,Pollute,Sprites/Monsters/PhongSlime
-CowMarchingCow,40,30,0.2,0.1,1.2,Marching Cow,Sprites/Monsters/RasterizeCow
-CowRasterBolt,40,30,0.2,0.1,1.2,Rasterbolt,Sprites/Monsters/RasterizeCow
-CowSicklyBreath,40,30,0.2,0.1,1.2,Sickly Breath,Sprites/Monsters/RasterizeCow
-MonkeyQuickSwing,20,40,0.35,0.2,0.7,Quick Swing,Sprites/Monsters/PhongMonkey
-MonkeyPiercingStare,20,40,0.35,0.2,0.7,Piercing Stare,Sprites/Monsters/PhongMonkey
-MonkeyEnragedStrike,20,40,0.35,0.2,0.7,Enraged Strike,Sprites/Monsters/PhongMonkey
-ZybookPiercingStare,30,50,0.2,0.12,0.85,Piercing Stare,Sprites/Monsters/Zybook
-ZybookEnragedStrike,30,50,0.2,0.12,0.85,Enraged Strike,Sprites/Monsters/Zybook
-ZybookLab,30,50,0.2,0.12,0.85,Lab,Sprites/Monsters/Zybook
-TapsRamble,50,30,0.35,0.2,0.45,Ramble,Sprites/Monsters/Taps
-TapsMarchingCow,50,30,0.35,0.2,0.45,Marching Cow,Sprites/Monsters/Taps
-TapsTicket,50,30,0.35,0.2,0.45,Ticket,Sprites/Monsters/Taps
-GradSicklyBreath,30,40,0.4,0.15,1.2,Sickly Breath,Sprites/Monsters/Grad
-GradPollute,30,40,0.4,0.15,1.2,Pollute,Sprites/Monsters/Grad
-GradTA,30,40,0.4,0.15,1.2,TA,Sprites/Monsters/Grad
-UndergradRamble,40,35,0.3,0.22,1,Ramble,Sprites/Monsters/Undergrad
-UndergradOozingGrowth,40,35,0.3,0.22,1,Oozing Growth,Sprites/Monsters/Undergrad
-UndergradStench,40,35,0.3,0.22,1,Stench,Sprites/Monsters/Undergrad
-AIRasterBolt,20,40,0.3,0.18,0.75,Rasterbolt,Sprites/Monsters/AI
-AISlimeSpear,20,40,0.3,0.18,0.75,Slime Spear,Sprites/Monsters/AI
-AIChatGPT,20,40,0.3,0.18,0.75,ChatGPT,Sprites/Monsters/AI
-FARamble,30,45,0.35,0.3,1,Ramble,Sprites/Monsters/FA
-FAQuickSwing,30,45,0.35,0.3,1,Quick Swing,Sprites/Monsters/FA
-FABill,30,45,0.35,0.3,1,Bill,Sprites/Monsters/FA
-AdvisorsPiercingStare,35,50,0.3,0.25,0.8,Piercing Stare,Sprites/Monsters/Advisors
-AdvisorsEnragedStrike,35,50,0.3,0.25,0.8,Enraged Strike,Sprites/Monsters/Advisors
-AdvisorsWorkshop,35,50,0.3,0.25,0.8,Workshop,Sprites/Monsters/Advisors
-180W,20,55,0.5,0.4,1,Ramble,Sprites/Monsters/180W
-Craig,50,70,0.7,0.25,1.5,Demo Feedback,Sprites/Monsters/Craig
+SlimeOozingGrowth,15,50,0.4,0.15,1,Oozing Growth,Sprites/Monsters/PhongSlime
+SlimeSlimeSpear,15,50,0.4,0.15,1,Slime Spear,Sprites/Monsters/PhongSlime
+SlimePollute,15,50,0.4,0.15,1,Pollute,Sprites/Monsters/PhongSlime
+CowMarchingCow,50,55,0.2,0.1,1.2,Marching Cow,Sprites/Monsters/RedRasterCow
+CowRasterBolt,50,55,0.2,0.1,1.2,Rasterbolt,Sprites/Monsters/BlueRasterCow
+CowSicklyBreath,50,55,0.2,0.1,1.2,Sickly Breath,Sprites/Monsters/GreenRasterCow
+MonkeyQuickSwing,25,60,0.35,0.2,0.7,Quick Swing,Sprites/Monsters/PhongMonkey
+MonkeyPiercingStare,25,60,0.35,0.2,0.7,Piercing Stare,Sprites/Monsters/PhongMonkey
+MonkeyEnragedStrike,25,60,0.35,0.2,0.7,Enraged Strike,Sprites/Monsters/PhongMonkey
+ZybookPiercingStare,55,80,0.2,0.12,0.85,Piercing Stare,Sprites/Monsters/Zybook
+ZybookEnragedStrike,55,80,0.2,0.12,0.85,Enraged Strike,Sprites/Monsters/Zybook
+ZybookLab,55,80,0.2,0.12,0.85,Lab,Sprites/Monsters/Zybook
+TapsRamble,65,50,0.35,0.2,0.45,Ramble,Sprites/Monsters/Taps
+TapsMarchingCow,65,50,0.35,0.2,0.45,Marching Cow,Sprites/Monsters/Taps
+TapsTicket,65,50,0.35,0.2,0.45,Ticket,Sprites/Monsters/Taps
+GradSicklyBreath,35,60,0.4,0.15,1.2,Sickly Breath,Sprites/Monsters/GradStudent
+GradPollute,35,60,0.4,0.15,1.2,Pollute,Sprites/Monsters/GradStudent
+GradTA,35,60,0.4,0.15,1.2,TA,Sprites/Monsters/GradStudent
+UndergradRamble,50,55,0.3,0.22,1,Ramble,Sprites/Monsters/Undergrad
+UndergradOozingGrowth,50,55,0.3,0.22,1,Oozing Growth,Sprites/Monsters/Undergrad
+UndergradStench,50,55,0.3,0.22,1,Stench,Sprites/Monsters/Undergrad
+AIRasterBolt,25,60,0.3,0.18,0.75,Rasterbolt,Sprites/Monsters/ArtificialIntelligence
+AISlimeSpear,25,60,0.3,0.18,0.75,Slime Spear,Sprites/Monsters/ArtificialIntelligence
+AIChatGPT,25,60,0.3,0.18,0.75,ChatGPT,Sprites/Monsters/ArtificialIntelligence
+FARamble,45,55,0.35,0.3,1,Ramble,Sprites/Monsters/TuitionCollector
+FAQuickSwing,45,55,0.35,0.3,1,Quick Swing,Sprites/Monsters/TuitionCollector
+FABill,45,55,0.35,0.3,1,Bill,Sprites/Monsters/TuitionCollector
+AdvisorsPiercingStare,60,70,0.3,0.25,0.8,Piercing Stare,Sprites/Monsters/Advisors
+AdvisorsEnragedStrike,60,70,0.3,0.25,0.8,Enraged Strike,Sprites/Monsters/Advisors
+AdvisorsWorkshop,60,70,0.3,0.25,0.8,Workshop,Sprites/Monsters/Advisors
+180W,50,70,0.35,0.4,1,Ramble,Sprites/Monsters/TwoDragons
+Craig,80,75,0.6,0.25,1.5,Demo Feedback,Sprites/Monsters/BossCraig

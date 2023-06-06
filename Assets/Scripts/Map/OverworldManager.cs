@@ -535,7 +535,7 @@ namespace Project.Map
                 {
                     int offset = this.m_currentX + j - kCenterColumn;
 
-                    if (offset >= this.m_columns.Count)
+                    if (offset < 0 || offset >= this.m_columns.Count)
                     {
                         this.m_gridTiles[i, j].GetComponent<SpriteRenderer>().sprite = this.m_blank.GetSprite(i);
                         this.m_gridTiles[i, j].GetComponent<Click>().Clickable = false;
@@ -710,10 +710,7 @@ namespace Project.Map
                 this.m_currentX++;
             }
 
-            if (Game.Player.IsPlayerLoaded)
-            {
-                this.PlayerObject.GetComponent<SpriteRenderer>().sprite = Game.Player.Instance.Sprite;
-            }
+            this.UpdatePlayerSprite();
 
             var starterColumn = new ColumnInfo();
 
@@ -802,10 +799,7 @@ namespace Project.Map
 
             this.Player.position = new Vector3(this.MovePointX, this.MovePointY, 0.0f);
 
-            if (Game.Player.IsPlayerLoaded)
-            {
-                this.PlayerObject.GetComponent<SpriteRenderer>().sprite = Game.Player.Instance.Sprite;
-            }
+            this.UpdatePlayerSprite();
 
             var current = this.m_columns[data.CurrentX].GetCell(data.CurrentY);
 
@@ -816,6 +810,14 @@ namespace Project.Map
 
             this.InGameUICallback();
             this.SetSprites();
+        }
+
+        public void UpdatePlayerSprite()
+        {
+            if (Game.Player.IsPlayerLoaded)
+            {
+                this.PlayerObject.GetComponent<SpriteRenderer>().sprite = Game.Player.Instance.Sprite;
+            }
         }
     }
 }

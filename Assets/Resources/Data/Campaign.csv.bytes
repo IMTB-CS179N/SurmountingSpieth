@@ -1,22 +1,22 @@
-SlimePollute,,,20,,,6,,,0,FALSE
-SlimeSlimeSpear,"SlimeOozingGrowth, SlimePollute",,25,"20, 25",,8,"6, 7",,0,FALSE
-CowMarchingCow,"TapsRamble, AIRasterBolt",,22,"24, 23",,7,"7, 8",,0,FALSE
-MonkeyEnragedStrike,"CowRasterBolt, AIChatGPT",,20,"22, 22",,8,"6, 6",,0,FALSE
-ZybookPiercingStare,"UndergradStench, FARamble","ZybookLab, GradTA, TapsTicket",25,"24, 22","20, 22, 24",10,"7, 8","10, 6, 10",0,FALSE
-FAQuickSwing,"AdvisorsPiercingStare, AIRasterBolt","GradPollute, SlimePollute, CowSicklyBreath",35,"28, 26","25, 27, 25",15,"10, 12","12, 10, 10",0,FALSE
-AdvisorsEnragedStrike,"CowRasterBolt, TapsRamble","AISlimeSpear, ZybookEnragedStrike, MonkeyQuickSwing",35,"28, 28","25, 26, 27",16,"12, 14","12, 12, 10",0,FALSE
-GradTA,"TapsRamble, ZybookLab","TapsTicket, MonkeyQuickSwing, SlimePollute",38,"30, 30","28, 28, 28",18,"15, 15","15, 15, 13",0,FALSE
-AdvsorsWorkshop,"FABill, AISlimeSpear","AIRasterBolt, UndergradOozingGrowth, UndergradStench",38,"32,32","30, 30, 30",19,"16, 16","16, 16, 16",0,FALSE
-AIChatGPT,"TapsRamble, CowMarchingCow","SlimePollute, FARamble, AdvisorsPiercingStare",40,"35, 35","33, 33, 33",22,"20, 20","20, 20, 16",0,FALSE
-,,180W,,,200,,,20,0,TRUE
-"SlimeOozingGrowth, SlimePollute","FAQuickSwing, AdvisorsPiercingStare, TapsTicket","MonkeyQuickSwing, MonkeyPiercingStare, MonkeyEnragedStrike, SlimePollute","45, 45","45, 42, 45","45, 42, 42, 45","25, 25","25, 22, 25","25, 22, 22, 25",0,FALSE
-"TapsRamble, AIRasterBolt","SlimeSlimeSpear, ZybookEnragedStrike, CowSicklyBreath","SlimePollute, SlimeSlimeSpear, SlimeOozingGrowth, ZybookLab","47, 47","47, 45, 47","47, 45, 45, 47","27, 27","27, 25, 27","27, 25, 25, 27",0,FALSE
-"CowRasterBolt, AIChatGPT","TapsMarchingCow, UndergradRamble, GradTA","CowMarchingCow, CowRasterBolt, CowSicklyBreath, UndergradRamble","50, 50","50, 45, 50","50, 45, 45, 50","28, 30","30, 28, 30","30, 28, 28, 30",0,FALSE
-"UndergradStench, FARamble","ZybookLab, GradTA, TapsTicket","ZybookLab, ZybookEnragedStrike, ZybookPiercingStare, GradPollute","52, 52","52, 50, 52","52, 50, 50, 52","32, 30","30, 32, 30","30, 32, 32, 30",0,FALSE
-"AdvisorsPiercingStare, AIRasterBolt","GradPollute, SlimePollute, CowSicklyBreath","TapsRamble, TapsMarchingCow, TapsTicket, FAQuickSwing","54, 54","54, 52, 54","54, 52, 52, 54","34, 34","34, 32, 34","34, 32, 32, 34",0,FALSE
-"CowRasterBolt, TapsRamble","AISlimeSpear, ZybookEnragedStrike, MonkeyQuickSwing","UndergradOozingGrowth, UndergradStench, UndergradRamble, AIChatGPT","54, 54","54, 52, 54","54, 52, 52, 54","34, 34","34, 32, 34","34, 32, 32, 34",0,FALSE
-"TapsRamble, ZybookLab","TapsTicket, MonkeyQuickSwing, SlimePollute","GradTA, GradPollute, GradSicklyBreath, AdvisorsPiercingStare","56, 56","56, 54, 56","56, 54, 54, 56","36, 36","36, 34, 36","36, 34, 34, 36",0,FALSE
-"FABill, AISlimeSpear","AIRasterBolt, UndergradOozingGrowth, UndergradStench","FARamble, FABill, FAQuickSwing, ZybookLab","56, 56","56, 54, 56","56, 54, 54, 56","36, 36","36, 34, 36","36, 34, 34, 36",0,FALSE
-"TapsRamble, CowMarchingCow","SlimePollute, FARamble, AdvisorsPiercingStare","AdvisorsPiercingStare, AdvisorsEnragedStrike, AdvisorsWorkshop, TapsTicket","60, 60","60, 56, 60","60, 56, 56, 60","40, 40","40, 36, 40","40, 36, 36, 40",0,FALSE
-"FARamble, TapsRamble","ZybookEnragedStrike, AdvisorsEnragedStrike, MonkeyEnragedStrike","GradTA, AIChatGPT, FABill, AdvisorsWorkshop","60, 60","60, 56, 60","60, 56, 56, 60","40, 40","40, 36, 40","40, 36, 36, 40",0,FALSE
-,,Craig,,,400,,,45,0,TRUE
+SlimeSlimeSpear,,,100,,,15,,,50,FALSE
+SlimePollute,SlimePollute,,130,150,,17,19,,50,FALSE
+CowMarchingCow,"CowMarchingCow, CowRasterBolt",,200,"140, 140",,18,"13, 13",,100,FALSE
+MonkeyQuickSwing,"MonkeyQuickSwing, MonkeyPiercingStare",,220,"160, 160",,20,"15, 15",,100,FALSE
+ZybookEnragedStrike,"ZybookEnragedStrike, SlimePollute","ZybookEnragedStrike, SlimePollute, SlimePollute",240,"240, 50","240, 50, 50",17,"17, 10","17, 10, 10",100,FALSE
+TapsRamble,"TapsRamble, MonkeyEnragedStrike","TapsRamble, MonkeyEnragedStrike, CowSicklyBreath",300,"300, 70","300, 70, 70",15,"15, 10","15, 10, 10",150,FALSE
+"ZybookPiercingStare, ZybookEnragedStrike, ZybookLab","ZybookPiercingStare, ZybookEnragedStrike, ZybookLab","ZybookPiercingStare, ZybookEnragedStrike, ZybookLab","180, 180, 180","230, 230, 230","280, 280, 280","11, 11, 11","13, 13, 13","15, 15, 15",150,FALSE
+TapsTicket,TapsTicket,TapsTicket,600,800,1000,20,20,20,150,FALSE
+"GradSicklyBreath, GradTA","GradSicklyBreath, GradTA","GradSicklyBreath, GradTA","400, 400","500, 500","600, 600","12, 15","12, 15","12, 18",200,FALSE
+"CowMarchingCow, CowMarchingCow","CowMarchingCow, CowMarchingCow, CowMarchingCow","CowMarchingCow, CowMarchingCow, CowMarchingCow, CowMarchingCow","400, 400","400, 400, 400","400, 400, 400, 400","20, 20","18, 18, 18","18, 18, 18, 18",500,FALSE
+,,180W,,,3000,,,16,500,TRUE
+,,,,,,,,,200,FALSE
+,,,,,,,,,200,FALSE
+,,,,,,,,,250,FALSE
+,,,,,,,,,250,FALSE
+,,,,,,,,,250,FALSE
+,,,,,,,,,250,FALSE
+,,,,,,,,,300,FALSE
+,,,,,,,,,300,FALSE
+,,,,,,,,,300,FALSE
+,,,,,,,,,500,FALSE
+,,Craig,,,,,,,2000,TRUE

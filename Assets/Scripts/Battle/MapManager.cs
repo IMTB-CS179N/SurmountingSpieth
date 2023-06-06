@@ -32,6 +32,18 @@ namespace Project.Battle
 
         public int LevelIndex = -1;
 
+#if DEBUG || DEVELOPMENT_BUILD
+        public string OverrideRace;
+        public string OverrideClass;
+
+        public bool OverrideEnemies = true;
+
+        public int OverrideEnemyCount = 0;
+        public string[] OverrideEnemyNames = new string[4];
+        public int[] OverrideEnemyHealth = new int[4];
+        public int[] OverrideEnemyDamage = new int[4];
+#endif
+
         private void Awake()
         {
             if (this.InGameUI == null)
@@ -44,6 +56,47 @@ namespace Project.Battle
                 Debug.Log("Warning: Overworld prefab is null");
             }
         }
+
+#if DEBUG || DEVELOPMENT_BUILD
+        private void Update()
+        {
+            if (Player.IsPlayerLoaded && !OverworldManager.IsOverworldNull)
+            {
+                var raceInfo = ResourceManager.Races.Find(_ => _.Name == this.OverrideRace);
+                var classInfo = ResourceManager.Classes.Find(_ => _.Name == this.OverrideClass);
+
+                bool updateSprite = false;
+
+                if (raceInfo is not null && classInfo is not null)
+                {
+                    updateSprite = true;
+
+                    Player.Instance.SwapRaceClass(raceInfo, classInfo);
+                }
+                else
+                {
+                    if (raceInfo is not null)
+                    {
+                        updateSprite = true;
+
+                        Player.Instance.SwapRaceClass(raceInfo, Player.Instance.Class);
+                    }
+
+                    if (classInfo is not null)
+                    {
+                        updateSprite = true;
+
+                        Player.Instance.SwapRaceClass(Player.Instance.Race, classInfo);
+                    }
+                }
+
+                if (updateSprite)
+                {
+                    OverworldManager.Instance.UpdatePlayerSprite();
+                }
+            }
+        }
+#endif
 
         public bool CanContinue()
         {
@@ -186,15 +239,15 @@ namespace Project.Battle
 
             int reward;
 
-            if (false)
+            if (this.OverrideEnemies)
             {
-                reward = 777;
+                reward = 100;
 
-                enemies = new Enemy[4];
+                enemies = new Enemy[this.OverrideEnemyCount];
 
                 for (int i = 0; i < enemies.Length; ++i)
                 {
-                    enemies[i] = Enemy.CreateDefaultEnemy();
+                    enemies[i] = new Enemy(this.OverrideEnemyNames[i], this.OverrideEnemyHealth[i], this.OverrideEnemyDamage[i]);
                 }
             }
             else

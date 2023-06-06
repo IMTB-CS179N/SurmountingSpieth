@@ -282,6 +282,17 @@ MonoBehaviour:
   InGameUI: {fileID: 1804606731}
   Difficulty: 0
   LevelIndex: -1
+  OverrideRace: 
+  OverrideClass: 
+  OverrideEnemies: 1
+  OverrideEnemyCount: 0
+  OverrideEnemyNames:
+  - 
+  - 
+  - 
+  - 
+  OverrideEnemyHealth: 00000000000000000000000000000000
+  OverrideEnemyDamage: 00000000000000000000000000000000
 --- !u!114 &296547418
 MonoBehaviour:
   m_ObjectHideFlags: 0

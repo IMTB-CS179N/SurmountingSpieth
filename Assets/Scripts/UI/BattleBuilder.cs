@@ -458,7 +458,7 @@ namespace Project.UI
                     Icon = ability.Sprite,
                     Name = ability.Name,
                     Type = kAbility,
-                    Time = ability.IsOnCooldown ? $"Cooldown: {ability.CooldownTime}" : "Can Use",
+                    Time = ability.IsOnCooldown ? $"Remaining Cooldown: {ability.RemainingCooldown}" : "Can Use",
                     Cost = String.Empty,
                     Desc = ability.Description,
                 };
@@ -1545,6 +1545,7 @@ namespace Project.UI
         private bool m_backPressed;
 
         private AnimationType m_animation;
+        private bool m_lockedActions;
 
         public IEntity CurrentEntity
         {
@@ -1643,6 +1644,7 @@ namespace Project.UI
         private void OnDisableEvent()
         {
             this.m_animation = AnimationType.None;
+            this.m_lockedActions = false;
 
             this.m_currentEntity = null;
             this.m_currentSelected = null;
@@ -1969,6 +1971,8 @@ namespace Project.UI
                     this.m_potionSlot3 = new PotionItem(kPotionSlot3Icon, 2, this);
 
                     this.m_actionButton = new ActionButton(kActionButton, kActionLabel, this);
+
+                    this.m_actionButton.SetLocked(this.m_lockedActions);
                 }
                 else
                 {
@@ -2237,7 +2241,7 @@ namespace Project.UI
             {
                 for (int i = 0; i < this.m_effectList.Count; ++i)
                 {
-                    if (this.m_effectList[i] == this.m_currentSelected)
+                    if (this.m_effectList[i] == this.m_currentProvider)
                     {
                         this.DisplayTooltip(null, false);
                     }
@@ -2299,11 +2303,13 @@ namespace Project.UI
 
         public void LockActions()
         {
+            this.m_lockedActions = true;
             this.m_actionButton?.SetLocked(true);
         }
 
         public void UnlockActions()
         {
+            this.m_lockedActions = false;
             this.m_actionButton?.SetLocked(false);
         }
 

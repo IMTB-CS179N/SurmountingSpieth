@@ -65,6 +65,7 @@ namespace Project.Battle
         private static BattleManager ms_instance;
 
         private GameObject m_background;
+        private GameObject m_parentObj;
         private Action m_onBattleEnded;
 
         private BattleBehavior[] m_enemyBehaviors;
@@ -147,26 +148,15 @@ namespace Project.Battle
             this.SetupCallbacks(false);
 
             Object.Destroy(this.m_background);
-            Object.Destroy(this.m_playerBehavior.gameObject);
+            Object.Destroy(this.m_parentObj);
 
-            if (this.m_enemyBehaviors is not null)
-            {
-                for (int i = 0; i < this.m_enemyBehaviors.Length; ++i)
-                {
-                    Object.Destroy(this.m_enemyBehaviors[i].gameObject);
-                }
-            }
-
-            if (this.m_playerEntity is not null)
-            {
-                this.m_playerEntity.FinishBattle();
-            }
+            this.m_playerEntity?.FinishBattle();
 
             if (this.m_enemyEntities is not null)
             {
                 for (int i = 0; i < this.m_enemyEntities.Length; ++i)
                 {
-                    this.m_enemyEntities[i].FinishBattle();
+                    this.m_enemyEntities[i]?.FinishBattle();
                 }
             }
 
@@ -187,6 +177,7 @@ namespace Project.Battle
         {
             var behavior = GameObject.Instantiate(this.EntityPrefab).GetComponent<BattleBehavior>();
 
+            behavior.gameObject.transform.parent = this.m_parentObj.transform;
             behavior.UnitOrigin = ms_playerPosition;
             behavior.DefaultScale = 1.25f;
             behavior.MaximumScale = 1.25f;
@@ -212,6 +203,7 @@ namespace Project.Battle
             {
                 var behavior = GameObject.Instantiate(this.EntityPrefab).GetComponent<BattleBehavior>();
 
+                behavior.gameObject.transform.parent = this.m_parentObj.transform;
                 behavior.UnitOrigin = enemyPositions[i];
                 behavior.DefaultScale = 1.0f;
                 behavior.MaximumScale = 1.0f;
@@ -235,6 +227,8 @@ namespace Project.Battle
         private IEnumerator PerformBattleStart(Action callback)
         {
             this.m_state = BattleState.StartBattle;
+
+            this.m_parentObj = new GameObject("Battle");
 
             yield return null;
 

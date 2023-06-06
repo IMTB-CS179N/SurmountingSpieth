@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using UnityEngine;
@@ -41,10 +40,18 @@ namespace Project.Game
         private readonly List<WeaponData> m_weapons;
         private readonly List<ArmorData> m_armors;
         private readonly List<Effect> m_effects;
+
+#if DEBUG || DEVELOPMENT_BUILD
+        private Ability[] m_abilities;
+        private ClassInfo m_classInfo;
+        private Sprite m_sprite;
+        private RaceInfo m_raceInfo;
+#else
         private readonly Ability[] m_abilities;
         private readonly ClassInfo m_classInfo;
-        private readonly RaceInfo m_raceInfo;
         private readonly Sprite m_sprite;
+        private readonly RaceInfo m_raceInfo;
+#endif
 
         private readonly Potion[] m_equippedPotions;
 
@@ -66,7 +73,7 @@ namespace Project.Game
 
         public const int MaxPotionSlots = 3;
 
-        public const int ManaRegeneration = 2;
+        public const int ManaRegeneration = 5;
 
         public const int HealthRegeneration = 2;
 
@@ -76,7 +83,7 @@ namespace Project.Game
 
         public static readonly float SellMultiplier = 0.8f;
 
-        public static readonly int InitialPlayerBank = 10000;
+        public static readonly int InitialPlayerBank = 0;
 
         public static bool IsPlayerLoaded => ms_instance is not null;
 
@@ -93,6 +100,10 @@ namespace Project.Game
         public ref readonly EntityStats EntityStats => ref this.m_stats;
 
         public ref readonly TurnStats TurnStats => ref this.m_turn;
+
+        public RaceInfo Race => this.m_raceInfo;
+
+        public ClassInfo Class => this.m_classInfo;
 
         public int Money => this.m_money;
 
@@ -403,40 +414,40 @@ namespace Project.Game
                 this.m_effects[i].ModifyStats(ref this.m_stats, ref this.m_turn);
             }
 
-            switch (this.m_raceInfo.Stat)
-            {
-                case Statistic.Health:
-                    this.m_stats.MaxHealth += (int)(this.m_stats.MaxHealth * this.m_raceInfo.Modifier);
-                    break;
-
-                case Statistic.Mana:
-                    this.m_stats.MaxMana += (int)(this.m_stats.MaxMana * this.m_raceInfo.Modifier);
-                    break;
-
-                case Statistic.Damage:
-                    this.m_stats.Damage += (int)(this.m_stats.Damage * this.m_raceInfo.Modifier);
-                    break;
-
-                case Statistic.Armor:
-                    this.m_stats.Armor += (int)(this.m_stats.Armor * this.m_raceInfo.Modifier);
-                    break;
-
-                case Statistic.Evasion:
-                    this.m_stats.Evasion += this.m_stats.Evasion * this.m_raceInfo.Modifier;
-                    break;
-
-                case Statistic.Precision:
-                    this.m_stats.Precision += this.m_stats.Precision * this.m_raceInfo.Modifier;
-                    break;
-
-                case Statistic.CritChance:
-                    this.m_stats.CritChance += this.m_stats.CritChance * this.m_raceInfo.Modifier;
-                    break;
-
-                case Statistic.CritMultiplier:
-                    this.m_stats.CritMultiplier += this.m_stats.CritMultiplier * this.m_raceInfo.Modifier;
-                    break;
-            }
+            //switch (this.m_raceInfo.Stat)
+            //{
+            //    case Statistic.Health:
+            //        this.m_stats.MaxHealth += (int)(this.m_stats.MaxHealth * this.m_raceInfo.Modifier);
+            //        break;
+            //
+            //    case Statistic.Mana:
+            //        this.m_stats.MaxMana += (int)(this.m_stats.MaxMana * this.m_raceInfo.Modifier);
+            //        break;
+            //
+            //    case Statistic.Damage:
+            //        this.m_stats.Damage += (int)(this.m_stats.Damage * this.m_raceInfo.Modifier);
+            //        break;
+            //
+            //    case Statistic.Armor:
+            //        this.m_stats.Armor += (int)(this.m_stats.Armor * this.m_raceInfo.Modifier);
+            //        break;
+            //
+            //    case Statistic.Evasion:
+            //        this.m_stats.Evasion += this.m_stats.Evasion * this.m_raceInfo.Modifier;
+            //        break;
+            //
+            //    case Statistic.Precision:
+            //        this.m_stats.Precision += this.m_stats.Precision * this.m_raceInfo.Modifier;
+            //        break;
+            //
+            //    case Statistic.CritChance:
+            //        this.m_stats.CritChance += this.m_stats.CritChance * this.m_raceInfo.Modifier;
+            //        break;
+            //
+            //    case Statistic.CritMultiplier:
+            //        this.m_stats.CritMultiplier += this.m_stats.CritMultiplier * this.m_raceInfo.Modifier;
+            //        break;
+            //}
 
             this.m_stats.CurHealth = Mathf.Clamp(this.m_stats.CurHealth, 0, this.m_stats.MaxHealth);
             this.m_stats.CurMana = Mathf.Clamp(this.m_stats.CurMana, 0, this.m_stats.MaxMana);
@@ -680,6 +691,10 @@ namespace Project.Game
         {
             if (ability is not null && ability.Owner == this)
             {
+#if DEBUG || DEVELOPMENT_BUILD
+                Debug.Assert(Array.IndexOf(this.m_abilities, ability) >= 0);
+#endif
+
                 if (ability.IsOnCooldown)
                 {
                     return AbilityUsage.OnCooldown;
@@ -740,6 +755,21 @@ namespace Project.Game
         }
 
 
+
+#if DEBUG || DEVELOPMENT_BUILD
+        public void SwapRaceClass(RaceInfo race, ClassInfo @class)
+        {
+            if (this.m_raceInfo != race || this.m_classInfo != @class)
+            {
+                this.m_raceInfo = race;
+                this.m_classInfo = @class;
+                this.m_sprite = Player.GetSpriteForRaceClass(race.Name, @class.Name);
+                this.m_abilities = ResourceManager.Abilities.Where(_ => _.Class == @class.Name).Select(_ => new Ability(this, _)).ToArray();
+
+                this.RecalculateStats();
+            }
+        }
+#endif
 
         public void AwardReward(int money)
         {
@@ -1319,6 +1349,96 @@ namespace Project.Game
             this.RecalculateStats();
         }
 
+        public bool HasEquippedItem(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            if (item is ArmorData armor)
+            {
+                if (this.m_helmet is not null && this.m_helmet.Data == armor)
+                {
+                    return true;
+                }
+
+                if (this.m_chestplate is not null && this.m_chestplate.Data == armor)
+                {
+                    return true;
+                }
+
+                if (this.m_leggings is not null && this.m_leggings.Data == armor)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (item is WeaponData weapon)
+            {
+                if (this.m_weapon is not null && this.m_weapon.Data == weapon)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (item is PotionData potion)
+            {
+                for (int i = 0; i < this.m_equippedPotions.Length; ++i)
+                {
+                    if (this.m_equippedPotions[i] is not null && this.m_equippedPotions[i].Data == potion)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            if (item is TrinketData trinket)
+            {
+                for (int i = 0; i < this.m_helmetTrinkets.Length; ++i)
+                {
+                    if (this.m_helmetTrinkets[i] is not null && this.m_helmetTrinkets[i].Data == trinket)
+                    {
+                        return true;
+                    }
+                }
+
+                for (int i = 0; i < this.m_chestplateTrinkets.Length; ++i)
+                {
+                    if (this.m_chestplateTrinkets[i] is not null && this.m_chestplateTrinkets[i].Data == trinket)
+                    {
+                        return true;
+                    }
+                }
+
+                for (int i = 0; i < this.m_leggingsTrinkets.Length; ++i)
+                {
+                    if (this.m_leggingsTrinkets[i] is not null && this.m_leggingsTrinkets[i].Data == trinket)
+                    {
+                        return true;
+                    }
+                }
+
+                for (int i = 0; i < this.m_weaponTrinkets.Length; ++i)
+                {
+                    if (this.m_weaponTrinkets[i] is not null && this.m_weaponTrinkets[i].Data == trinket)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+
 
 
         public int PurchaseArmor(ArmorData armor)
@@ -1625,8 +1745,8 @@ namespace Project.Game
             while (start <= end)
             {
                 int middle = start + ((end - start) >> 1);
-                var evaled = list[middle].Name;
-                int result = String.CompareOrdinal(item.Name, evaled);
+                var evaled = list[middle];
+                int result = (item.Tier == evaled.Tier) ? String.CompareOrdinal(item.Name, evaled.Name) : (item.Tier - evaled.Tier);
 
                 if (result == 0)
                 {
