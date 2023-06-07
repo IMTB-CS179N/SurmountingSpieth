@@ -9,14 +9,14 @@ TapsTicket,TapsTicket,TapsTicket,600,800,1000,20,20,20,150,FALSE
 "GradSicklyBreath, GradTA","GradSicklyBreath, GradTA","GradSicklyBreath, GradTA","400, 400","500, 500","600, 600","12, 15","12, 15","12, 18",200,FALSE
 "CowMarchingCow, CowMarchingCow","CowMarchingCow, CowMarchingCow, CowMarchingCow","CowMarchingCow, CowMarchingCow, CowMarchingCow, CowMarchingCow","400, 400","400, 400, 400","400, 400, 400, 400","20, 20","18, 18, 18","18, 18, 18, 18",500,FALSE
 ,,180W,,,3000,,,16,500,TRUE
-,,,,,,,,,200,FALSE
-,,,,,,,,,200,FALSE
-,,,,,,,,,250,FALSE
-,,,,,,,,,250,FALSE
-,,,,,,,,,250,FALSE
+"UndergradOozingGrowth, UndergradStench, UndergradRamble","UndergradOozingGrowth, UndergradStench, UndergradRamble","UndergradOozingGrowth, UndergradStench, UndergradRamble","500, 500, 500","650, 650, 650","800, 800, 800","20, 20, 16","20, 20, 16","20, 20, 16",200,FALSE
+"SlimePollute, SlimeSlimeSpear, SlimePollute, SlimeSlimeSpear","SlimePollute, SlimeSlimeSpear, SlimePollute, SlimeSlimeSpear","SlimePollute, SlimeSlimeSpear, SlimePollute, SlimeSlimeSpear","500, 500, 500, 500","750, 750, 750, 750","1000, 1000, 1000, 1000","16, 16, 16, 16","16, 16, 16, 16","16, 16, 16, 16",200,FALSE
+AIChatGPT,AIChatGPT,AIChatGPT,2200,2500,3000,40,45,50,250,FALSE
+"AIRasterBolt, AISlimeSpear, AIChatGPT","AIRasterBolt, AISlimeSpear, AIChatGPT","AIRasterBolt, AISlimeSpear, AIChatGPT","900, 900, 900","1200, 1200, 1200","1500, 1500, 1500","18, 18, 18","19, 19, 19","20, 20, 20",250,FALSE
 ,,,,,,,,,250,FALSE
 ,,,,,,,,,300,FALSE
 ,,,,,,,,,300,FALSE
 ,,,,,,,,,300,FALSE
-,,,,,,,,,500,FALSE
-,,Craig,,,,,,,2000,TRUE
+,,,,,,,,,300,FALSE
+,,,,,,,,,600,FALSE
+,,Craig,,,9999,,,50,2000,TRUE

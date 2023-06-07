@@ -41,14 +41,6 @@ namespace Project
             TrinketFactory.Initialize();
         }
 
-        private void Update()
-        {
-        }
-
-        private void FixedUpdate()
-        {
-        }
-
         private void SetMusicStatus(bool enable)
         {
             if (enable != this.m_enableMusic)
@@ -57,27 +49,6 @@ namespace Project
                 this.GetComponent<AudioSource>().enabled = enable;
                 // #TODO enable / disable
             }
-        }
-
-        public bool CanInitializeFromSaveData()
-        {
-            return SaveSystem.HasData();
-        }
-
-        public void InitializeFromSaveData()
-        {
-            var value = PlayerPrefs.GetString("PlayerSave");
-
-            // #TODO
-        }
-
-        public void SaveDataToPlayerPrefs()
-        {
-            string something = String.Empty;
-
-            PlayerPrefs.SetString("PlayerSave", something);
-
-            PlayerPrefs.Save();
         }
     }
 }
