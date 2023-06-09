@@ -80,11 +80,11 @@ namespace Project.Map
         private readonly GameObject[,] m_gridTiles = new GameObject[VerticalTileCount, HorizontalTileCount];
         private readonly List<ColumnInfo> m_columns = new();
         private readonly Queue<Vector3> m_moveQueue = new();
-        private readonly ColumnInfo m_blank = new();
         private readonly float m_moveSpeed = 48f;
         private InGameBuilder.ActionType m_action;
-        private int m_currentX;
         private bool m_destination = false;
+        private ColumnInfo m_blank;
+        private int m_currentX;
 
         public float MovePointX;
         public float MovePointY;
@@ -95,6 +95,8 @@ namespace Project.Map
 
         private void Awake()
         {
+            this.m_blank = new ColumnInfo();
+
             MapManager.Instance.InGameUI.OnUIEnabled += this.InGameUICallback;
         }
 
