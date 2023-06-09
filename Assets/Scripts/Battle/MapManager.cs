@@ -258,6 +258,16 @@ namespace Project.Battle
                 var encounter = ResourceManager.Campaign[this.LevelIndex];
 
                 reward = encounter.EncounterReward;
+                
+                if (!encounter.IsBossBattle)
+                {
+                    reward = (int)(reward * this.Difficulty switch
+                    {
+                        DifficultyLevel.Easy => 1.0f,
+                        DifficultyLevel.Medium => 1.1f,
+                        DifficultyLevel.Hard => 1.2f,
+                    });
+                }
 
                 (string[] names, int[] health, int[] damage) enemyData = this.Difficulty switch
                 {
@@ -364,8 +374,8 @@ namespace Project.Battle
                     return difficulty switch
                     {
                         DifficultyLevel.Easy => money,
-                        DifficultyLevel.Medium => (int)(money * 1.25f),
-                        DifficultyLevel.Hard => (int)(money * 1.5f),
+                        DifficultyLevel.Medium => (int)(money * 1.10f),
+                        DifficultyLevel.Hard => (int)(money * 1.20f),
                         _ => 0,
                     };
                 }

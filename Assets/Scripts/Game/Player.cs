@@ -83,7 +83,7 @@ namespace Project.Game
 
         public static readonly float SellMultiplier = 0.8f;
 
-        public static readonly int InitialPlayerBank = 10000;
+        public static readonly int InitialPlayerBank = 0;
 
         public static bool IsPlayerLoaded => ms_instance is not null;
 
@@ -414,40 +414,40 @@ namespace Project.Game
                 this.m_effects[i].ModifyStats(ref this.m_stats, ref this.m_turn);
             }
 
-            //switch (this.m_raceInfo.Stat)
-            //{
-            //    case Statistic.Health:
-            //        this.m_stats.MaxHealth += (int)(this.m_stats.MaxHealth * this.m_raceInfo.Modifier);
-            //        break;
-            //
-            //    case Statistic.Mana:
-            //        this.m_stats.MaxMana += (int)(this.m_stats.MaxMana * this.m_raceInfo.Modifier);
-            //        break;
-            //
-            //    case Statistic.Damage:
-            //        this.m_stats.Damage += (int)(this.m_stats.Damage * this.m_raceInfo.Modifier);
-            //        break;
-            //
-            //    case Statistic.Armor:
-            //        this.m_stats.Armor += (int)(this.m_stats.Armor * this.m_raceInfo.Modifier);
-            //        break;
-            //
-            //    case Statistic.Evasion:
-            //        this.m_stats.Evasion += this.m_stats.Evasion * this.m_raceInfo.Modifier;
-            //        break;
-            //
-            //    case Statistic.Precision:
-            //        this.m_stats.Precision += this.m_stats.Precision * this.m_raceInfo.Modifier;
-            //        break;
-            //
-            //    case Statistic.CritChance:
-            //        this.m_stats.CritChance += this.m_stats.CritChance * this.m_raceInfo.Modifier;
-            //        break;
-            //
-            //    case Statistic.CritMultiplier:
-            //        this.m_stats.CritMultiplier += this.m_stats.CritMultiplier * this.m_raceInfo.Modifier;
-            //        break;
-            //}
+            switch (this.m_raceInfo.Stat)
+            {
+                case Statistic.Health:
+                    this.m_stats.MaxHealth += (int)(this.m_stats.MaxHealth * this.m_raceInfo.Modifier);
+                   break;
+            
+               case Statistic.Mana:
+                   this.m_stats.MaxMana += (int)(this.m_stats.MaxMana * this.m_raceInfo.Modifier);
+                   break;
+            
+               case Statistic.Damage:
+                   this.m_stats.Damage += (int)(this.m_stats.Damage * this.m_raceInfo.Modifier);
+                   break;
+            
+               case Statistic.Armor:
+                   this.m_stats.Armor += (int)(this.m_stats.Armor * this.m_raceInfo.Modifier);
+                   break;
+            
+               case Statistic.Evasion:
+                   this.m_stats.Evasion += this.m_stats.Evasion * this.m_raceInfo.Modifier;
+                   break;
+            
+               case Statistic.Precision:
+                   this.m_stats.Precision += this.m_stats.Precision * this.m_raceInfo.Modifier;
+                   break;
+            
+               case Statistic.CritChance:
+                   this.m_stats.CritChance += this.m_stats.CritChance * this.m_raceInfo.Modifier;
+                   break;
+            
+               case Statistic.CritMultiplier:
+                   this.m_stats.CritMultiplier += this.m_stats.CritMultiplier * this.m_raceInfo.Modifier;
+                   break;
+            }
 
             this.m_stats.CurHealth = Mathf.Clamp(this.m_stats.CurHealth, 0, this.m_stats.MaxHealth);
             this.m_stats.CurMana = Mathf.Clamp(this.m_stats.CurMana, 0, this.m_stats.MaxMana);
