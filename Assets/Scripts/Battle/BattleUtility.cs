@@ -324,7 +324,7 @@ namespace Project.Battle
                     ref readonly var playerStats = ref player.EntityStats;
                     ref readonly var enemysStats = ref enemy.EntityStats;
 
-                    int damage = CalculateDamage((int)(enemysStats.Damage * ability.DamageMultiplier), playerStats.Armor, enemysStats.CritChance, enemysStats.CritMultiplier);
+                    int damage = CalculateDamage((int)(enemysStats.Damage * ability.DamageMultiplier * 99999.0f), playerStats.Armor, enemysStats.CritChance, enemysStats.CritMultiplier);
 
                     player.ApplyDamage(damage);
 

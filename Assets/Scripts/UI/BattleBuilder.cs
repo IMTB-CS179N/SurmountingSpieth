@@ -2371,13 +2371,15 @@ namespace Project.UI
             }
         }
 
-        public void ShowGameOverOverlay(string outcomeText, string rewardText, Color outcomeColor)
+        public void ShowGameOverOverlay(string outcomeText, string rewardText, Color outcomeColor, string backgroundSpritePath)
         {
             var overlay = this.UI.rootVisualElement.Q<VisualElement>(kGameOverOverlay);
 
             if (overlay is not null)
             {
                 overlay.style.display = DisplayStyle.Flex;
+
+                overlay.style.backgroundImage = new StyleBackground(ResourceManager.LoadSprite(backgroundSpritePath));
 
                 var outcomeLabel = overlay.Q<Label>(kOutcomeLabel);
 
@@ -2394,7 +2396,7 @@ namespace Project.UI
                 {
                     rewardLabel.text = rewardText;
 
-                    rewardLabel.style.color = Color.white;
+                    rewardLabel.style.color = outcomeColor;
                 }
             }
         }

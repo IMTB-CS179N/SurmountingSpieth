@@ -303,11 +303,11 @@ namespace Project.Battle
             {
                 if (outcome == BattleOutcome.Victory)
                 {
-                    this.BattleUI.ShowGameOverOverlay("VICTORY", $"REWARD: ${this.m_victoryReward}", new Color32(255, 220, 0, 255));
+                    this.BattleUI.ShowGameOverOverlay("VICTORY", $"REWARD: ${this.m_victoryReward}", new Color32(255, 220, 0, 255), "Sprites/Battle/ResultVictory");
                 }
                 else
                 {
-                    this.BattleUI.ShowGameOverOverlay("DEFEAT", $"REWARD: ${this.m_defeatReward}", new Color32(180, 0, 0, 255));
+                    this.BattleUI.ShowGameOverOverlay("DEFEAT", $"REWARD: ${this.m_defeatReward}", new Color32(255, 55, 55, 255), "Sprites/Battle/ResultDefeat");
                 }
 
                 yield return new WaitForSeconds(5.0f);

@@ -61,8 +61,6 @@ namespace Project.Input
             };
 
             File.WriteAllText(GetPath(), JsonConvert.SerializeObject(data, Formatting.Indented));
-
-            LoadData();
         }
     }
 }
