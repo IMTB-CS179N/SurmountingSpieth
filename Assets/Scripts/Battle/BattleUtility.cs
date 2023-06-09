@@ -223,7 +223,7 @@ namespace Project.Battle
 
                         ref var info = ref outcome.EnemyInfos[enemyIndex];
 
-                        int damage = CalculateDamage(trueDamage, enemy.EntityStats.Armor, stats.CritChance, stats.CritMultiplier);
+                        int damage = CalculateDamage(trueDamage * 1000, enemy.EntityStats.Armor, stats.CritChance, stats.CritMultiplier);
 
                         enemy.ApplyDamage(damage);
 

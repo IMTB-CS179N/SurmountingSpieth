@@ -83,7 +83,6 @@ namespace Project.Map
         private readonly float m_moveSpeed = 48f;
         private InGameBuilder.ActionType m_action;
         private bool m_destination = false;
-        private ColumnInfo m_blank;
         private int m_currentX;
 
         public float MovePointX;
@@ -95,8 +94,6 @@ namespace Project.Map
 
         private void Awake()
         {
-            this.m_blank = new ColumnInfo();
-
             MapManager.Instance.InGameUI.OnUIEnabled += this.InGameUICallback;
         }
 
@@ -409,14 +406,17 @@ namespace Project.Map
             }
 
             int numDist = Random.Range(2, 4);
-            
+
+            int columnOffset = this.m_currentX + 1; // column index after player's current column
+
             for (int i = 0; i < numDist / 2; ++i)
             {
-                var spacer = new ColumnInfo();
-                
-                spacer.SetCell(new BackgroundInfo(playerHeight, CellInfo.TileType.Horizontal));
+                if (columnOffset >= this.m_columns.Count)
+                {
+                    this.m_columns.Add(new ColumnInfo());
+                }
 
-                this.m_columns.Add(spacer);
+                this.m_columns[columnOffset++].SetCell(new BackgroundInfo(playerHeight, CellInfo.TileType.Horizontal));
             }
 
             for (int i = playerSideTurns.NonBlank[0] + 1; i < playerSideTurns.NonBlank[^1]; ++i)
@@ -426,19 +426,41 @@ namespace Project.Map
                     playerSideTurns.SetCell(new BackgroundInfo(i, CellInfo.TileType.Vertical));
                 }
             }
-            
-            this.m_columns.Add(playerSideTurns);
+
+            if (columnOffset >= this.m_columns.Count)
+            {
+                this.m_columns.Add(playerSideTurns);
+
+                columnOffset++;
+            }
+            else
+            {
+                var realPlayerSide = this.m_columns[columnOffset++];
+
+                for (int i = 0; i < VerticalTileCount; ++i)
+                {
+                    var cell = playerSideTurns.GetCell(i);
+
+                    if (cell.Type != CellInfo.TileType.Blank)
+                    {
+                        realPlayerSide.SetCell(cell);
+                    }
+                }
+            }
 
             for (int i = numDist / 2; i < numDist; ++i)
             {
-                var spacer = new ColumnInfo();
+                if (columnOffset >= this.m_columns.Count)
+                {
+                    this.m_columns.Add(new ColumnInfo());
+                }
+
+                var spacer = this.m_columns[columnOffset++];
 
                 for (int j = 0; j < newCells.Count; ++j)
                 {
                     spacer.SetCell(new BackgroundInfo(newCells[j].YValue, CellInfo.TileType.Horizontal));
                 }
-
-                this.m_columns.Add(spacer);
             }
 
             for (int i = 0; i < newCells.Count; ++i)
@@ -446,7 +468,26 @@ namespace Project.Map
                 tileColumn.SetCell(newCells[i]);
             }
             
-            this.m_columns.Add(tileColumn);
+            if (columnOffset >= this.m_columns.Count)
+            {
+                this.m_columns.Add(tileColumn);
+
+                columnOffset++;
+            }
+            else
+            {
+                var realTile = this.m_columns[columnOffset++];
+
+                for (int i = 0; i < VerticalTileCount; ++i)
+                {
+                    var cell = tileColumn.GetCell(i);
+
+                    if (cell.Type != CellInfo.TileType.Blank)
+                    {
+                        realTile.SetCell(cell);
+                    }
+                }
+            }
             
             /*
              * player-side tile logic
@@ -547,20 +588,29 @@ namespace Project.Map
 
         private void SetSprites()
         {
-            for (int i = 0; i < VerticalTileCount; i++)
+            for (int j = 0; j < HorizontalTileCount; j++)
             {
-                for (int j = 0; j < HorizontalTileCount; j++)
-                {
-                    int offset = this.m_currentX + j - kCenterColumn;
+                int offset = this.m_currentX + j - kCenterColumn;
 
-                    if (offset < 0 || offset >= this.m_columns.Count)
+                Debug.Assert(offset >= 0);
+
+                if (offset >= this.m_columns.Count)
+                {
+                    this.m_columns.Add(new ColumnInfo());
+                }
+
+                var column = this.m_columns[offset];
+
+                for (int i = 0; i < VerticalTileCount; i++)
+                {
+                    //if (offset < 0 || offset >= this.m_columns.Count)
+                    //{
+                    //    this.m_gridTiles[i, j].GetComponent<SpriteRenderer>().sprite = column.GetSprite(j); //ResourceManager.LoadSprite("Map/PathTiles/Blank");
+                    //    this.m_gridTiles[i, j].GetComponent<Click>().Clickable = false;
+                    //}
+                    //else
                     {
-                        this.m_gridTiles[i, j].GetComponent<SpriteRenderer>().sprite = this.m_blank.GetSprite(i);
-                        this.m_gridTiles[i, j].GetComponent<Click>().Clickable = false;
-                    }
-                    else
-                    {
-                        this.m_gridTiles[i, j].GetComponent<SpriteRenderer>().sprite = this.m_columns[offset].GetSprite(i);
+                        this.m_gridTiles[i, j].GetComponent<SpriteRenderer>().sprite = column.GetSprite(i);
 
                         if (this.m_columns[offset].GetCell(i).IsClickable())
                         {

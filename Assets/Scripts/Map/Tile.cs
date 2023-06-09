@@ -86,9 +86,8 @@ namespace Project.Map
         {
         }
 
-        //public BackgroundInfo(int yValue, TileType type) : base(yValue, type, "Map/PathTiles/" + (type == TileType.Blank ? ("Grass" + Random.Range(1, 17).ToString()) : type.ToString()))
-
-        public BackgroundInfo(int yValue, TileType type) : base(yValue, type, "Map/PathTiles/" + type.ToString())
+        public BackgroundInfo(int yValue, TileType type) : base(yValue, type, "Map/PathTiles/" + (type == TileType.Blank ? ("Grass" + Random.Range(1, 17).ToString()) : type.ToString()))
+        //public BackgroundInfo(int yValue, TileType type) : base(yValue, type, "Map/PathTiles/" + type.ToString())
         {
         }
 
