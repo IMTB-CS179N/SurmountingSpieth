@@ -24,6 +24,8 @@ namespace Project.Input
 
         public float Height => this.m_screenHeight;
 
+        public float AspectRatio => this.m_screenWidth / this.m_screenHeight;
+
         public float OrthographicSize => this.m_camera.orthographicSize;
 
         public Texture2D CursorTexture => this.m_cursorTexture;

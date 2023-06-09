@@ -170,6 +170,8 @@ namespace Project.Map
                         break;
 
                     case CellInfo.TileType.BattleHard:
+                    case CellInfo.TileType.BattleMidBoss:
+                    case CellInfo.TileType.BattleFinalBoss:
                         MapManager.Instance.Difficulty = MapManager.DifficultyLevel.Hard;
                         MapManager.Instance.UpdateAction(InGameBuilder.ActionType.Battle);
                         this.m_action = InGameBuilder.ActionType.Battle;
@@ -492,22 +494,36 @@ namespace Project.Map
             var battleTypes = new List<CellInfo.TileType>();
 
             int random = Random.Range(0, 5);
-            
-            if (currentEncounter.EasyEnemyList.Length > 0)
+
+            if (currentEncounter.IsBossBattle)
             {
-                battleTypes.Add(CellInfo.TileType.BattleEasy);
+                if (MapManager.Instance.LevelIndex + 1 == ResourceManager.Campaign.Count)
+                {
+                    battleTypes.Add(CellInfo.TileType.BattleFinalBoss);
+                }
+                else
+                {
+                    battleTypes.Add(CellInfo.TileType.BattleMidBoss);
+                }
+            }
+            else
+            {
+                if (currentEncounter.EasyEnemyList.Length > 0)
+                {
+                    battleTypes.Add(CellInfo.TileType.BattleEasy);
+                }
+
+                if (currentEncounter.NormalEnemyList.Length > 0)
+                {
+                    battleTypes.Add(CellInfo.TileType.BattleMedium);
+                }
+
+                if (currentEncounter.HardEnemyList.Length > 0)
+                {
+                    battleTypes.Add(CellInfo.TileType.BattleHard);
+                }
             }
 
-            if (currentEncounter.NormalEnemyList.Length > 0)
-            {
-                battleTypes.Add(CellInfo.TileType.BattleMedium);
-            }
-            
-            if (currentEncounter.HardEnemyList.Length > 0)
-            {
-                battleTypes.Add(CellInfo.TileType.BattleHard);
-            }
-            
             for (int i = 0; i < battleTypes.Count; ++i)
             {
                 while (heights.Contains(random))

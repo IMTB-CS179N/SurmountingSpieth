@@ -1,11 +1,11 @@
-#define DEFAULT_ENEMIES
-
 using Project.Game;
 using Project.Input;
 using Project.UI;
 
 using System;
 using System.Collections;
+
+using Unity.VisualScripting;
 
 using UnityEngine;
 
@@ -64,9 +64,10 @@ namespace Project.Battle
 
         private static BattleManager ms_instance;
 
-        private GameObject m_background;
+        private SpriteRenderer m_background;
         private GameObject m_parentObj;
         private Action m_onBattleEnded;
+        private float m_backgroundRatio;
 
         private BattleBehavior[] m_enemyBehaviors;
         private BattleBehavior m_playerBehavior;
@@ -147,7 +148,6 @@ namespace Project.Battle
             this.MaybeChangeCursorTexture(true);
             this.SetupCallbacks(false);
 
-            Object.Destroy(this.m_background);
             Object.Destroy(this.m_parentObj);
 
             this.m_playerEntity?.FinishBattle();
@@ -221,7 +221,19 @@ namespace Project.Battle
 
         private void InitializeBackground()
         {
-            // #TODO
+            var scaleY = ScreenManager.Instance.OrthographicSize * 0.4f; // (orthoSize / 5) * 2
+
+            this.m_background = new GameObject("Background").AddComponent<SpriteRenderer>();
+
+            this.m_background.sprite = ResourceManager.LoadSprite("Sprites/Battle/BattleBackground");
+
+            var size = this.m_background.bounds.size;
+
+            this.m_backgroundRatio = size.y / size.x;
+
+            this.m_background.gameObject.transform.parent = this.m_parentObj.transform;
+            this.m_background.gameObject.transform.position = Vector3.zero;
+            this.m_background.gameObject.transform.localScale = new Vector3(scaleY * ScreenManager.Instance.AspectRatio * this.m_backgroundRatio, scaleY, 1.0f);
         }
 
         private IEnumerator PerformBattleStart(Action callback)
@@ -1364,6 +1376,13 @@ namespace Project.Battle
                             this.m_enemyBehaviors[i].RecalculateTransform();
                         }
                     }
+                }
+
+                if (this.m_background != null)
+                {
+                    var scaleY = ScreenManager.Instance.OrthographicSize * 0.4f; // (orthoSize / 5) * 2
+
+                    this.m_background.gameObject.transform.localScale = new Vector3(scaleY * ScreenManager.Instance.AspectRatio * this.m_backgroundRatio, scaleY, 1.0f);
                 }
             }
         }

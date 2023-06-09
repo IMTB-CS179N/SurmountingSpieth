@@ -83,7 +83,7 @@ namespace Project.Game
 
         public static readonly float SellMultiplier = 0.8f;
 
-        public static readonly int InitialPlayerBank = 0;
+        public static readonly int InitialPlayerBank = 10000;
 
         public static bool IsPlayerLoaded => ms_instance is not null;
 

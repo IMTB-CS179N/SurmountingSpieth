@@ -29,7 +29,9 @@ namespace Project.Map
             Shop,
             BattleEasy,
             BattleMedium,
-            BattleHard
+            BattleHard,
+            BattleMidBoss,
+            BattleFinalBoss,
         }
 
         public readonly int YValue;
@@ -38,7 +40,19 @@ namespace Project.Map
 
         public bool IsClickable()
         {
-            return this.Type == TileType.Shop || Type == TileType.BattleEasy || Type == TileType.BattleMedium || Type == TileType.BattleHard;
+            switch (this.Type)
+            {
+                case TileType.Shop:
+                case TileType.BattleEasy:
+                case TileType.BattleMedium:
+                case TileType.BattleHard:
+                case TileType.BattleMidBoss:
+                case TileType.BattleFinalBoss:
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         private CellInfo(OverworldManager.Data.Cell cell)
@@ -131,19 +145,29 @@ namespace Project.Map
             }
         }
 
-        public ShopInfo(int yValue) : base(yValue, TileType.Shop, "Map/Trade_Post") // #TODO different tier shop sprites
+        public ShopInfo(int yValue) : base(yValue, TileType.Shop, "Map/Trade_Tier" + Random.Range(1, 4))
         {
-            this.Tier = Random.Range(1, 4);
+            this.Tier = this.SpritePath[^1] - '0';
 
-            this.Weapons = new();
-            this.Trinkets = new();
-            this.Potions = new();
             this.Armors = new();
+            this.Weapons = new();
+            this.Potions = new();
+            this.Trinkets = new();
 
-            ShopInfo.GenerateItems(ResourceManager.Armors, this.Armors, this.Tier);
-            ShopInfo.GenerateItems(ResourceManager.Weapons, this.Weapons, this.Tier);
-            ShopInfo.GenerateItems(ResourceManager.Potions, this.Potions, this.Tier);
-            ShopInfo.GenerateItems(ResourceManager.Trinkets, this.Trinkets, this.Tier);
+            if (Battle.MapManager.Instance.LevelIndex + 1 >= ResourceManager.Campaign.Count)
+            {
+                this.Armors.UnionWith(ResourceManager.Armors);
+                this.Weapons.UnionWith(ResourceManager.Weapons);
+                this.Potions.UnionWith(ResourceManager.Potions);
+                this.Trinkets.UnionWith(ResourceManager.Trinkets);
+            }
+            else
+            {
+                ShopInfo.GenerateItems(ResourceManager.Armors, this.Armors, this.Tier);
+                ShopInfo.GenerateItems(ResourceManager.Weapons, this.Weapons, this.Tier);
+                ShopInfo.GenerateItems(ResourceManager.Potions, this.Potions, this.Tier);
+                ShopInfo.GenerateItems(ResourceManager.Trinkets, this.Trinkets, this.Tier);
+            }
         }
 
         public void SetupForUI()
