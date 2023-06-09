@@ -239,6 +239,7 @@ namespace Project.Battle
 
             int reward;
 
+#if DEBUG || DEVELOPMENT_BUILD
             if (this.OverrideEnemies)
             {
                 reward = 100;
@@ -251,6 +252,7 @@ namespace Project.Battle
                 }
             }
             else
+#endif
             {
                 Debug.Assert(this.LevelIndex >= 0 && this.LevelIndex < ResourceManager.Campaign.Count);
                 Debug.Assert(this.Difficulty != DifficultyLevel.None);
